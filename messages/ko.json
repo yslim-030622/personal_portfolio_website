@@ -1,0 +1,23 @@
+{
+  "nav": {
+    "localeToggle": "en · ko",
+    "themeToggle": "☼ · ☾",
+    "switchToEnglish": "영어로 전환",
+    "switchToKorean": "한국어로 전환",
+    "switchToLight": "라이트 모드로 전환",
+    "switchToDark": "다크 모드로 전환",
+    "currentLocale": "현재 언어",
+    "currentTheme": "현재 테마"
+  },
+  "courses": {
+    "open": "수업 상세 열기",
+    "close": "수업 상세 닫기"
+  },
+  "links": {
+    "external": "외부 링크"
+  },
+  "notFound": {
+    "title": "페이지를 찾을 수 없습니다.",
+    "home": "처음으로 돌아가기"
+  }
+}

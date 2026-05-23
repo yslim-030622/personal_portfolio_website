@@ -1,0 +1,23 @@
+{
+  "nav": {
+    "localeToggle": "en · ko",
+    "themeToggle": "☼ · ☾",
+    "switchToEnglish": "Switch to English",
+    "switchToKorean": "Switch to Korean",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode",
+    "currentLocale": "Current language",
+    "currentTheme": "Current theme"
+  },
+  "courses": {
+    "open": "Open course details",
+    "close": "Close course details"
+  },
+  "links": {
+    "external": "External link"
+  },
+  "notFound": {
+    "title": "Page not found.",
+    "home": "return home"
+  }
+}
