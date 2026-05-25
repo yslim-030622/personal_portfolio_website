@@ -18,13 +18,13 @@ export function HeroLinks({links}: HeroLinksProps) {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[1rem] tracking-wide text-fg">
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-display text-[1rem] tracking-wide text-fg md:flex-nowrap lg:gap-x-4 lg:text-[1.05rem]">
       {links.map((link, index) => {
         const isEmail = link.href?.startsWith("mailto:");
         const email = isEmail ? link.href!.replace("mailto:", "") : null;
 
         return (
-          <span className="flex items-center gap-x-3" key={link.label}>
+          <span className="flex items-center gap-x-2 md:gap-x-2.5 lg:gap-x-3" key={link.label}>
             {isEmail ? (
               <button
                 aria-label={link.ariaLabel}

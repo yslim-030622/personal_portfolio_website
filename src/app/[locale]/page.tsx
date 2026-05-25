@@ -36,8 +36,13 @@ export default async function Page({params}: PageProps) {
     <>
       <LenisProvider />
       <Navigation />
-      <main>
-        <Hero content={content.hero} />
+      {/* Hero pinned — sections slide over it as a card (desktop only) */}
+      <div className="lg:h-[100svh]">
+        <div className="lg:sticky lg:top-0 lg:h-[100svh] lg:overflow-hidden">
+          <Hero content={content.hero} />
+        </div>
+      </div>
+      <main className="relative z-10 rounded-t-[24px] bg-bg shadow-[0_-8px_48px_rgba(0,0,0,0.18)]">
         <WorkSection eyebrow={content.sectionEyebrows.work} items={content.work} />
         <ProjectsSection
           eyebrow={content.sectionEyebrows.projects}

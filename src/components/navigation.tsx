@@ -3,21 +3,74 @@
 import {Link} from "@/i18n/navigation";
 import Image from "next/image";
 import {useLocale, useTranslations} from "next-intl";
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useState, type ReactNode} from "react";
 
 type Theme = "dark" | "light";
+
+function themeForCurrentHour(): Theme {
+  const hour = new Date().getHours();
+  return hour >= 7 && hour < 18 ? "light" : "dark";
+}
+
+function SegmentedSwitch<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: {label: ReactNode; value: T; ariaLabel?: string}[];
+  value: T;
+  onChange: (val: T) => void;
+}) {
+  const activeIndex = options.findIndex((o) => o.value === value);
+
+  return (
+    <div
+      className="relative inline-flex items-stretch overflow-hidden rounded-[5px] border border-border/80 bg-bg-elev"
+      style={{boxShadow: "inset 0 1px 3px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.04)"}}
+    >
+      {/* sliding track */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-[2px] rounded-[3px] border border-border/60 bg-fg/10 transition-all duration-200"
+        style={{
+          width: `calc(${100 / options.length}% - 4px)`,
+          left: `calc(${(activeIndex * 100) / options.length}% + 2px)`,
+          boxShadow: "0 1px 0 rgba(255,255,255,0.06), inset 0 1px 2px rgba(0,0,0,0.12)",
+        }}
+      />
+      {options.map((opt, i) => (
+        <button
+          aria-label={opt.ariaLabel}
+          className={`relative z-10 px-2.5 py-1.5 text-[0.68rem] tracking-widest transition-colors duration-200 ${
+            value === opt.value ? "text-fg" : "text-fg-muted hover:text-fg/60"
+          }`}
+          key={String(opt.value)}
+          onClick={() => onChange(opt.value)}
+          type="button"
+        >
+          {opt.label}
+          {i < options.length - 1 && (
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute right-0 top-1/2 h-3 w-px -translate-y-1/2 bg-border/60"
+            />
+          )}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export function Navigation() {
   const locale = useLocale();
   const t = useTranslations("nav");
   const [theme, setTheme] = useState<Theme>("dark");
   const [scrolled, setScrolled] = useState(false);
-  const localeParts = useMemo(() => t("localeToggle").split(" · "), [t]);
   const themeParts = useMemo(() => t("themeToggle").split(" · "), [t]);
 
   useEffect(() => {
     const stored = window.localStorage.getItem("ysl-theme");
-    const next = stored === "light" || stored === "dark" ? stored : "dark";
+    const next = stored === "light" || stored === "dark" ? stored : themeForCurrentHour();
     document.documentElement.dataset.theme = next;
     const frame = window.requestAnimationFrame(() => setTheme(next));
     return () => window.cancelAnimationFrame(frame);
@@ -58,54 +111,27 @@ export function Navigation() {
             width={56}
           />
         </Link>
-        <div className="flex items-center gap-6">
-          <div aria-label={t("currentLocale")} className="flex items-center gap-2">
-            <Link
-              aria-label={t("switchToEnglish")}
-              className={`transition-colors duration-200 hover:text-accent ${
-                locale === "en" ? "font-semibold text-fg" : "text-fg-muted"
-              }`}
-              href="/"
-              locale="en"
-            >
-              {localeParts[0]}
-            </Link>
-            <span aria-hidden="true" className="text-fg-muted">·</span>
-            <Link
-              aria-label={t("switchToKorean")}
-              className={`transition-colors duration-200 hover:text-accent ${
-                locale === "ko" ? "font-semibold text-fg" : "text-fg-muted"
-              }`}
-              href="/"
-              locale="ko"
-            >
-              {localeParts[1]}
-            </Link>
-          </div>
 
-          <div aria-label={t("currentTheme")} className="flex items-center gap-2 text-[1.05rem] leading-none">
-            <button
-              aria-label={t("switchToLight")}
-              className={`transition-colors duration-200 hover:text-accent ${
-                theme === "light" ? "font-semibold text-fg" : "text-fg-muted"
-              }`}
-              type="button"
-              onClick={() => setThemeValue("light")}
-            >
-              {themeParts[0]}
-            </button>
-            <span aria-hidden="true" className="text-[0.9rem] text-fg-muted">·</span>
-            <button
-              aria-label={t("switchToDark")}
-              className={`transition-colors duration-200 hover:text-accent ${
-                theme === "dark" ? "font-semibold text-fg" : "text-fg-muted"
-              }`}
-              type="button"
-              onClick={() => setThemeValue("dark")}
-            >
-              {themeParts[1]}
-            </button>
-          </div>
+        <div className="flex items-center gap-3">
+          <SegmentedSwitch
+            options={[
+              {label: "ENG", value: "en", ariaLabel: t("switchToEnglish")},
+              {label: "KOR", value: "ko", ariaLabel: t("switchToKorean")},
+            ]}
+            value={locale as "en" | "ko"}
+            onChange={(val) => {
+              window.location.href = val === "en" ? "/en" : "/ko";
+            }}
+          />
+
+          <SegmentedSwitch
+            options={[
+              {label: themeParts[0], value: "light", ariaLabel: t("switchToLight")},
+              {label: themeParts[1], value: "dark", ariaLabel: t("switchToDark")},
+            ]}
+            value={theme}
+            onChange={setThemeValue}
+          />
         </div>
       </nav>
     </header>

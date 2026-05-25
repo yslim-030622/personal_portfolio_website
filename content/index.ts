@@ -85,7 +85,7 @@ export function getPortfolioContent(
             status: "filled",
             company: entry.company,
             companyUrl: entry.companyUrl,
-            dates: entry.dates,
+            dates: typeof entry.dates === "string" ? entry.dates : text(entry.dates, locale),
             location: text(entry.location, locale),
             role: text(entry.role, locale),
             paragraph: text(entry.paragraph, locale),
@@ -107,6 +107,7 @@ export function getPortfolioContent(
             title: entry.title,
             kindDate: entry.kindDate,
             description: text(entry.description, locale),
+            highlights: entry.highlights?.map((highlight) => text(highlight, locale)),
             tech: entry.tech,
             links: entry.links ? localizeLinks(entry.links, locale) : undefined
           }

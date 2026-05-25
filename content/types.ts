@@ -24,7 +24,7 @@ export type RawWorkEntry =
       status: "filled";
       company: string;
       companyUrl?: string;
-      dates: string;
+      dates: string | Bilingual;
       location: Bilingual;
       role: Bilingual;
       paragraph: BilingualParagraph;
@@ -45,6 +45,7 @@ export type RawProjectEntry =
       title: string;
       kindDate: string;
       description: BilingualParagraph;
+      highlights?: BilingualParagraph[];
       tech: string[];
       links?: OptionalLink[];
     }
@@ -144,6 +145,7 @@ export type LocalizedProjectEntry =
       title: string;
       kindDate: string;
       description: string;
+      highlights?: string[];
       tech: string[];
       links?: LocalizedOptionalLink[];
     }

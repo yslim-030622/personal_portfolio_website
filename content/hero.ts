@@ -18,21 +18,21 @@ export const hero = {
       ko: "임영석"
     },
     before: {
-      en: "Software engineer building ",
-      ko: ""
+      en: "Hello, I'm\n",
+      ko: "안녕하세요,\n"
     },
     italic: {
-      en: "reliable",
-      ko: "안정적인"
+      en: "Yeongseok",
+      ko: "임영석"
     },
     after: {
-      en: " systems.",
-      ko: " 시스템을 만드는 소프트웨어 엔지니어입니다."
+      en: " 👋",
+      ko: "입니다 👋"
     }
   },
   subline: {
-    en: "Hi, I\u2019m Yeongseok Lim. I was born in Korea and recently graduated from UW\u2060\u2013\u2060Madison with a degree in\u00a0Computer\u00a0Science. I\u2019m interested in backend systems and practical\u00a0AI\u00a0workflows, and I\u2019m now developing FeverCoach workflow automation at\u00a0MoDoc\u00a0AI.",
-    ko: "안녕하세요, 임영석입니다. 한국에서 태어났고 최근 UW\u2060\u2013\u2060Madison에서 Computer\u00a0Science 전공으로 졸업했습니다. 백엔드 시스템과 실무형 AI\u00a0워크플로에 관심이 많고, 현재는 MoDoc\u00a0AI에서 FeverCoach 자동화 워크플로를 개발하고 있습니다."
+    en: "Hi, I'm Yeongseok Lim. I was born in Korea and recently graduated from UW⁠–⁠Madison with a degree in Computer Science. I'm interested in backend systems and AI, and I'm actively looking for new opportunities. This site is where I document what I build — let's stay connected!",
+    ko: "안녕하세요! 임영석입니다. 한국에서 태어나 미국에서 고등학교부터 학업을 이어왔고, 최근 위스콘신 대학교에서 컴퓨터 과학 전공으로 졸업했습니다. 백엔드 시스템과 인공지능에 관심이 많고, 현재 직업 기회를 찾고 있습니다! 이 웹사이트는 제가 만든 것들을 정리하는 공간입니다. 편하게 연락 주세요!"
   },
   image: {
     src: "/photo1.jpg",

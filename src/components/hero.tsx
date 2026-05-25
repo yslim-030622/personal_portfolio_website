@@ -12,7 +12,7 @@ type Token = {type: "word" | "space"; content: string};
 
 function tokenize(text: string): Token[] {
   return text
-    .split(/(\s+)/)
+    .split(/(\n|\s+)/)
     .filter((s) => s.length > 0)
     .map((s) => ({type: /\s+/.test(s) ? "space" : "word", content: s}));
 }
@@ -42,11 +42,32 @@ function HeadlineWords({
 
   const renderToken = (token: Token, isItalic: boolean, key: string) => {
     if (token.type === "space") {
+      if (token.content.includes("\n")) {
+        return <br key={key} />;
+      }
+
       return <span key={key}>{token.content}</span>;
     }
     const delay = BASE_DELAY + wordIdx++ * PER_WORD;
+    const isWaveEmoji = token.content === "👋";
+
+    if (isWaveEmoji) {
+      return (
+        <span key={key} style={{display: "inline-block", overflow: "hidden", verticalAlign: "bottom", paddingBottom: "0.22em", marginBottom: "-0.22em"}}>
+          <span className="word-slide" style={{animationDelay: `${delay}ms`}}>
+            <span
+              className="wave-hand"
+              style={{"--wave-delay": `${delay + 600}ms`} as CSSProperties}
+            >
+              {token.content}
+            </span>
+          </span>
+        </span>
+      );
+    }
+
     const inner = isItalic ? (
-      <em className="font-display italic">{token.content}</em>
+      <em className="hero-name-accent font-display not-italic">{token.content}</em>
     ) : (
       token.content
     );
@@ -86,51 +107,51 @@ function HeadlineWords({
 }
 
 export function Hero({content}: HeroProps) {
-  const nameWordCount = countWords(content.headline.name);
-
   return (
     <section
-      className="mx-auto grid w-full max-w-[1480px] items-start overflow-hidden px-6 pb-8 pt-20 md:min-h-[70svh] md:grid-cols-[minmax(0,50vw)_minmax(0,50vw)] md:px-10 md:pb-8 md:pt-28 xl:px-14"
+      className="mx-auto grid w-full max-w-[1480px] content-start items-start overflow-hidden overflow-x-hidden px-6 pb-0 pt-20 md:min-h-[100svh] md:grid-cols-[minmax(0,50vw)_minmax(0,50vw)] md:px-10 md:pb-8 md:pt-28 xl:px-14"
     >
-      <div className="relative z-10 min-w-0 md:pr-8 xl:pr-12">
-        <div className="hero-reveal" style={{animationDelay: "40ms"}}>
-          <p className="hero-name-glow hero-headline font-display text-[clamp(2.65rem,4.7vw,4.05rem)] font-medium leading-[1.02] tracking-normal text-white md:leading-[0.98]">
-            {content.headline.name}
-          </p>
-        </div>
-
+      <div className="relative z-10 min-w-0 max-w-[540px] md:max-w-none md:pr-8 xl:pr-12">
         <h1
-          className="hero-headline mt-3 max-w-[16.5ch] font-display text-[clamp(2.65rem,4.7vw,4.05rem)] font-medium leading-[1.07] tracking-normal text-fg md:mt-4 md:max-w-[17ch] md:leading-[1.03] lg:max-w-[17.5ch]"
+          className="hero-headline mt-3 max-w-[17ch] font-display text-[clamp(3.1rem,6vw,5.65rem)] font-medium leading-[1.02] tracking-normal text-fg md:mt-4 md:max-w-[18ch] md:leading-[0.98] lg:max-w-[18.5ch]"
         >
           <HeadlineWords
             before={content.headline.before}
             italic={content.headline.italic}
             after={content.headline.after}
-            startWordIndex={nameWordCount}
           />
         </h1>
 
         <p
-          className="hero-reveal mt-6 max-w-[38ch] font-display text-[1rem] font-normal leading-[1.62] text-fg/85 [hyphens:none] [overflow-wrap:break-word] md:mt-8 md:max-w-[34ch] md:text-[1.12rem] md:leading-[1.6]"
+          className="hero-reveal hero-subline mt-6 hidden max-w-[37ch] font-display text-[1.34rem] font-normal leading-[1.58] text-fg/88 [hyphens:none] [overflow-wrap:break-word] md:mt-8 md:block xl:text-[1.42rem]"
           style={{animationDelay: "180ms"}}
         >
           {content.subline}
         </p>
 
-        <figure
-          className="hero-reveal hero-photo hero-photo-mobile mt-6 md:hidden"
-          style={{animationDelay: "300ms"}}
-        >
-          <div className="hero-photo-frame relative aspect-[16/10] w-full overflow-hidden">
+      </div>
+
+      <div className="hero-reveal mt-5 max-w-[540px] md:hidden" style={{animationDelay: "200ms"}}>
+        <figure className="hero-photo hero-photo-mobile overflow-hidden rounded-[6px]">
+          <div className="hero-photo-frame relative h-[48vh] min-h-[260px] w-full overflow-hidden">
             <Image
               alt={content.image.alt}
-              className="hero-photo-image object-cover object-[58%_58%]"
+              className="hero-photo-image object-cover object-[56%_28%]"
               fill
+              priority
               sizes="92vw"
               src={content.image.src}
             />
           </div>
         </figure>
+        <p
+          className="hero-subline mt-5 font-display text-[1.16rem] font-normal leading-[1.62] text-fg/88 [hyphens:none] [overflow-wrap:break-word]"
+        >
+          {content.subline}
+        </p>
+        <div className="px-1 py-5">
+          <HeroLinks links={content.links} />
+        </div>
       </div>
 
       <figure
@@ -138,18 +159,19 @@ export function Hero({content}: HeroProps) {
         style={{animationDelay: "260ms"}}
       >
         <div className="hero-photo-frame relative h-full w-full overflow-hidden">
-          <Image
-            alt={content.image.alt}
-            className="hero-photo-image object-cover object-[56%_58%]"
-            fill
-            sizes="(min-width: 1280px) 41vw, (min-width: 1024px) 41vw, 92vw"
-            src={content.image.src}
-          />
+            <Image
+              alt={content.image.alt}
+              className="hero-photo-image object-cover object-[56%_58%]"
+              fill
+              priority
+              sizes="(min-width: 1280px) 41vw, (min-width: 768px) 50vw, 92vw"
+              src={content.image.src}
+            />
         </div>
       </figure>
 
       <div
-        className="hero-reveal mt-7 pb-6 md:col-span-2 md:mt-8 md:flex md:items-center md:justify-end"
+        className="hero-reveal hidden pb-6 md:col-start-2 md:mt-8 md:flex md:items-center md:justify-center"
         style={{animationDelay: "420ms"}}
       >
         <HeroLinks links={content.links} />
