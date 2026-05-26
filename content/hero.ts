@@ -2,7 +2,7 @@ import type {RawPortfolioContent} from "./types";
 
 export const sectionEyebrows = {
   work: {en: "01 — Selected Work", ko: "01 — 주요 경력"},
-  projects: {en: "02 — Projects", ko: "02 — 만든 것들"},
+  projects: {en: "02 — Projects", ko: "02 — 프로젝트"},
   notes: {en: "03 — Coursework", ko: "03 — 수강 과목"},
   skills: {en: "04 — Tools", ko: "04 — 자주 쓰는 도구들"}
 } satisfies RawPortfolioContent["sectionEyebrows"];
@@ -31,8 +31,8 @@ export const hero = {
     }
   },
   subline: {
-    en: "Hi, I'm Yeongseok Lim. I was born in Korea and recently graduated from UW⁠–⁠Madison with a degree in Computer Science. I'm interested in backend systems and AI, and I'm actively looking for new opportunities. This site is where I document what I build — let's stay connected!",
-    ko: "안녕하세요! 임영석입니다. 한국에서 태어나 미국에서 고등학교부터 학업을 이어왔고, 최근 위스콘신 대학교에서 컴퓨터 과학 전공으로 졸업했습니다. 백엔드 시스템과 인공지능에 관심이 많고, 현재 직업 기회를 찾고 있습니다! 이 웹사이트는 제가 만든 것들을 정리하는 공간입니다. 편하게 연락 주세요!"
+    en: "Hi, I'm Yeongseok Lim. I was born in Korea, continued my education in the U.S. starting in high school, and recently graduated from the University of Wisconsin-Madison with a degree in Computer Science. I'm interested in backend systems and AI, and this site is where I document what I build. I'm exploring new career opportunities where I can apply the skills I've developed. Let's stay connected!",
+    ko: "한국에서 태어나 미국에서 고등학교부터 학업을 이어왔고, 최근 위스콘신 대학교에서 컴퓨터 과학 전공으로 졸업했습니다. 백엔드 시스템과 인공지능에 관심이 많고, 이 웹사이트는 제가 만든 것들을 정리하는 공간입니다. 보유한 역량을 바탕으로 새로운 직업 기회를 탐색하고 있습니다. 편하게 연락 주세요!"
   },
   image: {
     src: "/photo1.jpg",

@@ -1,5 +1,13 @@
-import {Fraunces, Geist, Gowun_Batang, Nanum_Myeongjo} from "next/font/google";
+import {Cormorant_Garamond, Fraunces, Geist, Plus_Jakarta_Sans} from "next/font/google";
 import localFont from "next/font/local";
+
+export const cormorantGaramond = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-cormorant-garamond",
+  display: "optional",
+  preload: true
+});
 
 export const fraunces = Fraunces({
   subsets: ["latin"],
@@ -16,31 +24,16 @@ export const geist = Geist({
   preload: true
 });
 
-export const notoSerifKr = localFont({
-  src: "../app/fonts/NotoSerifKRPortfolio.woff2",
-  variable: "--font-noto-serif-kr",
-  weight: "500",
-  style: "normal",
-  display: "optional",
+export const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-plus-jakarta-sans",
+  display: "swap",
   preload: true
 });
 
-export const gowunBatang = Gowun_Batang({
-  weight: ["400", "700"],
-  variable: "--font-gowun-batang",
-  display: "optional",
-  preload: false
-});
-
-export const nanumMyeongjo = Nanum_Myeongjo({
-  weight: ["400", "700", "800"],
-  variable: "--font-nanum-myeongjo",
-  display: "optional",
-  preload: false
-});
-
 export const pretendard = localFont({
-  src: "../app/fonts/PretendardPortfolio.woff2",
+  src: "../app/fonts/PretendardVariable.woff2",
   variable: "--font-pretendard",
   weight: "45 920",
   style: "normal",
@@ -49,16 +42,13 @@ export const pretendard = localFont({
 });
 
 const englishFontVariables = [
+  cormorantGaramond.variable,
   fraunces.variable,
-  geist.variable
+  geist.variable,
+  plusJakartaSans.variable,
 ].join(" ");
 
-const koreanFontVariables = [
-  nanumMyeongjo.variable,
-  gowunBatang.variable,
-  notoSerifKr.variable,
-  pretendard.variable
-].join(" ");
+const koreanFontVariables = pretendard.variable;
 
 export function fontVariablesForLocale(locale: "en" | "ko") {
   return locale === "ko" ? koreanFontVariables : englishFontVariables;

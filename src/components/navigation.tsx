@@ -1,7 +1,5 @@
 "use client";
 
-import {Link} from "@/i18n/navigation";
-import Image from "next/image";
 import {useLocale, useTranslations} from "next-intl";
 import {useEffect, useMemo, useState, type ReactNode} from "react";
 
@@ -25,24 +23,21 @@ function SegmentedSwitch<T extends string>({
 
   return (
     <div
-      className="relative inline-flex items-stretch overflow-hidden rounded-[5px] border border-border/80 bg-bg-elev"
-      style={{boxShadow: "inset 0 1px 3px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.04)"}}
+      className="liquid-switch relative inline-flex h-11 items-stretch overflow-hidden rounded-xl p-1"
     >
-      {/* sliding track */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-y-[2px] rounded-[3px] border border-border/60 bg-fg/10 transition-all duration-200"
+        className="liquid-switch-thumb pointer-events-none absolute inset-y-1 rounded-lg transition-all duration-300"
         style={{
-          width: `calc(${100 / options.length}% - 4px)`,
-          left: `calc(${(activeIndex * 100) / options.length}% + 2px)`,
-          boxShadow: "0 1px 0 rgba(255,255,255,0.06), inset 0 1px 2px rgba(0,0,0,0.12)",
+          width: `calc(${100 / options.length}% - 8px)`,
+          left: `calc(${(activeIndex * 100) / options.length}% + 4px)`,
         }}
       />
       {options.map((opt, i) => (
         <button
           aria-label={opt.ariaLabel}
-          className={`relative z-10 px-2.5 py-1.5 text-[0.68rem] tracking-widest transition-colors duration-200 ${
-            value === opt.value ? "text-fg" : "text-fg-muted hover:text-fg/60"
+          className={`relative z-10 min-w-11 px-3 text-[0.76rem] font-medium tracking-[0.16em] transition-colors duration-200 ${
+            value === opt.value ? "text-fg" : "text-fg-muted hover:text-fg"
           }`}
           key={String(opt.value)}
           onClick={() => onChange(opt.value)}
@@ -52,7 +47,7 @@ function SegmentedSwitch<T extends string>({
           {i < options.length - 1 && (
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute right-0 top-1/2 h-3 w-px -translate-y-1/2 bg-border/60"
+              className="liquid-switch-divider pointer-events-none absolute right-0 top-1/2 h-5 w-px -translate-y-1/2"
             />
           )}
         </button>
@@ -77,16 +72,20 @@ export function Navigation() {
   }, []);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener("scroll", onScroll, {passive: true});
-    return () => window.removeEventListener("scroll", onScroll);
+    const onSection = (e: Event) => {
+      const {index} = (e as CustomEvent<{index: number}>).detail;
+      setScrolled(index > 0);
+    };
+    document.addEventListener("fp-section-change", onSection);
+    return () => document.removeEventListener("fp-section-change", onSection);
   }, []);
 
   const setThemeValue = (value: Theme) => {
+    document.documentElement.classList.add("theme-transitioning");
     setTheme(value);
     document.documentElement.dataset.theme = value;
     window.localStorage.setItem("ysl-theme", value);
+    setTimeout(() => document.documentElement.classList.remove("theme-transitioning"), 500);
   };
 
   return (
@@ -97,21 +96,7 @@ export function Navigation() {
           : "border-b border-transparent bg-transparent"
       }`}
     >
-      <nav className="flex w-full items-center justify-between text-[0.9rem] uppercase tracking-normal text-fg">
-        <Link
-          aria-label="University of Wisconsin-Madison"
-          className="uw-logo-link"
-          href="/"
-        >
-          <Image
-            alt="University of Wisconsin-Madison crest"
-            className="uw-logo-mark"
-            height={87}
-            src="/uw-crest-color-web-digital.svg"
-            width={56}
-          />
-        </Link>
-
+      <nav className="flex w-full items-center justify-end text-[0.9rem] uppercase tracking-normal text-fg">
         <div className="flex items-center gap-3">
           <SegmentedSwitch
             options={[

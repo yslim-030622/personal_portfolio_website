@@ -7,12 +7,13 @@ import type {
   LocalizedProjectEntry,
   LocalizedWorkEntry
 } from "@/content";
+import type {MotionValue} from "motion/react";
 import {NotesAccordion} from "./notes-accordion";
 import {PresentationPreview} from "./presentation-preview";
 import {usePrefersReducedMotion} from "./use-prefers-reduced-motion";
-import {motion} from "motion/react";
+import {motion, useMotionValue, useTransform} from "motion/react";
 import Image from "next/image";
-import {type ReactNode} from "react";
+import {Children, type ReactNode, useRef, useState, useEffect} from "react";
 
 type SectionProps = {
   eyebrow: string;
@@ -22,7 +23,6 @@ type SectionProps = {
 };
 
 type FilledWorkEntry = Extract<LocalizedWorkEntry, {status: "filled"}>;
-type FilledProjectEntry = Extract<LocalizedProjectEntry, {status: "filled"}>;
 
 function isFilledEntry<T extends {status: string}>(
   item: T
@@ -31,19 +31,18 @@ function isFilledEntry<T extends {status: string}>(
 }
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
-const VP = {once: true, amount: 0.03} as const;
+const VP = {once: true, margin: "0px 0px -80px 0px", amount: 0.06} as const;
 
 function Section({eyebrow, children, className, animateContent = true}: SectionProps) {
   const reduce = usePrefersReducedMotion();
 
   return (
     <section
-      className={`content-visibility-auto mx-auto max-w-[1100px] px-5 py-10 md:px-8 md:py-14 ${className ?? ""}`}
+      className={`mx-auto max-w-[1100px] px-5 py-10 md:px-8 md:py-14 ${className ?? ""}`}
     >
       <div className="flex items-center gap-5">
-        {/* eyebrow slide-in */}
         <motion.p
-          className="shrink-0 font-display text-[0.9rem] tracking-normal text-fg/70"
+          className="shrink-0 font-body text-[1rem] tracking-wide uppercase text-fg/70"
           initial={reduce ? false : {opacity: 0, x: -20}}
           whileInView={reduce ? undefined : {opacity: 1, x: 0}}
           viewport={VP}
@@ -51,26 +50,15 @@ function Section({eyebrow, children, className, animateContent = true}: SectionP
         >
           {eyebrow}
         </motion.p>
-
-        {/* line sweep */}
-        <motion.div
-          aria-hidden="true"
-          className="h-px flex-1 origin-left bg-fg/70"
-          initial={reduce ? false : {scaleX: 0}}
-          whileInView={reduce ? undefined : {scaleX: 1}}
-          viewport={VP}
-          transition={{duration: 0.42, ease: EASE}}
-        />
       </div>
 
       {animateContent ? (
-        /* content fade-up */
         <motion.div
           className="mt-7 md:mt-8"
-          initial={reduce ? false : {opacity: 0, y: 18}}
+          initial={reduce ? false : {opacity: 0, y: 64}}
           whileInView={reduce ? undefined : {opacity: 1, y: 0}}
           viewport={VP}
-          transition={{duration: 0.38, delay: 0.1, ease: EASE}}
+          transition={{duration: 0.72, delay: 0.14, ease: EASE}}
         >
           {children}
         </motion.div>
@@ -83,13 +71,13 @@ function Section({eyebrow, children, className, animateContent = true}: SectionP
 
 function ExternalLink({link}: {link: LocalizedOptionalLink}) {
   if (!link.href) {
-    return <span className="text-fg-muted">→ {link.label}</span>;
+    return <span className="text-white/60">→ {link.label}</span>;
   }
 
   return (
     <a
       aria-label={link.ariaLabel}
-      className="link-underline transition-colors duration-200 hover:text-accent"
+      className="transition-colors duration-200 hover:text-white/80"
       href={link.href}
       rel={link.external ? "noreferrer" : undefined}
       target={link.external ? "_blank" : undefined}
@@ -102,6 +90,12 @@ function ExternalLink({link}: {link: LocalizedOptionalLink}) {
 const isPdfLink = (link: LocalizedOptionalLink) =>
   link.href?.toLowerCase().endsWith(".pdf") ?? false;
 
+const isGitHubRepoLink = (link: LocalizedOptionalLink) =>
+  link.label.toLowerCase() === "github";
+
+const isGitHubPullRequestLink = (link: LocalizedOptionalLink) =>
+  /github\.com\/[^/]+\/[^/]+\/pull\/\d+/i.test(link.href ?? "");
+
 function GitHubIcon() {
   return (
     <svg aria-hidden="true" fill="currentColor" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
@@ -110,9 +104,203 @@ function GitHubIcon() {
   );
 }
 
-const ITEM_VP = {once: true, margin: "0px 0px -2% 0px", amount: 0.04} as const;
+function GitHubButton({
+  link,
+  fallbackAriaLabel
+}: {
+  link: LocalizedOptionalLink;
+  fallbackAriaLabel: string;
+}) {
+  if (!link.href) {
+    return null;
+  }
 
-function WorkItem({item, index}: {item: FilledWorkEntry; index: number}) {
+  return (
+    <a
+      aria-label={link.ariaLabel ?? fallbackAriaLabel}
+      className="card-github-btn inline-flex items-center gap-2 rounded-md px-3.5 py-2 text-[0.82rem] text-white transition-all duration-200"
+      href={link.href}
+      rel="noreferrer"
+      target="_blank"
+    >
+      <GitHubIcon />
+      {link.label}
+    </a>
+  );
+}
+
+const ITEM_VP = {once: true, margin: "0px 0px -80px 0px", amount: 0.1} as const;
+
+const WORK_CARD_COLORS = ['#e11d48', '#d97706', '#0d9488', '#4f46e5'];
+const PROJECT_CARD_COLORS = ['#4f46e5', '#0d9488', '#d97706', '#e11d48'];
+
+function StackCard({
+  children,
+  index,
+  activeIndex,
+  total,
+  scrollYProgress,
+}: {
+  children: ReactNode;
+  index: number;
+  activeIndex: number;
+  total: number;
+  scrollYProgress: MotionValue<number>;
+}) {
+  const reduce = usePrefersReducedMotion();
+
+  const targetProgress = total > 1 ? index / (total - 1) : 0;
+  const points = Array.from({ length: total }, (_, i) => i / (total - 1));
+
+  const yValues = points.map(p => {
+    if (p < targetProgress) return "100vh";
+    if (p === targetProgress) return "0vh";
+    const depth = (p - targetProgress) * (total - 1);
+    return `-${depth * 4}vh`;
+  });
+
+  const scaleValues = points.map(p => {
+    if (p < targetProgress) return 1;
+    if (p === targetProgress) return 1;
+    const depth = (p - targetProgress) * (total - 1);
+    return Math.max(0.8, 1 - depth * 0.05);
+  });
+
+  const rotateXValues = points.map(p => {
+    if (p < targetProgress) return "0deg";
+    if (p === targetProgress) return "0deg";
+    const depth = (p - targetProgress) * (total - 1);
+    return `${depth * 2}deg`; 
+  });
+
+  const opacityValues = points.map(p => {
+    if (p < targetProgress) return 1;
+    if (p === targetProgress) return 1;
+    const depth = (p - targetProgress) * (total - 1);
+    return Math.max(0, 1 - depth * 0.2);
+  });
+
+  const y = useTransform(scrollYProgress, points, yValues);
+  const scale = useTransform(scrollYProgress, points, scaleValues);
+  const rotateX = useTransform(scrollYProgress, points, rotateXValues);
+  const opacity = useTransform(scrollYProgress, points, opacityValues);
+  const stackOffset = index - activeIndex;
+  const stackDepth = Math.abs(stackOffset);
+  const reducedY = stackDepth === 0 ? "0px" : `-${stackDepth * 18}px`;
+  const reducedScale = Math.max(0.94, 1 - stackDepth * 0.025);
+
+  return (
+    <div
+      aria-label={`Card ${index + 1} of ${total}`}
+      className="card-stack-item"
+      style={{
+        zIndex: reduce ? total - stackDepth : index,
+        pointerEvents: index === activeIndex ? "auto" : "none",
+      }}
+    >
+      <motion.div
+        className="card-stack-drag will-change-transform"
+        style={
+          reduce
+            ? { y: reducedY, scale: reducedScale, opacity: 1 }
+            : { y, scale, rotateX, opacity, transformOrigin: "center bottom" }
+        }
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+
+function ActiveCount({ activeIndex, total }: { activeIndex: number, total: number }) {
+  return (
+    <span className="card-stack-count" aria-hidden="true">
+      {activeIndex + 1}/{total}
+    </span>
+  );
+}
+
+function CardStack({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  const cards = Children.toArray(children);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollYProgress = useMotionValue(0);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const el = containerRef.current?.closest('.fp-section');
+    if (!el) return;
+
+    const updateActiveIndex = (progress: number) => {
+      if (cards.length <= 1) {
+        setActiveIndex(0);
+        return;
+      }
+
+      const step = 1 / (cards.length - 1);
+      const index = Math.round(progress / step);
+      setActiveIndex(Math.max(0, Math.min(index, cards.length - 1)));
+    };
+
+    const updateScroll = () => {
+      const maxScroll = el.scrollHeight - el.clientHeight;
+      if (maxScroll > 0) {
+        let progress = el.scrollTop / maxScroll;
+        progress = Math.max(0, Math.min(1, progress));
+        scrollYProgress.set(progress);
+        updateActiveIndex(progress);
+      } else {
+        scrollYProgress.set(0);
+        updateActiveIndex(0);
+      }
+    };
+
+    updateScroll();
+    el.addEventListener('scroll', updateScroll, { passive: true });
+    window.addEventListener('resize', updateScroll, { passive: true });
+
+    return () => {
+      el.removeEventListener('scroll', updateScroll);
+      window.removeEventListener('resize', updateScroll);
+    };
+  }, [cards.length, scrollYProgress]);
+
+  if (cards.length <= 1) {
+    return <div className={className ?? ""}>{cards}</div>;
+  }
+
+  return (
+    <div
+      className={`card-stack-scroll relative w-full ${className ?? ""}`}
+      ref={containerRef}
+      style={{ height: `${cards.length * 100}vh` }}
+    >
+      <div className="card-stack-sticky sticky top-0 h-[100svh] flex items-center justify-center overflow-hidden perspective-[1200px]">
+        <div className="card-stack-stage relative mx-auto h-full max-w-[1100px] w-full">
+          <ActiveCount activeIndex={activeIndex} total={cards.length} />
+          {cards.map((child, i) => (
+            <StackCard
+              key={i}
+              index={i}
+              activeIndex={activeIndex}
+              total={cards.length}
+              scrollYProgress={scrollYProgress}
+            >
+              {child}
+            </StackCard>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string}) {
   const reduce = usePrefersReducedMotion();
   const previewLinks = item.links?.filter(isPdfLink);
   const textLinks = item.links?.filter((link) => !isPdfLink(link));
@@ -120,30 +308,28 @@ function WorkItem({item, index}: {item: FilledWorkEntry; index: number}) {
 
   return (
     <motion.article
-      className="group grid gap-4 py-6 first:pt-0 last:pb-0 md:grid-cols-[220px_1fr] md:gap-9 md:py-7"
-      initial={reduce ? false : {opacity: 0, y: 28}}
+      className="card-colored liquid-card group grid gap-4 rounded-[28px] p-5 transition duration-300 md:grid-cols-[240px_1fr] md:gap-8 md:p-7"
+      style={{"--card-color": colorValue} as React.CSSProperties}
+      initial={reduce ? false : {opacity: 0, y: 72}}
       whileInView={reduce ? undefined : {opacity: 1, y: 0}}
       viewport={ITEM_VP}
-      transition={{duration: 0.6, delay: index === 0 ? 0.05 : 0, ease: EASE}}
+      transition={{duration: 0.75, delay: 0, ease: EASE}}
     >
       <motion.div
         className={
           photos?.length
-            ? "grid grid-cols-[minmax(0,1fr)_96px] items-start gap-4 md:block"
-            : undefined
+            ? "grid grid-cols-[minmax(0,1fr)_96px] items-start gap-4 md:block md:border-r md:border-white/20 md:pr-8"
+            : "md:border-r md:border-white/20 md:pr-8"
         }
-        initial={reduce ? false : {opacity: 0, x: -12}}
+        initial={reduce ? false : {opacity: 0, x: -28}}
         whileInView={reduce ? undefined : {opacity: 1, x: 0}}
         viewport={ITEM_VP}
-        transition={{duration: 0.52, delay: index === 0 ? 0.12 : 0.08, ease: EASE}}
+        transition={{duration: 0.65, delay: 0.08, ease: EASE}}
       >
         <div>
-          <p className="font-display text-[1rem] tracking-normal text-fg/68">
-            {item.dates}
-          </p>
           {item.companyUrl ? (
             <a
-              className="mt-3 inline-block font-display text-[1.5rem] font-medium leading-tight text-fg transition-colors duration-200 hover:text-accent md:text-[1.6rem]"
+              className="inline-block font-display text-[1.42rem] font-medium leading-tight text-white transition-colors duration-200 hover:text-white/80 md:text-[1.72rem]"
               href={item.companyUrl}
               rel="noreferrer"
               target="_blank"
@@ -151,14 +337,17 @@ function WorkItem({item, index}: {item: FilledWorkEntry; index: number}) {
               {item.company}
             </a>
           ) : (
-            <h2 className="mt-3 font-display text-[1.5rem] font-medium leading-tight text-fg transition-colors duration-200 group-hover:text-accent md:text-[1.6rem]">
+            <h2 className="font-display text-[1.42rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.72rem]">
               {item.company}
             </h2>
           )}
-          <p className="mt-1.5 text-[0.96rem] leading-[1.55] text-fg">
+          <p className="mt-3 font-body text-[0.94rem] leading-[1.55] text-white/90">
             {item.role}
           </p>
-          <p className="mt-1 font-display text-[0.92rem] tracking-normal text-fg/62">
+          <p className="mt-4 font-body text-[0.86rem] leading-snug text-white/70">
+            {item.dates}
+          </p>
+          <p className="mt-1.5 font-body text-[0.84rem] tracking-normal text-white/65">
             {item.location}
           </p>
         </div>
@@ -166,7 +355,7 @@ function WorkItem({item, index}: {item: FilledWorkEntry; index: number}) {
           <div className="grid max-w-[96px] gap-3 md:mt-5 md:max-w-[150px]">
             {photos.map((photo) => (
               <motion.figure
-                className="relative overflow-hidden rounded-[6px] border border-border bg-bg-elev"
+                className="liquid-media relative overflow-hidden rounded-md"
                 initial={reduce ? false : {opacity: 0, scale: 0.94}}
                 whileInView={reduce ? undefined : {opacity: 1, scale: 1}}
                 viewport={ITEM_VP}
@@ -188,28 +377,28 @@ function WorkItem({item, index}: {item: FilledWorkEntry; index: number}) {
         ) : null}
       </motion.div>
       <motion.div
-        initial={reduce ? false : {opacity: 0, y: 16}}
+        initial={reduce ? false : {opacity: 0, y: 48}}
         whileInView={reduce ? undefined : {opacity: 1, y: 0}}
         viewport={ITEM_VP}
-        transition={{duration: 0.56, delay: index === 0 ? 0.18 : 0.12, ease: EASE}}
+        transition={{duration: 0.68, delay: 0.16, ease: EASE}}
       >
-        <p className="max-w-[62ch] font-display text-[1.08rem] leading-[1.76] text-fg">
+        <p className="max-w-[64ch] font-body text-[0.875rem] leading-[1.65] text-white/90 md:text-[1.03rem] md:leading-[1.78]">
           {item.paragraph}
         </p>
         {item.highlights?.length ? (
-          <ul className="mt-4 grid gap-3 font-display text-[1.03rem] leading-[1.68] text-fg-muted">
+          <ul className="mt-3 grid gap-2 font-body text-[0.84rem] leading-[1.6] text-white/80 md:mt-4 md:gap-3 md:text-[1rem] md:leading-[1.72]">
             {item.highlights.map((highlight, hi) => (
               <motion.li
                 className="flex gap-3"
-                initial={reduce ? false : {opacity: 0, x: 8}}
-                whileInView={reduce ? undefined : {opacity: 1, x: 0}}
+                initial={reduce ? false : {opacity: 0, y: 20}}
+                whileInView={reduce ? undefined : {opacity: 1, y: 0}}
                 viewport={ITEM_VP}
-                transition={{duration: 0.4, delay: (index === 0 ? 0.24 : 0.16) + hi * 0.06, ease: EASE}}
+                transition={{duration: 0.5, delay: 0.22 + hi * 0.08, ease: EASE}}
                 key={highlight}
               >
                 <span
                   aria-hidden="true"
-                  className="mt-[0.62em] h-1.5 w-1.5 flex-none rounded-full bg-accent/80"
+                  className="mt-[0.62em] h-1.5 w-1.5 flex-none rounded-full bg-white/70"
                 />
                 <span>{highlight}</span>
               </motion.li>
@@ -220,26 +409,23 @@ function WorkItem({item, index}: {item: FilledWorkEntry; index: number}) {
           <PresentationPreview className="mt-5" key={link.label} link={link} />
         ))}
         {(() => {
-          const githubLink = textLinks?.find((l) => l.label.toLowerCase() === "github");
-          const otherLinks = textLinks?.filter((l) => l.label.toLowerCase() !== "github");
+          const githubLink = textLinks?.find(isGitHubRepoLink);
+          const prLink = textLinks?.find(isGitHubPullRequestLink);
+          const otherLinks = textLinks?.filter((l) => !isGitHubRepoLink(l) && !isGitHubPullRequestLink(l));
           return (
             <>
-              {githubLink?.href ? (
-                <div className="mt-5">
-                  <a
-                    aria-label={githubLink.ariaLabel ?? `${item.company} GitHub repository`}
-                    className="inline-flex items-center gap-2 rounded-md border border-border px-3.5 py-2 text-[0.82rem] text-fg/75 transition-all duration-200 hover:border-accent hover:text-accent"
-                    href={githubLink.href}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    <GitHubIcon />
-                    GitHub
-                  </a>
+              {githubLink?.href || prLink?.href ? (
+                <div className="mt-5 flex flex-wrap gap-2.5">
+                  {githubLink ? (
+                    <GitHubButton fallbackAriaLabel={`${item.company} GitHub repository`} link={githubLink} />
+                  ) : null}
+                  {prLink ? (
+                    <GitHubButton fallbackAriaLabel={`${item.company} pull request on GitHub`} link={prLink} />
+                  ) : null}
                 </div>
               ) : null}
               {otherLinks?.length ? (
-                <div className="mt-5 flex flex-wrap gap-4 text-[0.75rem] uppercase text-fg">
+                <div className="mt-5 flex flex-wrap gap-4 text-[0.75rem] uppercase text-white">
                   {otherLinks.map((link) => (
                     <ExternalLink key={link.label} link={link} />
                   ))}
@@ -263,13 +449,125 @@ export function WorkSection({
   const filled = items.filter(isFilledEntry);
 
   return (
-    <Section eyebrow={eyebrow} animateContent={false}>
-      <div className="divide-y divide-border">
-        {filled.map((item, index) => (
-          <WorkItem index={index} item={item} key={`${item.company}-${item.dates}`} />
+    <Section className="deck-section" eyebrow={eyebrow} animateContent={false}>
+      <CardStack>
+        {filled.map((item, idx) => (
+          <WorkItem
+            item={item}
+            colorValue={WORK_CARD_COLORS[idx % WORK_CARD_COLORS.length]}
+            key={`${item.company}-${item.dates}`}
+          />
         ))}
-      </div>
+      </CardStack>
     </Section>
+  );
+}
+
+type FilledProjectEntry = Extract<LocalizedProjectEntry, {status: "filled"}>;
+
+function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: string}) {
+  const reduce = usePrefersReducedMotion();
+  const previewLinks = item.links?.filter(isPdfLink);
+  const githubLink = item.links?.find((link) => !isPdfLink(link) && isGitHubRepoLink(link));
+  const prLink = item.links?.find((link) => !isPdfLink(link) && isGitHubPullRequestLink(link));
+  const otherLinks = item.links?.filter(
+    (link) => !isPdfLink(link) && !isGitHubRepoLink(link) && !isGitHubPullRequestLink(link)
+  );
+  const [kind, date] = item.kindDate.includes(" · ")
+    ? item.kindDate.split(" · ", 2)
+    : [item.kindDate, ""];
+
+  return (
+    <motion.article
+      className="card-colored liquid-card group rounded-[28px] p-5 transition duration-300 md:grid md:grid-cols-[240px_1fr] md:gap-8 md:p-7"
+      style={{"--card-color": colorValue} as React.CSSProperties}
+      initial={reduce ? false : {opacity: 0, y: 72}}
+      whileInView={reduce ? undefined : {opacity: 1, y: 0}}
+      viewport={ITEM_VP}
+      transition={{duration: 0.75, ease: EASE}}
+      key={item.title}
+    >
+      <motion.div
+        className="min-w-0 md:border-r md:border-white/20 md:pr-8"
+        initial={reduce ? false : {opacity: 0, x: -28}}
+        whileInView={reduce ? undefined : {opacity: 1, x: 0}}
+        viewport={ITEM_VP}
+        transition={{duration: 0.65, delay: 0.08, ease: EASE}}
+      >
+        <p className="font-body text-[0.78rem] tracking-wide text-white/65 uppercase">
+          {kind}
+        </p>
+        <h2 className="mt-2.5 font-display text-[1.18rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.56rem]">
+          {item.title}
+        </h2>
+        {date ? (
+          <p className="mt-1 font-body text-[0.8rem] tracking-normal text-white/65">
+            {date}
+          </p>
+        ) : null}
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {item.tech.map((tech) => (
+            <span
+              className="liquid-pill inline-block rounded-md px-2.5 py-[3px] font-sans text-[0.72rem] text-white/80"
+              key={tech}
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+      </motion.div>
+      <motion.div
+        className="mt-3 min-w-0 md:mt-0"
+        initial={reduce ? false : {opacity: 0, y: 48}}
+        whileInView={reduce ? undefined : {opacity: 1, y: 0}}
+        viewport={ITEM_VP}
+        transition={{duration: 0.68, delay: 0.16, ease: EASE}}
+      >
+        <p className="max-w-[64ch] font-body text-[0.875rem] leading-[1.65] text-white/90 md:text-[1.03rem] md:leading-[1.78]">
+          {item.description}
+        </p>
+        {item.highlights?.length ? (
+          <ul className="mt-3 grid gap-2 font-body text-[0.84rem] leading-[1.6] text-white/80 md:mt-4 md:gap-2.5 md:text-[1rem] md:leading-[1.72]">
+            {item.highlights.map((highlight, hi) => (
+              <motion.li
+                className="flex gap-3"
+                initial={reduce ? false : {opacity: 0, y: 20}}
+                whileInView={reduce ? undefined : {opacity: 1, y: 0}}
+                viewport={ITEM_VP}
+                transition={{duration: 0.5, delay: 0.22 + hi * 0.08, ease: EASE}}
+                key={highlight}
+              >
+                <span
+                  aria-hidden="true"
+                  className="mt-[0.65em] h-1.5 w-1.5 flex-none rounded-full bg-white/70"
+                />
+                <span>{highlight}</span>
+              </motion.li>
+            ))}
+          </ul>
+        ) : null}
+        {previewLinks?.map((link) => (
+          <PresentationPreview className="mt-5" key={link.label} link={link} />
+        ))}
+        {githubLink?.href || prLink?.href ? (
+          <div className="mt-5 flex flex-wrap gap-2.5">
+            {githubLink ? (
+              <GitHubButton fallbackAriaLabel={`${item.title} GitHub repository`} link={githubLink} />
+            ) : null}
+            {prLink ? (
+              <GitHubButton fallbackAriaLabel={`${item.title} pull request on GitHub`} link={prLink} />
+            ) : null}
+          </div>
+        ) : null}
+        {otherLinks?.length ? (
+          <div className="mt-5 flex flex-wrap gap-4 text-[0.8rem] text-white">
+            {otherLinks.map((link) => (
+              <ExternalLink key={link.label} link={link} />
+            ))}
+          </div>
+        ) : null}
+      </motion.div>
+    </motion.article>
   );
 }
 
@@ -280,95 +578,19 @@ export function ProjectsSection({
   eyebrow: string;
   items: LocalizedProjectEntry[];
 }) {
-  const filled = items.filter(isFilledEntry);
+  const filled = items.filter(isFilledEntry) as FilledProjectEntry[];
 
   return (
-    <Section eyebrow={eyebrow}>
-      <div className="divide-y divide-border/80 border-y border-border/80">
-        {filled.map((item) => {
-          const previewLinks = item.links?.filter(isPdfLink);
-          const githubLink = item.links?.find((link) => !isPdfLink(link) && link.label.toLowerCase() === "github");
-          const otherLinks = item.links?.filter(
-            (link) => !isPdfLink(link) && link.label.toLowerCase() !== "github"
-          );
-          const [kind, date] = item.kindDate.includes(" · ")
-            ? item.kindDate.split(" · ", 2)
-            : [item.kindDate, ""];
-
-          return (
-            <article
-              className="group py-7 md:grid md:grid-cols-[240px_1fr] md:gap-10 md:py-9"
-              key={item.title}
-            >
-              <div className="min-w-0">
-                <p className="font-display text-[0.86rem] tracking-normal text-fg/65">
-                  {kind}
-                </p>
-                <h2 className="mt-2.5 font-display text-[1.45rem] font-medium leading-tight text-fg transition-colors duration-200 group-hover:text-accent md:text-[1.6rem]">
-                  {item.title}
-                </h2>
-                {date ? (
-                  <p className="mt-1 font-display text-[0.8rem] tracking-normal text-fg/60">
-                    {date}
-                  </p>
-                ) : null}
-                <div className="mt-4 flex flex-wrap gap-1.5">
-                  {item.tech.map((tech) => (
-                    <span
-                      className="inline-block rounded-full border border-border px-2.5 py-[3px] font-sans text-[0.72rem] text-fg/65"
-                      key={tech}
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div className="mt-5 min-w-0 md:mt-0">
-                <p className="max-w-[64ch] font-display text-[1.02rem] leading-[1.74] text-fg">
-                  {item.description}
-                </p>
-                {item.highlights?.length ? (
-                  <ul className="mt-4 grid gap-2.5 font-display text-[0.98rem] leading-[1.7] text-fg-muted">
-                    {item.highlights.map((highlight) => (
-                      <li className="flex gap-3" key={highlight}>
-                        <span
-                          aria-hidden="true"
-                          className="mt-[0.65em] h-1.5 w-1.5 flex-none rounded-full bg-accent/80"
-                        />
-                        <span>{highlight}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-                {previewLinks?.map((link) => (
-                  <PresentationPreview className="mt-5" key={link.label} link={link} />
-                ))}
-                {githubLink?.href ? (
-                  <div className="mt-5">
-                    <a
-                      aria-label={githubLink.ariaLabel ?? `${item.title} GitHub repository`}
-                      className="inline-flex items-center gap-2 rounded-md border border-border px-3.5 py-2 text-[0.82rem] text-fg/75 transition-all duration-200 hover:border-accent hover:text-accent"
-                      href={githubLink.href}
-                      rel="noreferrer"
-                      target="_blank"
-                    >
-                      <GitHubIcon />
-                      GitHub
-                    </a>
-                  </div>
-                ) : null}
-                {otherLinks?.length ? (
-                  <div className="mt-5 flex flex-wrap gap-4 text-[0.8rem] text-fg">
-                    {otherLinks.map((link) => (
-                      <ExternalLink key={link.label} link={link} />
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            </article>
-          );
-        })}
-      </div>
+    <Section className="deck-section" eyebrow={eyebrow} animateContent={false}>
+      <CardStack>
+        {filled.map((item, idx) => (
+          <ProjectItem
+            item={item}
+            colorValue={PROJECT_CARD_COLORS[idx % PROJECT_CARD_COLORS.length]}
+            key={item.title}
+          />
+        ))}
+      </CardStack>
     </Section>
   );
 }
@@ -384,7 +606,7 @@ export function NotesSection({
 }) {
   return (
     <Section eyebrow={eyebrow}>
-      <p className="max-w-[56ch] font-display text-[1.02rem] leading-[1.74] text-fg">
+      <p className="max-w-[56ch] font-body text-[1.06rem] leading-[1.76] text-fg">
         {intro}
       </p>
       <NotesAccordion items={items} />
@@ -407,7 +629,7 @@ export function SkillsSection({
             <h2 className="font-display text-[1.3rem] font-medium leading-tight text-fg transition-colors duration-200 group-hover:text-accent md:text-[1.4rem]">
               {item.title}
             </h2>
-            <p className="mt-3 max-w-[56ch] font-display text-[0.93rem] leading-[1.8] text-fg">
+            <p className="mt-3 max-w-[56ch] font-body text-[0.97rem] leading-[1.78] text-fg">
               {item.body}
             </p>
           </section>
@@ -421,8 +643,8 @@ export function Footer({content}: {content: LocalizedPortfolioContent["footer"]}
   const dateMatch = content.line1.match(/^(.*?)(\d{4}-\d{2}-\d{2})(\.)?$/);
 
   return (
-    <footer className="mx-auto max-w-[1100px] px-5 pb-12 pt-8 md:px-8">
-      <div className="border-t border-border pt-8">
+    <footer className="mx-auto max-w-[1100px] px-5 pb-3 pt-3 md:px-8">
+      <div className="border-t border-border pt-3 flex items-center justify-between">
         <p className="text-sm leading-7 text-fg-muted">
           {dateMatch ? (
             <>
@@ -434,9 +656,22 @@ export function Footer({content}: {content: LocalizedPortfolioContent["footer"]}
             content.line1
           )}
         </p>
-        <p className="mt-2 text-[0.72rem] uppercase text-fg-muted">
-          {content.line2}
-        </p>
+        <div className="footer-logo">
+          <Image
+            alt="Yeongseok Lim"
+            className="footer-logo-light h-6 w-auto"
+            height={48}
+            src="/yeongseok-lim-orange.png"
+            width={192}
+          />
+          <Image
+            alt="Yeongseok Lim"
+            className="footer-logo-dark h-6 w-auto"
+            height={48}
+            src="/yeongseok-lim-white-new.png"
+            width={192}
+          />
+        </div>
       </div>
     </footer>
   );

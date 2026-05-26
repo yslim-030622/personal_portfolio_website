@@ -46,22 +46,21 @@ export function NotesAccordion({items}: {items: LocalizedNoteEntry[]}) {
               type="button"
               onClick={() => setOpenIndex(open ? -1 : index)}
             >
-              <span className="font-display text-[0.82rem] tracking-normal text-fg/60 transition-colors duration-200 group-hover:text-accent/70">
+              <span className="font-body text-[0.82rem] tracking-wide uppercase text-fg/60 transition-colors duration-200 group-hover:text-accent/70">
                 {item.date}
               </span>
 
               <span className="flex min-w-0 items-center justify-between gap-3">
-                <span className="font-display text-[1.08rem] font-medium leading-snug text-fg transition-colors duration-200 group-hover:text-accent md:text-[1.2rem]">
+                <span className="font-body text-[1.06rem] font-medium leading-snug text-fg transition-colors duration-200 group-hover:text-accent md:text-[1.16rem]">
                   {item.title}
                 </span>
-                {/* rotating chevron */}
+                {/* rotating chevron — mobile only */}
                 <span
                   aria-hidden="true"
-                  className="flex-none text-fg-muted transition-colors duration-200 group-hover:text-accent md:hidden"
+                  className="inline-flex flex-none text-fg-muted transition-colors duration-200 group-hover:text-accent md:hidden"
                   style={{
                     transform: open ? "rotate(180deg)" : "rotate(0deg)",
                     transition: "transform 0.25s cubic-bezier(0.22,1,0.36,1), color 0.2s",
-                    display: "inline-flex",
                   }}
                 >
                   <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14">
@@ -73,7 +72,7 @@ export function NotesAccordion({items}: {items: LocalizedNoteEntry[]}) {
               {/* category badge */}
               <span className="col-start-2 flex items-center justify-between gap-3 md:col-start-auto md:justify-end">
                 {item.tag ? (
-                  <span className="inline-flex items-center rounded-[4px] border border-border px-2 py-0.5 font-display text-[0.72rem] tracking-normal text-fg/60 transition-colors duration-200 group-hover:border-accent/40 group-hover:text-accent/70">
+                  <span className="inline-flex items-center rounded-[4px] border border-border px-2 py-0.5 font-body text-[0.72rem] tracking-wide uppercase text-fg/60 transition-colors duration-200 group-hover:border-accent/40 group-hover:text-accent/70">
                     {item.tag}
                   </span>
                 ) : null}
@@ -104,7 +103,7 @@ export function NotesAccordion({items}: {items: LocalizedNoteEntry[]}) {
                   style={{overflow: "hidden"}}
                 >
                   <motion.p
-                    className="max-w-[68ch] pb-6 pl-[6.2rem] font-display text-[1.02rem] leading-[1.74] text-fg/80 md:pl-[9rem]"
+                    className="max-w-[68ch] pb-6 pl-[6.2rem] font-body text-[1.02rem] leading-[1.76] text-fg/80 md:pl-[9rem]"
                     initial={reduce ? false : {opacity: 0, y: 6}}
                     animate={{opacity: 1, y: 0}}
                     transition={{duration: 0.22, delay: 0.06, ease: EASE}}
