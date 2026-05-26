@@ -85,6 +85,18 @@ export function FullPageScroll({sections}: {sections: PageSection[]}) {
   const touchStartY             = useRef(0);
   const decayTimer              = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const positionSectionForEntry = useCallback((index: number, dir: 1 | -1) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const el = sectionRefs.current[index];
+        if (!el) return;
+
+        const maxScroll = Math.max(0, el.scrollHeight - el.clientHeight);
+        el.scrollTo({top: dir < 0 ? maxScroll : 0});
+      });
+    });
+  }, []);
+
   const navigate = useCallback(
     (dir: 1 | -1) => {
       if (isAnimating.current) return;
@@ -98,14 +110,12 @@ export function FullPageScroll({sections}: {sections: PageSection[]}) {
       document.dispatchEvent(
         new CustomEvent("fp-section-change", {detail: {index: next}})
       );
-      requestAnimationFrame(() => {
-        sectionRefs.current[next]?.scrollTo({top: 0});
-      });
+      positionSectionForEntry(next, dir);
       setTimeout(() => {
         isAnimating.current = false;
       }, CARD_ENTER_DURATION * 1000 + 140);
     },
-    [sections.length]
+    [positionSectionForEntry, sections.length]
   );
 
   const refreshOverflowMetrics = useCallback((index = currentRef.current) => {
@@ -122,6 +132,7 @@ export function FullPageScroll({sections}: {sections: PageSection[]}) {
       if (isAnimating.current || index === currentRef.current) return;
       if (index < 0 || index >= sections.length) return;
 
+      const dir = index > currentRef.current ? 1 : -1;
       isAnimating.current = true;
       currentRef.current  = index;
       accDelta.current    = 0;
@@ -129,14 +140,12 @@ export function FullPageScroll({sections}: {sections: PageSection[]}) {
       document.dispatchEvent(
         new CustomEvent("fp-section-change", {detail: {index}})
       );
-      requestAnimationFrame(() => {
-        sectionRefs.current[index]?.scrollTo({top: 0});
-      });
+      positionSectionForEntry(index, dir);
       setTimeout(() => {
         isAnimating.current = false;
       }, CARD_ENTER_DURATION * 1000 + 140);
     },
-    [sections.length]
+    [positionSectionForEntry, sections.length]
   );
 
   // Wheel: accumulate with per-event cap + decay reset

@@ -186,25 +186,46 @@ function StackCard({
   const opacity = useTransform(scrollYProgress, points, opacityValues);
   const stackOffset = index - activeIndex;
   const stackDepth = Math.abs(stackOffset);
-  const reducedY = stackDepth === 0 ? "0px" : `-${stackDepth * 18}px`;
+  const reducedY = `${stackOffset * 18}px`;
   const reducedScale = Math.max(0.94, 1 - stackDepth * 0.025);
+
+  if (reduce) {
+    return (
+      <div
+        aria-label={`Card ${index + 1} of ${total}`}
+        className="card-stack-item"
+        style={{
+          zIndex: total - stackDepth,
+          pointerEvents: index === activeIndex ? "auto" : "none",
+        }}
+      >
+        <div
+          className="card-stack-drag will-change-transform"
+          style={{
+            opacity: 1,
+            transform: `translateY(${reducedY}) scale(${reducedScale})`,
+            transformOrigin: "center bottom",
+            transition: "transform 440ms cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
+        >
+          {children}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
       aria-label={`Card ${index + 1} of ${total}`}
       className="card-stack-item"
       style={{
-        zIndex: reduce ? total - stackDepth : index,
+        zIndex: index,
         pointerEvents: index === activeIndex ? "auto" : "none",
       }}
     >
       <motion.div
         className="card-stack-drag will-change-transform"
-        style={
-          reduce
-            ? { y: reducedY, scale: reducedScale, opacity: 1 }
-            : { y, scale, rotateX, opacity, transformOrigin: "center bottom" }
-        }
+        style={{ y, scale, rotateX, opacity, transformOrigin: "center bottom" }}
       >
         {children}
       </motion.div>
