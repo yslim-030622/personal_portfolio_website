@@ -131,8 +131,9 @@ function GitHubButton({
 
 const ITEM_VP = {once: true, margin: "0px 0px -80px 0px", amount: 0.1} as const;
 
-const WORK_CARD_COLORS = ['#e11d48', '#d97706', '#0d9488', '#4f46e5'];
-const PROJECT_CARD_COLORS = ['#4f46e5', '#0d9488', '#d97706', '#e11d48'];
+const STACK_CARD_COLORS = ['#e11d48', '#0ea5e9'];
+const WORK_CARD_COLORS = STACK_CARD_COLORS;
+const PROJECT_CARD_COLORS = ['#3DBFA0', '#5B73C8', '#E8673A', '#FF4757'];
 
 function StackCard({
   children,

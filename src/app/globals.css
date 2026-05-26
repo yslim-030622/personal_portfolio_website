@@ -313,8 +313,8 @@ html[lang="ko"] h2.font-display {
 }
 
 .card-stack-count {
-  top: max(0.25rem, calc(50% - 17.25rem));
-  right: max(0.5rem, calc((100% - min(90vw, 1000px)) / 2 + 1rem));
+  top: max(1.5rem, calc(50% - 14.4rem));
+  right: max(1.5rem, calc((100% - min(88vw, 1040px)) / 2 + 2rem));
 }
 
 .card-stack-remaining {
