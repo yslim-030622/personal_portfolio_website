@@ -11,7 +11,7 @@ import type {MotionValue} from "motion/react";
 import {NotesAccordion} from "./notes-accordion";
 import {PresentationPreview} from "./presentation-preview";
 import {usePrefersReducedMotion} from "./use-prefers-reduced-motion";
-import {motion, useMotionValue, useTransform} from "motion/react";
+import {motion, useMotionValue, useSpring, useTransform} from "motion/react";
 import Image from "next/image";
 import {Children, type ReactNode, useRef, useState, useEffect} from "react";
 
@@ -153,31 +153,31 @@ function StackCard({
   const points = Array.from({ length: total }, (_, i) => i / (total - 1));
 
   const yValues = points.map(p => {
-    if (p < targetProgress) return "100vh";
+    if (p < targetProgress) return "92vh";
     if (p === targetProgress) return "0vh";
     const depth = (p - targetProgress) * (total - 1);
-    return `-${depth * 4}vh`;
+    return `${depth * 5}vh`;
   });
 
   const scaleValues = points.map(p => {
-    if (p < targetProgress) return 1;
+    if (p < targetProgress) return 0.965;
     if (p === targetProgress) return 1;
     const depth = (p - targetProgress) * (total - 1);
-    return Math.max(0.8, 1 - depth * 0.05);
+    return Math.max(0.9, 1 - depth * 0.035);
   });
 
   const rotateXValues = points.map(p => {
-    if (p < targetProgress) return "0deg";
+    if (p < targetProgress) return "-2deg";
     if (p === targetProgress) return "0deg";
     const depth = (p - targetProgress) * (total - 1);
-    return `${depth * 2}deg`; 
+    return `${depth * 3}deg`; 
   });
 
   const opacityValues = points.map(p => {
-    if (p < targetProgress) return 1;
+    if (p < targetProgress) return 0.96;
     if (p === targetProgress) return 1;
     const depth = (p - targetProgress) * (total - 1);
-    return Math.max(0, 1 - depth * 0.2);
+    return Math.max(0.66, 1 - depth * 0.12);
   });
 
   const y = useTransform(scrollYProgress, points, yValues);
@@ -186,14 +186,17 @@ function StackCard({
   const opacity = useTransform(scrollYProgress, points, opacityValues);
   const stackOffset = index - activeIndex;
   const stackDepth = Math.abs(stackOffset);
-  const reducedY = `${stackOffset * 18}px`;
-  const reducedScale = Math.max(0.94, 1 - stackDepth * 0.025);
+  const reducedY = `${stackOffset * 42}px`;
+  const reducedScale = Math.max(0.88, 1 - stackDepth * 0.045);
+  const reducedRotateX = stackOffset === 0 ? 0 : stackOffset > 0 ? 5 : -4;
 
   if (reduce) {
     return (
       <div
         aria-label={`Card ${index + 1} of ${total}`}
+        aria-hidden={index !== activeIndex}
         className="card-stack-item"
+        data-active={index === activeIndex}
         style={{
           zIndex: total - stackDepth,
           pointerEvents: index === activeIndex ? "auto" : "none",
@@ -203,9 +206,9 @@ function StackCard({
           className="card-stack-drag will-change-transform"
           style={{
             opacity: 1,
-            transform: `translateY(${reducedY}) scale(${reducedScale})`,
+            transform: `translateY(${reducedY}) scale(${reducedScale}) rotateX(${reducedRotateX}deg)`,
             transformOrigin: "center bottom",
-            transition: "transform 440ms cubic-bezier(0.22, 1, 0.36, 1)",
+            transition: "transform 720ms cubic-bezier(0.22, 1, 0.36, 1)",
           }}
         >
           {children}
@@ -217,7 +220,9 @@ function StackCard({
   return (
     <div
       aria-label={`Card ${index + 1} of ${total}`}
+      aria-hidden={index !== activeIndex}
       className="card-stack-item"
+      data-active={index === activeIndex}
       style={{
         zIndex: index,
         pointerEvents: index === activeIndex ? "auto" : "none",
@@ -225,6 +230,7 @@ function StackCard({
     >
       <motion.div
         className="card-stack-drag will-change-transform"
+        transition={{duration: 0.68, ease: EASE}}
         style={{ y, scale, rotateX, opacity, transformOrigin: "center bottom" }}
       >
         {children}
@@ -251,6 +257,12 @@ function CardStack({
   const cards = Children.toArray(children);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollYProgress = useMotionValue(0);
+  const easedScrollYProgress = useSpring(scrollYProgress, {
+    stiffness: 118,
+    damping: 28,
+    mass: 0.72,
+    restDelta: 0.0008,
+  });
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
@@ -310,7 +322,7 @@ function CardStack({
               index={i}
               activeIndex={activeIndex}
               total={cards.length}
-              scrollYProgress={scrollYProgress}
+              scrollYProgress={easedScrollYProgress}
             >
               {child}
             </StackCard>
