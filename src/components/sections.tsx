@@ -186,9 +186,9 @@ function StackCard({
   const opacity = useTransform(scrollYProgress, points, opacityValues);
   const stackOffset = index - activeIndex;
   const stackDepth = Math.abs(stackOffset);
-  const reducedY = `${stackOffset * 42}px`;
+  const reducedY = `${stackDepth * 42}px`;
   const reducedScale = Math.max(0.88, 1 - stackDepth * 0.045);
-  const reducedRotateX = stackOffset === 0 ? 0 : stackOffset > 0 ? 5 : -4;
+  const reducedRotateX = stackDepth === 0 ? 0 : 5;
 
   if (reduce) {
     return (
