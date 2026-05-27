@@ -320,7 +320,7 @@ function CardStack({
               index={i}
               activeIndex={activeIndex}
               total={cards.length}
-              scrollYProgress={smoothProgress}
+              scrollYProgress={scrollYProgress}
             >
               {child}
             </StackCard>

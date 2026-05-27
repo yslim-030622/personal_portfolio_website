@@ -152,16 +152,11 @@ export function FullPageScroll({sections}: {sections: PageSection[]}) {
       const canScrollUp   = el.scrollTop > 1;
 
       if (e.deltaY > 0 && canScrollDown) {
-        e.preventDefault();
-        el.scrollTop = Math.min(
-          metrics.scrollHeight - metrics.clientHeight,
-          el.scrollTop + Math.min(Math.abs(e.deltaY), DELTA_CAP * 2)
-        );
+        // Native scroll
         return;
       }
       if (e.deltaY < 0 && canScrollUp) {
-        e.preventDefault();
-        el.scrollTop = Math.max(0, el.scrollTop - Math.min(Math.abs(e.deltaY), DELTA_CAP * 2));
+        // Native scroll
         return;
       }
 
