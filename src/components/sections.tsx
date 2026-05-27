@@ -168,6 +168,7 @@ function StackCard({
 }) {
   const PEEK_VH      = 5;
   const ENTRY_Y      = 100;   // vh — exactly bottom of screen
+  const PEEK_OPACITY = 0.90; // high opacity = vivid original colors preserved
   const step         = total > 1 ? 1 / (total - 1) : 1;
 
     // Uniform progress keypoints: [0, 1/(n-1), 2/(n-1), ..., 1]
@@ -218,8 +219,7 @@ function StackCard({
   for (let pi = index + 1; pi < total; pi++) {
     const currP      = pi * step;
     const depth      = pi - index;
-    // Dim the background cards significantly to reduce visual clutter and emphasize the blur
-    const peekOp     = Math.max(0.0, 0.45 - (depth - 1) * 0.25);
+    const peekOp     = Math.max(0.65, PEEK_OPACITY - (depth - 1) * 0.07);
 
     // Instead of fading to 0 and reappearing, just dim smoothly to peekOp
     opacityIns.push(currP);       
