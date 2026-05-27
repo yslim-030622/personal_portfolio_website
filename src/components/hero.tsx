@@ -97,7 +97,7 @@ function HeadlineWords({
 export function Hero({content}: HeroProps) {
   return (
     <section
-      className="relative mx-auto grid w-full max-w-[1480px] content-start items-start overflow-hidden overflow-x-hidden px-6 pb-0 pt-14 md:min-h-[100svh] md:grid-cols-[minmax(0,50vw)_minmax(0,50vw)] md:content-start md:items-start md:px-10 md:pb-10 md:pt-16 lg:pt-18 xl:px-14"
+      className="mx-auto grid w-full max-w-[1480px] content-start items-start overflow-hidden overflow-x-hidden px-6 pb-0 pt-14 md:min-h-[100svh] md:grid-cols-[minmax(0,50vw)_minmax(0,50vw)] md:content-start md:items-start md:px-10 md:pb-10 md:pt-16 lg:pt-18 xl:px-14"
     >
       <div className="relative z-10 min-w-0 max-w-[540px] md:max-w-none md:pr-8 xl:pr-12">
         <h1
@@ -121,7 +121,7 @@ export function Hero({content}: HeroProps) {
         </h1>
 
         <p
-          className="hero-reveal hero-subline mt-6 hidden max-w-[42ch] font-display text-[1.34rem] font-normal leading-[1.58] text-[var(--fg-muted)] [hyphens:none] [overflow-wrap:break-word] md:mt-8 md:block xl:max-w-[44ch] xl:text-[1.42rem]"
+          className="hero-reveal hero-subline mt-6 hidden max-w-[42ch] font-display text-[1.34rem] font-normal leading-[1.58] text-fg/88 [hyphens:none] [overflow-wrap:break-word] md:mt-8 md:block xl:max-w-[44ch] xl:text-[1.42rem]"
           style={{animationDelay: "120ms"}}
         >
           {content.subline}
