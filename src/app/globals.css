@@ -238,7 +238,7 @@ html[lang="ko"] h2.font-display {
   align-items: center;
   justify-content: center;
   padding: 0 1.25rem;
-  overflow: hidden;
+  /* overflow: hidden; */
   perspective: 1500px;
   perspective-origin: center center;
 }
@@ -254,6 +254,7 @@ html[lang="ko"] h2.font-display {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  will-change: transform, opacity;
 }
 
 .card-stack-drag {

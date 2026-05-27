@@ -288,11 +288,11 @@ function CardStack({
 
   return (
     <div
-      className={`card-stack-scroll relative w-full ${className ?? ""}`}
+      className={`card-stack-scroll relative w-full ${className ?? ""} z-10`}
       ref={containerRef}
       style={{ height: `${cards.length * 100}vh` }}
     >
-      <div className="card-stack-sticky sticky top-0 h-[100svh] flex items-center justify-center overflow-hidden perspective-[1200px]">
+      <div className="card-stack-sticky sticky top-0 h-[100svh] flex items-center justify-center perspective-[1200px]">
         <div className="card-stack-stage relative mx-auto h-full max-w-[1100px] w-full">
           {cards.map((child, i) => (
             <StackCard

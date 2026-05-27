@@ -50,7 +50,7 @@ export function ContinuousScroll({sections}: {sections: PageSection[]}) {
             ref={(el) => {
               sectionRefs.current[i] = el;
             }}
-            className="w-full"
+            className="w-full relative z-10"
           >
             {section.content}
           </section>
