@@ -1,7 +1,7 @@
 import {getPortfolioContent, type Locale} from "@/content";
 import {Hero} from "@/components/hero";
 import {Navigation} from "@/components/navigation";
-import {FullPageScroll} from "@/components/full-page-scroll";
+import {ContinuousScroll} from "@/components/continuous-scroll";
 import {
   Footer,
   NotesSection,
@@ -90,7 +90,7 @@ export default async function Page({params}: PageProps) {
   return (
     <>
       <Navigation sectionTitles={sections.map((section) => section.navTitle)} />
-      <FullPageScroll sections={sections} />
+      <ContinuousScroll sections={sections} />
     </>
   );
 }

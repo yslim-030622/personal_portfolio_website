@@ -262,24 +262,36 @@ function CardStack({
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
-    const el = containerRef.current?.closest('.fp-section');
-    if (!el) return;
+    const container = containerRef.current;
+    if (!container) return;
 
     const update = () => {
-      const maxScroll = el.scrollHeight - el.clientHeight;
-      const progress = maxScroll > 0 ? Math.max(0, Math.min(1, el.scrollTop / maxScroll)) : 0;
+      // Find the distance from top of container to top of viewport
+      const rect = container.getBoundingClientRect();
+      
+      // Calculate how far we've scrolled inside this specific container
+      // Rect.top is 0 when the container hits the top of the viewport
+      // maxScroll is the scrollable height of the container
+      const maxScroll = rect.height - window.innerHeight;
+      
+      let progress = 0;
+      if (maxScroll > 0) {
+        progress = Math.max(0, Math.min(1, -rect.top / maxScroll));
+      }
+      
       scrollYProgress.set(progress);
+      
       if (cards.length <= 1) { setActiveIndex(0); return; }
       const step = 1 / (cards.length - 1);
       setActiveIndex(Math.max(0, Math.min(Math.round(progress / step), cards.length - 1)));
     };
 
     update();
-    el.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update, { passive: true });
 
     return () => {
-      el.removeEventListener('scroll', update);
+      window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
     };
   }, [cards.length, scrollYProgress]);
