@@ -48,9 +48,7 @@ export default async function Page({params}: PageProps) {
       label: "주요 경력",
       navTitle: content.sectionEyebrows.work,
       content: (
-        <div className="pb-[150svh]">
-          <WorkSection eyebrow={content.sectionEyebrows.work} items={content.work} />
-        </div>
+        <WorkSection eyebrow={content.sectionEyebrows.work} items={content.work} />
       ),
     },
     {
@@ -58,12 +56,10 @@ export default async function Page({params}: PageProps) {
       label: "프로젝트",
       navTitle: content.sectionEyebrows.projects,
       content: (
-        <div className="pb-[150svh]">
-          <ProjectsSection
-            eyebrow={content.sectionEyebrows.projects}
-            items={content.projects}
-          />
-        </div>
+        <ProjectsSection
+          eyebrow={content.sectionEyebrows.projects}
+          items={content.projects}
+        />
       ),
     },
     {
