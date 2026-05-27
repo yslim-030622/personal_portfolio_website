@@ -56,12 +56,18 @@ function SegmentedSwitch<T extends string>({
   );
 }
 
-export function Navigation() {
+export function Navigation({
+  sectionTitles = [],
+}: {
+  sectionTitles?: (string | null | undefined)[];
+}) {
   const locale = useLocale();
   const t = useTranslations("nav");
   const [theme, setTheme] = useState<Theme>("dark");
   const [scrolled, setScrolled] = useState(false);
+  const [currentSection, setCurrentSection] = useState(0);
   const themeParts = useMemo(() => t("themeToggle").split(" · "), [t]);
+  const currentTitle = currentSection > 0 ? sectionTitles[currentSection] : undefined;
 
   useEffect(() => {
     const stored = window.localStorage.getItem("ysl-theme");
@@ -74,6 +80,7 @@ export function Navigation() {
   useEffect(() => {
     const onSection = (e: Event) => {
       const {index} = (e as CustomEvent<{index: number}>).detail;
+      setCurrentSection(index);
       setScrolled(index > 0);
     };
     document.addEventListener("fp-section-change", onSection);
@@ -96,7 +103,15 @@ export function Navigation() {
           : "border-b border-transparent bg-transparent"
       }`}
     >
-      <nav className="flex w-full items-center justify-end text-[0.9rem] uppercase tracking-normal text-fg">
+      <nav className="flex min-h-11 w-full items-center justify-between gap-4 text-[0.9rem] uppercase tracking-normal text-fg">
+        <p
+          aria-live="polite"
+          className={`max-w-[52vw] truncate font-body text-[0.78rem] tracking-[0.16em] text-fg/70 transition-opacity duration-300 md:max-w-none md:text-[0.86rem] ${
+            currentTitle ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          {currentTitle ?? "\u00a0"}
+        </p>
         <div className="flex items-center gap-3">
           <SegmentedSwitch
             options={[

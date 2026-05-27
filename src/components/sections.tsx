@@ -38,23 +38,13 @@ function Section({eyebrow, children, className, animateContent = true}: SectionP
 
   return (
     <section
-      className={`mx-auto max-w-[1100px] px-5 py-10 md:px-8 md:py-14 ${className ?? ""}`}
+      className={`mx-auto max-w-[1100px] pl-3 pr-5 py-10 md:pl-5 md:pr-8 md:py-14 ${className ?? ""}`}
     >
-      <div className="flex items-center gap-5">
-        <motion.p
-          className="shrink-0 font-body text-[1rem] tracking-wide uppercase text-fg/70"
-          initial={reduce ? false : {opacity: 0, x: -20}}
-          whileInView={reduce ? undefined : {opacity: 1, x: 0}}
-          viewport={VP}
-          transition={{duration: 0.28, delay: 0.04, ease: EASE}}
-        >
-          {eyebrow}
-        </motion.p>
-      </div>
+      <span className="sr-only">{eyebrow}</span>
 
       {animateContent ? (
         <motion.div
-          className="mt-7 md:mt-8"
+          className="mt-0"
           initial={reduce ? false : {opacity: 0, y: 64}}
           whileInView={reduce ? undefined : {opacity: 1, y: 0}}
           viewport={VP}
@@ -63,7 +53,7 @@ function Section({eyebrow, children, className, animateContent = true}: SectionP
           {children}
         </motion.div>
       ) : (
-        <div className="mt-7 md:mt-8">{children}</div>
+        <div className="mt-0">{children}</div>
       )}
     </section>
   );
@@ -129,11 +119,10 @@ function GitHubButton({
   );
 }
 
-const ITEM_VP = {once: true, margin: "0px 0px -80px 0px", amount: 0.1} as const;
 
-const STACK_CARD_COLORS = ['#e11d48', '#0ea5e9'];
+const STACK_CARD_COLORS = ['#E8314A', '#5C6BC0'];
 const WORK_CARD_COLORS = STACK_CARD_COLORS;
-const PROJECT_CARD_COLORS = ['#3DBFA0', '#5B73C8', '#E8673A', '#FF4757'];
+const PROJECT_CARD_COLORS = ['#2B4A70', '#1F5C5A', '#B87B22', '#9B2335'];
 
 function StackCard({
   children,
@@ -150,66 +139,106 @@ function StackCard({
 }) {
   const reduce = usePrefersReducedMotion();
 
-  const targetProgress = total > 1 ? index / (total - 1) : 0;
-  const points = Array.from({ length: total }, (_, i) => i / (total - 1));
+  const PEEK_VH      = 5;
+  const ENTRY_Y      = 82;   // vh — just below viewport bottom
+  const PEEK_OPACITY = 0.90; // high opacity = vivid original colors preserved
+  const step         = total > 1 ? 1 / (total - 1) : 1;
 
-  const yValues = points.map(p => {
-    if (p < targetProgress) return "92vh";
-    if (p === targetProgress) return "0vh";
-    const depth = (p - targetProgress) * (total - 1);
-    return `${depth * 5}vh`;
+  // Uniform progress keypoints: [0, 1/(n-1), 2/(n-1), ..., 1]
+  const points = Array.from({ length: total }, (_, i) => (total > 1 ? i / (total - 1) : 0));
+
+  // Y: cluster-centering formula.
+  // activeShift offsets the active card downward so the entire visible stack
+  // (active + peeked cards above) remains centered in the viewport.
+  // Without it, peeked cards push the visual mass upward.
+  const yValues = points.map((_, pi) => {
+    if (pi < index) return `${ENTRY_Y}vh`;
+    const depth       = pi - index;
+    const activeShift = pi * (PEEK_VH / 2); // shifts active card down to balance peek mass above
+    return `${activeShift - depth * PEEK_VH}vh`;
   });
 
-  const scaleValues = points.map(p => {
-    if (p < targetProgress) return 0.965;
-    if (p === targetProgress) return 1;
-    const depth = (p - targetProgress) * (total - 1);
-    return Math.max(0.9, 1 - depth * 0.035);
+  // Scale: active at 1, peeked cards shrink slightly
+  const scaleValues = points.map((_, pi) => {
+    if (pi <= index) return 1;
+    return Math.max(0.91, 1 - (pi - index) * 0.03);
   });
 
-  const rotateXValues = points.map(p => {
-    if (p < targetProgress) return "-2deg";
-    if (p === targetProgress) return "0deg";
-    const depth = (p - targetProgress) * (total - 1);
-    return `${depth * 3}deg`; 
+  // RotateX: peeked cards tilt backward for depth (perspective is set on sticky container)
+  const rotateXValues = points.map((_, pi) => {
+    if (pi <= index) return 0;
+    return Math.min((pi - index) * 2, 5);
   });
 
-  const opacityValues = points.map(p => {
-    if (p < targetProgress) return 0.96;
-    if (p === targetProgress) return 1;
-    const depth = (p - targetProgress) * (total - 1);
-    return Math.max(0.66, 1 - depth * 0.12);
-  });
+  // Opacity: non-uniform keyframes for a clean crossfade during transitions.
+  // The card fades to 0 at the midpoint of the next card's entry, then
+  // reappears at near-full peek opacity so colors stay vivid.
+  const opacityIns: number[] = [];
+  const opacityOuts: number[] = [];
 
-  const y = useTransform(scrollYProgress, points, yValues);
-  const scale = useTransform(scrollYProgress, points, scaleValues);
-  const rotateX = useTransform(scrollYProgress, points, rotateXValues);
-  const opacity = useTransform(scrollYProgress, points, opacityValues);
-  const stackOffset = index - activeIndex;
-  const stackDepth = Math.abs(stackOffset);
-  const reducedY = `${stackDepth * 42}px`;
-  const reducedScale = Math.max(0.88, 1 - stackDepth * 0.045);
-  const reducedRotateX = stackDepth === 0 ? 0 : 5;
+  if (index === 0) {
+    opacityIns.push(0); opacityOuts.push(1);
+  } else {
+    const prevP       = (index - 1) * step;
+    const fadeInStart = prevP + 0.44 * step;
+    if (prevP > 0) {
+      opacityIns.push(0); opacityOuts.push(0);
+    }
+    opacityIns.push(prevP);        opacityOuts.push(0);
+    opacityIns.push(fadeInStart);  opacityOuts.push(0);
+    opacityIns.push(index * step); opacityOuts.push(1);
+  }
+
+  for (let pi = index + 1; pi < total; pi++) {
+    const prevP      = (pi - 1) * step;
+    const currP      = pi * step;
+    const depth      = pi - index;
+    // Shallow falloff so deeper cards still show vivid color
+    const peekOp     = Math.max(0.65, PEEK_OPACITY - (depth - 1) * 0.07);
+    const fadeOutAt  = prevP + 0.50 * step;
+    const reappearAt = prevP + 0.80 * step;
+
+    opacityIns.push(fadeOutAt);   opacityOuts.push(0);
+    opacityIns.push(reappearAt);  opacityOuts.push(peekOp * 0.5);
+    opacityIns.push(currP);       opacityOuts.push(peekOp);
+  }
+
+  const y       = useTransform(scrollYProgress, points,     yValues);
+  const scale   = useTransform(scrollYProgress, points,     scaleValues);
+  const rotateX = useTransform(scrollYProgress, points,     rotateXValues);
+  const opacity = useTransform(scrollYProgress, opacityIns, opacityOuts);
+
+  const zIndex   = index + 1;
+  const isActive = index === activeIndex;
 
   if (reduce) {
+    const isPast      = index < activeIndex;
+    const isFuture    = index > activeIndex;
+    const depth       = activeIndex - index;
+    const activeShift = activeIndex * PEEK_VH / 2;
+    const yStr        = isActive
+      ? `${activeShift}vh`
+      : isPast
+        ? `${activeShift - depth * PEEK_VH}vh`
+        : `${ENTRY_Y}vh`;
+    const scaleVal = isPast ? Math.max(0.91, 1 - depth * 0.03) : 1;
+    const rxVal    = isPast ? Math.min(depth * 2, 5) : 0;
+    const opVal    = isFuture ? 0 : isPast ? Math.max(0.65, PEEK_OPACITY - (depth - 1) * 0.07) : 1;
     return (
       <div
         aria-label={`Card ${index + 1} of ${total}`}
-        aria-hidden={index !== activeIndex}
+        aria-hidden={!isActive}
         className="card-stack-item"
-        data-active={index === activeIndex}
-        style={{
-          zIndex: total - stackDepth,
-          pointerEvents: index === activeIndex ? "auto" : "none",
-        }}
+        data-active={isActive}
+        style={{ zIndex, pointerEvents: isActive ? "auto" : "none" }}
       >
         <div
           className="card-stack-drag will-change-transform"
           style={{
-            opacity: 1,
-            transform: `translateY(${reducedY}) scale(${reducedScale}) rotateX(${reducedRotateX}deg)`,
-            transformOrigin: "center bottom",
-            transition: "transform 720ms cubic-bezier(0.22, 1, 0.36, 1)",
+            opacity: opVal,
+            transform: `translateY(${yStr}) scale(${scaleVal}) rotateX(${rxVal}deg)`,
+            transformOrigin: "center center",
+            transition: "transform 600ms cubic-bezier(0.22,1,0.36,1), opacity 400ms cubic-bezier(0.22,1,0.36,1)",
           }}
         >
           {children}
@@ -221,30 +250,18 @@ function StackCard({
   return (
     <div
       aria-label={`Card ${index + 1} of ${total}`}
-      aria-hidden={index !== activeIndex}
+      aria-hidden={!isActive}
       className="card-stack-item"
-      data-active={index === activeIndex}
-      style={{
-        zIndex: index,
-        pointerEvents: index === activeIndex ? "auto" : "none",
-      }}
+      data-active={isActive}
+      style={{ zIndex, pointerEvents: isActive ? "auto" : "none" }}
     >
       <motion.div
         className="card-stack-drag will-change-transform"
-        transition={{duration: 0.68, ease: EASE}}
-        style={{ y, scale, rotateX, opacity, transformOrigin: "center bottom" }}
+        style={{ y, scale, rotateX, opacity, transformOrigin: "center center" }}
       >
         {children}
       </motion.div>
     </div>
-  );
-}
-
-function ActiveCount({ activeIndex, total }: { activeIndex: number, total: number }) {
-  return (
-    <span className="card-stack-count" aria-hidden="true">
-      {activeIndex + 1}/{total}
-    </span>
   );
 }
 
@@ -258,11 +275,11 @@ function CardStack({
   const cards = Children.toArray(children);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollYProgress = useMotionValue(0);
-  const easedScrollYProgress = useSpring(scrollYProgress, {
-    stiffness: 118,
-    damping: 28,
-    mass: 0.72,
-    restDelta: 0.0008,
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 280,
+    damping: 32,
+    mass: 0.4,
+    restDelta: 0.0003,
   });
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -270,37 +287,22 @@ function CardStack({
     const el = containerRef.current?.closest('.fp-section');
     if (!el) return;
 
-    const updateActiveIndex = (progress: number) => {
-      if (cards.length <= 1) {
-        setActiveIndex(0);
-        return;
-      }
-
-      const step = 1 / (cards.length - 1);
-      const index = Math.round(progress / step);
-      setActiveIndex(Math.max(0, Math.min(index, cards.length - 1)));
-    };
-
-    const updateScroll = () => {
+    const update = () => {
       const maxScroll = el.scrollHeight - el.clientHeight;
-      if (maxScroll > 0) {
-        let progress = el.scrollTop / maxScroll;
-        progress = Math.max(0, Math.min(1, progress));
-        scrollYProgress.set(progress);
-        updateActiveIndex(progress);
-      } else {
-        scrollYProgress.set(0);
-        updateActiveIndex(0);
-      }
+      const progress = maxScroll > 0 ? Math.max(0, Math.min(1, el.scrollTop / maxScroll)) : 0;
+      scrollYProgress.set(progress);
+      if (cards.length <= 1) { setActiveIndex(0); return; }
+      const step = 1 / (cards.length - 1);
+      setActiveIndex(Math.max(0, Math.min(Math.round(progress / step), cards.length - 1)));
     };
 
-    updateScroll();
-    el.addEventListener('scroll', updateScroll, { passive: true });
-    window.addEventListener('resize', updateScroll, { passive: true });
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update, { passive: true });
 
     return () => {
-      el.removeEventListener('scroll', updateScroll);
-      window.removeEventListener('resize', updateScroll);
+      el.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
     };
   }, [cards.length, scrollYProgress]);
 
@@ -316,14 +318,13 @@ function CardStack({
     >
       <div className="card-stack-sticky sticky top-0 h-[100svh] flex items-center justify-center overflow-hidden perspective-[1200px]">
         <div className="card-stack-stage relative mx-auto h-full max-w-[1100px] w-full">
-          <ActiveCount activeIndex={activeIndex} total={cards.length} />
           {cards.map((child, i) => (
             <StackCard
               key={i}
               index={i}
               activeIndex={activeIndex}
               total={cards.length}
-              scrollYProgress={easedScrollYProgress}
+              scrollYProgress={smoothProgress}
             >
               {child}
             </StackCard>
@@ -335,35 +336,26 @@ function CardStack({
 }
 
 function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string}) {
-  const reduce = usePrefersReducedMotion();
   const previewLinks = item.links?.filter(isPdfLink);
   const textLinks = item.links?.filter((link) => !isPdfLink(link));
   const photos = item.photos;
 
   return (
-    <motion.article
-      className="card-colored liquid-card group grid gap-4 rounded-[28px] p-5 transition duration-300 md:grid-cols-[240px_1fr] md:gap-8 md:p-7"
+    <article
+      className="card-colored liquid-card group grid items-center gap-5 rounded-[28px] p-6 text-center transition duration-300 md:grid-cols-[240px_1fr] md:gap-9 md:p-9"
       style={{"--card-color": colorValue} as React.CSSProperties}
-      initial={reduce ? false : {opacity: 0, y: 72}}
-      whileInView={reduce ? undefined : {opacity: 1, y: 0}}
-      viewport={ITEM_VP}
-      transition={{duration: 0.75, delay: 0, ease: EASE}}
     >
-      <motion.div
+      <div
         className={
           photos?.length
-            ? "grid grid-cols-[minmax(0,1fr)_96px] items-start gap-4 md:block md:border-r md:border-white/20 md:pr-8"
-            : "md:border-r md:border-white/20 md:pr-8"
+            ? "grid grid-cols-[minmax(0,1fr)_96px] items-center gap-4 md:block md:border-r md:border-white/20 md:pr-9"
+            : "md:border-r md:border-white/20 md:pr-9"
         }
-        initial={reduce ? false : {opacity: 0, x: -28}}
-        whileInView={reduce ? undefined : {opacity: 1, x: 0}}
-        viewport={ITEM_VP}
-        transition={{duration: 0.65, delay: 0.08, ease: EASE}}
       >
         <div>
           {item.companyUrl ? (
             <a
-              className="inline-block font-display text-[1.42rem] font-medium leading-tight text-white transition-colors duration-200 hover:text-white/80 md:text-[1.72rem]"
+              className="inline-block font-display text-[1.58rem] font-medium leading-tight text-white transition-colors duration-200 hover:text-white/80 md:text-[1.95rem]"
               href={item.companyUrl}
               rel="noreferrer"
               target="_blank"
@@ -371,29 +363,25 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
               {item.company}
             </a>
           ) : (
-            <h2 className="font-display text-[1.42rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.72rem]">
+            <h2 className="font-display text-[1.58rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.95rem]">
               {item.company}
             </h2>
           )}
-          <p className="mt-3 font-body text-[0.94rem] leading-[1.55] text-white/90">
+          <p className="mt-3 font-body text-[1.02rem] leading-[1.5] text-white/90 md:text-[1.12rem]">
             {item.role}
           </p>
-          <p className="mt-4 font-body text-[0.86rem] leading-snug text-white/70">
+          <p className="mt-4 font-body text-[0.92rem] leading-snug text-white/70 md:text-[1rem]">
             {item.dates}
           </p>
-          <p className="mt-1.5 font-body text-[0.84rem] tracking-normal text-white/65">
+          <p className="mt-1.5 font-body text-[0.9rem] tracking-normal text-white/65 md:text-[0.98rem]">
             {item.location}
           </p>
         </div>
         {photos?.length ? (
-          <div className="grid max-w-[96px] gap-3 md:mt-5 md:max-w-[150px]">
+          <div className="grid w-full max-w-[96px] gap-3 md:mx-auto md:mt-5 md:max-w-[128px]">
             {photos.map((photo) => (
-              <motion.figure
+              <figure
                 className="liquid-media relative overflow-hidden rounded-md"
-                initial={reduce ? false : {opacity: 0, scale: 0.94}}
-                whileInView={reduce ? undefined : {opacity: 1, scale: 1}}
-                viewport={ITEM_VP}
-                transition={{duration: 0.6, delay: 0.18, ease: EASE}}
                 key={photo.src}
               >
                 <div className="relative aspect-[4/5]">
@@ -405,42 +393,17 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
                     src={photo.src}
                   />
                 </div>
-              </motion.figure>
+              </figure>
             ))}
           </div>
         ) : null}
-      </motion.div>
-      <motion.div
-        initial={reduce ? false : {opacity: 0, y: 48}}
-        whileInView={reduce ? undefined : {opacity: 1, y: 0}}
-        viewport={ITEM_VP}
-        transition={{duration: 0.68, delay: 0.16, ease: EASE}}
-      >
-        <p className="max-w-[64ch] font-body text-[0.875rem] leading-[1.65] text-white/90 md:text-[1.03rem] md:leading-[1.78]">
+      </div>
+      <div>
+        <p className="mx-auto max-w-[58ch] font-body text-[0.94rem] leading-[1.68] text-white/90 md:text-[1.18rem] md:leading-[1.76]">
           {item.paragraph}
         </p>
-        {item.highlights?.length ? (
-          <ul className="mt-3 grid gap-2 font-body text-[0.84rem] leading-[1.6] text-white/80 md:mt-4 md:gap-3 md:text-[1rem] md:leading-[1.72]">
-            {item.highlights.map((highlight, hi) => (
-              <motion.li
-                className="flex gap-3"
-                initial={reduce ? false : {opacity: 0, y: 20}}
-                whileInView={reduce ? undefined : {opacity: 1, y: 0}}
-                viewport={ITEM_VP}
-                transition={{duration: 0.5, delay: 0.22 + hi * 0.08, ease: EASE}}
-                key={highlight}
-              >
-                <span
-                  aria-hidden="true"
-                  className="mt-[0.62em] h-1.5 w-1.5 flex-none rounded-full bg-white/70"
-                />
-                <span>{highlight}</span>
-              </motion.li>
-            ))}
-          </ul>
-        ) : null}
         {previewLinks?.map((link) => (
-          <PresentationPreview className="mt-5" key={link.label} link={link} />
+          <PresentationPreview className="mx-auto mt-6" key={link.label} link={link} />
         ))}
         {(() => {
           const githubLink = textLinks?.find(isGitHubRepoLink);
@@ -449,7 +412,7 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
           return (
             <>
               {githubLink?.href || prLink?.href ? (
-                <div className="mt-5 flex flex-wrap gap-2.5">
+                <div className="mt-6 flex flex-wrap justify-center gap-2.5">
                   {githubLink ? (
                     <GitHubButton fallbackAriaLabel={`${item.company} GitHub repository`} link={githubLink} />
                   ) : null}
@@ -459,7 +422,7 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
                 </div>
               ) : null}
               {otherLinks?.length ? (
-                <div className="mt-5 flex flex-wrap gap-4 text-[0.75rem] uppercase text-white">
+                <div className="mt-6 flex flex-wrap justify-center gap-4 text-[0.8rem] uppercase text-white md:text-[0.88rem]">
                   {otherLinks.map((link) => (
                     <ExternalLink key={link.label} link={link} />
                   ))}
@@ -468,8 +431,8 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
             </>
           );
         })()}
-      </motion.div>
-    </motion.article>
+      </div>
+    </article>
   );
 }
 
@@ -500,7 +463,6 @@ export function WorkSection({
 type FilledProjectEntry = Extract<LocalizedProjectEntry, {status: "filled"}>;
 
 function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: string}) {
-  const reduce = usePrefersReducedMotion();
   const previewLinks = item.links?.filter(isPdfLink);
   const githubLink = item.links?.find((link) => !isPdfLink(link) && isGitHubRepoLink(link));
   const prLink = item.links?.find((link) => !isPdfLink(link) && isGitHubPullRequestLink(link));
@@ -512,79 +474,42 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
     : [item.kindDate, ""];
 
   return (
-    <motion.article
-      className="card-colored liquid-card group rounded-[28px] p-5 transition duration-300 md:grid md:grid-cols-[240px_1fr] md:gap-8 md:p-7"
+    <article
+      className="card-colored liquid-card group rounded-[28px] p-6 text-center transition duration-300 md:grid md:grid-cols-[240px_1fr] md:items-center md:gap-9 md:p-9"
       style={{"--card-color": colorValue} as React.CSSProperties}
-      initial={reduce ? false : {opacity: 0, y: 72}}
-      whileInView={reduce ? undefined : {opacity: 1, y: 0}}
-      viewport={ITEM_VP}
-      transition={{duration: 0.75, ease: EASE}}
-      key={item.title}
     >
-      <motion.div
-        className="min-w-0 md:border-r md:border-white/20 md:pr-8"
-        initial={reduce ? false : {opacity: 0, x: -28}}
-        whileInView={reduce ? undefined : {opacity: 1, x: 0}}
-        viewport={ITEM_VP}
-        transition={{duration: 0.65, delay: 0.08, ease: EASE}}
-      >
-        <p className="font-body text-[0.78rem] tracking-wide text-white/65 uppercase">
+      <div className="min-w-0 md:flex md:h-full md:flex-col md:justify-center md:border-r md:border-white/20 md:pr-9">
+        <p className="font-body text-[0.84rem] tracking-wide text-white/65 uppercase md:text-[0.92rem]">
           {kind}
         </p>
-        <h2 className="mt-2.5 font-display text-[1.18rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.56rem]">
+        <h2 className="mt-2.5 font-display text-[1.34rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.82rem]">
           {item.title}
         </h2>
         {date ? (
-          <p className="mt-1 font-body text-[0.8rem] tracking-normal text-white/65">
+          <p className="mt-2 font-body text-[0.88rem] tracking-normal text-white/65 md:text-[0.96rem]">
             {date}
           </p>
         ) : null}
-        <div className="mt-4 flex flex-wrap gap-1.5">
+        <div className="mt-5 flex flex-wrap justify-center gap-1.5">
           {item.tech.map((tech) => (
             <span
-              className="liquid-pill inline-block rounded-md px-2.5 py-[3px] font-sans text-[0.72rem] text-white/80"
+              className="liquid-pill inline-block rounded-md px-2.5 py-[3px] font-sans text-[0.76rem] text-white/80 md:text-[0.82rem]"
               key={tech}
             >
               {tech}
             </span>
           ))}
         </div>
-      </motion.div>
-      <motion.div
-        className="mt-3 min-w-0 md:mt-0"
-        initial={reduce ? false : {opacity: 0, y: 48}}
-        whileInView={reduce ? undefined : {opacity: 1, y: 0}}
-        viewport={ITEM_VP}
-        transition={{duration: 0.68, delay: 0.16, ease: EASE}}
-      >
-        <p className="max-w-[64ch] font-body text-[0.875rem] leading-[1.65] text-white/90 md:text-[1.03rem] md:leading-[1.78]">
+      </div>
+      <div className="mt-3 min-w-0 md:mt-0">
+        <p className="mx-auto max-w-[58ch] font-body text-[0.94rem] leading-[1.68] text-white/90 md:text-[1.18rem] md:leading-[1.76]">
           {item.description}
         </p>
-        {item.highlights?.length ? (
-          <ul className="mt-3 grid gap-2 font-body text-[0.84rem] leading-[1.6] text-white/80 md:mt-4 md:gap-2.5 md:text-[1rem] md:leading-[1.72]">
-            {item.highlights.map((highlight, hi) => (
-              <motion.li
-                className="flex gap-3"
-                initial={reduce ? false : {opacity: 0, y: 20}}
-                whileInView={reduce ? undefined : {opacity: 1, y: 0}}
-                viewport={ITEM_VP}
-                transition={{duration: 0.5, delay: 0.22 + hi * 0.08, ease: EASE}}
-                key={highlight}
-              >
-                <span
-                  aria-hidden="true"
-                  className="mt-[0.65em] h-1.5 w-1.5 flex-none rounded-full bg-white/70"
-                />
-                <span>{highlight}</span>
-              </motion.li>
-            ))}
-          </ul>
-        ) : null}
         {previewLinks?.map((link) => (
-          <PresentationPreview className="mt-5" key={link.label} link={link} />
+          <PresentationPreview className="mx-auto mt-6" key={link.label} link={link} />
         ))}
         {githubLink?.href || prLink?.href ? (
-          <div className="mt-5 flex flex-wrap gap-2.5">
+          <div className="mt-6 flex flex-wrap justify-center gap-2.5">
             {githubLink ? (
               <GitHubButton fallbackAriaLabel={`${item.title} GitHub repository`} link={githubLink} />
             ) : null}
@@ -594,14 +519,14 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
           </div>
         ) : null}
         {otherLinks?.length ? (
-          <div className="mt-5 flex flex-wrap gap-4 text-[0.8rem] text-white">
+          <div className="mt-6 flex flex-wrap justify-center gap-4 text-[0.86rem] text-white md:text-[0.94rem]">
             {otherLinks.map((link) => (
               <ExternalLink key={link.label} link={link} />
             ))}
           </div>
         ) : null}
-      </motion.div>
-    </motion.article>
+      </div>
+    </article>
   );
 }
 

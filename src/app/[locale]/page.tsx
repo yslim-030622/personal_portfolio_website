@@ -44,6 +44,7 @@ export default async function Page({params}: PageProps) {
     {
       id: "work",
       label: "주요 경력",
+      navTitle: content.sectionEyebrows.work,
       content: (
         <WorkSection eyebrow={content.sectionEyebrows.work} items={content.work} />
       ),
@@ -51,6 +52,7 @@ export default async function Page({params}: PageProps) {
     {
       id: "projects",
       label: "프로젝트",
+      navTitle: content.sectionEyebrows.projects,
       content: (
         <ProjectsSection
           eyebrow={content.sectionEyebrows.projects}
@@ -61,6 +63,7 @@ export default async function Page({params}: PageProps) {
     {
       id: "notes",
       label: "노트",
+      navTitle: content.sectionEyebrows.notes,
       content: (
         <div className="min-h-[100svh] bg-bg pt-16 md:pt-20">
           <NotesSection
@@ -74,6 +77,7 @@ export default async function Page({params}: PageProps) {
     {
       id: "skills",
       label: "기술",
+      navTitle: content.sectionEyebrows.skills,
       content: (
         <div className="min-h-[100svh] bg-bg pt-16 md:pt-20">
           <SkillsSection eyebrow={content.sectionEyebrows.skills} items={content.skills} />
@@ -85,7 +89,7 @@ export default async function Page({params}: PageProps) {
 
   return (
     <>
-      <Navigation />
+      <Navigation sectionTitles={sections.map((section) => section.navTitle)} />
       <FullPageScroll sections={sections} />
     </>
   );
