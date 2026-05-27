@@ -45,8 +45,8 @@ function Section({eyebrow, children, className, animateContent = true}: SectionP
       {animateContent ? (
         <motion.div
           className="mt-0"
-          initial={reduce ? false : {opacity: 0, y: 64}}
-          whileInView={reduce ? undefined : {opacity: 1, y: 0}}
+          initial={{opacity: 0, y: 64}}
+          whileInView={{opacity: 1, y: 0}}
           viewport={VP}
           transition={{duration: 0.72, delay: 0.14, ease: EASE}}
         >
