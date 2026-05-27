@@ -170,9 +170,7 @@ function StackCard({
     return Math.min((pi - index) * 2, 5);
   });
 
-  // Opacity: non-uniform keyframes for a clean crossfade during transitions.
-  // The card fades to 0 at the midpoint of the next card's entry, then
-  // reappears at near-full peek opacity so colors stay vivid.
+  // Opacity: smooth transition without dipping to 0 when moving to the background
   const opacityIns: number[] = [];
   const opacityOuts: number[] = [];
 
@@ -180,27 +178,25 @@ function StackCard({
     opacityIns.push(0); opacityOuts.push(1);
   } else {
     const prevP       = (index - 1) * step;
-    const fadeInStart = prevP + 0.44 * step;
+    const fadeInStart = prevP + 0.2 * step; // Start fading in slightly after it begins moving
+    
     if (prevP > 0) {
       opacityIns.push(0); opacityOuts.push(0);
     }
-    opacityIns.push(prevP);        opacityOuts.push(0);
-    opacityIns.push(fadeInStart);  opacityOuts.push(0);
+    opacityIns.push(prevP);       opacityOuts.push(0);
+    opacityIns.push(fadeInStart); opacityOuts.push(0.1);
     opacityIns.push(index * step); opacityOuts.push(1);
   }
 
+  // When card moves to the background (pi > index)
   for (let pi = index + 1; pi < total; pi++) {
-    const prevP      = (pi - 1) * step;
     const currP      = pi * step;
     const depth      = pi - index;
-    // Shallow falloff so deeper cards still show vivid color
     const peekOp     = Math.max(0.65, PEEK_OPACITY - (depth - 1) * 0.07);
-    const fadeOutAt  = prevP + 0.50 * step;
-    const reappearAt = prevP + 0.80 * step;
 
-    opacityIns.push(fadeOutAt);   opacityOuts.push(0);
-    opacityIns.push(reappearAt);  opacityOuts.push(peekOp * 0.5);
-    opacityIns.push(currP);       opacityOuts.push(peekOp);
+    // Instead of fading to 0 and reappearing, just dim smoothly to peekOp
+    opacityIns.push(currP);       
+    opacityOuts.push(peekOp);
   }
 
   const y       = useTransform(scrollYProgress, points,     yValues);

@@ -285,9 +285,6 @@ html[lang="ko"] h2.font-display {
     0 11px 24px rgb(0 0 0 / 0.20);
 }
 
-.card-stack-item[data-active="false"] .card-stack-drag > .liquid-card > * {
-  visibility: hidden;
-}
 
 .card-stack-count,
 .card-stack-remaining {
