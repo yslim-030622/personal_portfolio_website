@@ -36,7 +36,8 @@ export default async function Page({params}: PageProps) {
       id: "hero",
       label: "소개",
       content: (
-        <div className="h-[250svh] bg-bg">
+        <div className="h-[250svh] relative" style={{ background: "linear-gradient(160deg, #ffffff 0%, #e0eaf5 50%, #c4d7ec 100%)", color: "#0f172a", "--fg": "#0f172a", "--fg-muted": "#334155" } as React.CSSProperties}>
+          <div className="absolute inset-x-0 bottom-0 h-[30vh] pointer-events-none" style={{ background: "linear-gradient(to bottom, transparent, var(--bg))" }} />
           <div className="sticky top-0 h-[100svh]">
             <Hero content={content.hero} />
           </div>
