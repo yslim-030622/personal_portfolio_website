@@ -251,6 +251,13 @@ function CardStack({
   const cards = Children.toArray(children);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollYProgress = useMotionValue(0);
+  // Add a very buttery smooth spring to the scroll progress
+  // Low mass makes it responsive, appropriate damping prevents rubber-banding
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 24,
+    mass: 0.2,
+  });
 
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -295,7 +302,7 @@ function CardStack({
               index={i}
               activeIndex={activeIndex}
               total={cards.length}
-              scrollYProgress={scrollYProgress}
+              scrollYProgress={smoothProgress}
             >
               {child}
             </StackCard>
