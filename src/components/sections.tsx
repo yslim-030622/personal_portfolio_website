@@ -34,7 +34,7 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const VP = {once: true, margin: "0px 0px -80px 0px", amount: 0.06} as const;
 
 function Section({eyebrow, children, className, animateContent = true}: SectionProps) {
-  const reduce = usePrefersReducedMotion();
+  
 
   return (
     <section
@@ -151,7 +151,7 @@ function StackCard({
   // We want the card to be at ENTRY_Y when its turn hasn't started yet,
   // and smoothly move to its active position exactly when scroll reaches its index.
   const activeP = total > 1 ? index / (total - 1) : 0;
-  const startP = Math.max(0, activeP - (total > 1 ? 1 / (total - 1) : 0));
+  
   
   // Add points for every card index to define the path
   for(let pi = 0; pi < total; pi++) {
@@ -221,41 +221,7 @@ function StackCard({
   const zIndex   = index + 1;
   const isActive = index === activeIndex;
 
-  if (reduce) {
-    const isPast      = index < activeIndex;
-    const isFuture    = index > activeIndex;
-    const depth       = activeIndex - index;
-    const activeShift = activeIndex * PEEK_VH / 2;
-    const yStr        = isActive
-      ? `${activeShift}vh`
-      : isPast
-        ? `${activeShift - depth * PEEK_VH}vh`
-        : `${ENTRY_Y}vh`;
-    const scaleVal = isPast ? Math.max(0.91, 1 - depth * 0.03) : 1;
-    const rxVal    = isPast ? Math.min(depth * 2, 5) : 0;
-    const opVal    = isFuture ? 0 : isPast ? Math.max(0.65, PEEK_OPACITY - (depth - 1) * 0.07) : 1;
-    return (
-      <div
-        aria-label={`Card ${index + 1} of ${total}`}
-        aria-hidden={!isActive}
-        className="card-stack-item"
-        data-active={isActive}
-        style={{ zIndex, pointerEvents: isActive ? "auto" : "none" }}
-      >
-        <div
-          className="card-stack-drag will-change-transform"
-          style={{
-            opacity: opVal,
-            transform: `translateY(${yStr}) scale(${scaleVal}) rotateX(${rxVal}deg)`,
-            transformOrigin: "center center",
-            transition: "transform 600ms cubic-bezier(0.22,1,0.36,1), opacity 400ms cubic-bezier(0.22,1,0.36,1)",
-          }}
-        >
-          {children}
-        </div>
-      </div>
-    );
-  }
+  
 
   return (
     <div
@@ -285,12 +251,7 @@ function CardStack({
   const cards = Children.toArray(children);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollYProgress = useMotionValue(0);
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 280,
-    damping: 32,
-    mass: 0.4,
-    restDelta: 0.0003,
-  });
+
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
