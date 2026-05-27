@@ -353,7 +353,7 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
           <div className="min-w-0 flex-1">
             {item.companyUrl ? (
               <a
-                className="font-display text-[1.5rem] font-medium leading-tight text-white transition-colors duration-200 hover:text-white/80 md:text-[1.82rem]"
+                className="font-display text-[1.5rem] font-medium leading-tight text-white transition-colors duration-200 hover:text-white/80 md:text-[1.82rem] break-keep"
                 href={item.companyUrl}
                 rel="noreferrer"
                 target="_blank"
@@ -365,18 +365,18 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
                 {item.company}
               </h2>
             )}
-            <p className="mt-2 font-body text-[0.88rem] leading-snug text-white/90 md:mt-3 md:text-[0.94rem]">
+            <p className="mt-2 font-body text-[0.88rem] leading-snug text-white/90 md:mt-3 md:text-[0.94rem] break-keep">
               {item.role}
             </p>
-            <p className="mt-1.5 font-body text-[0.8rem] text-white/65 md:text-[0.86rem]">
+            <p className="mt-1.5 font-body text-[0.8rem] text-white/65 md:text-[0.86rem] break-keep">
               {item.dates}{item.location ? ` · ${item.location}` : ""}
             </p>
           </div>
           {photos?.length ? (
             <div className="shrink-0 md:hidden">
-              <figure className="liquid-media overflow-hidden rounded-md" key={photos[0].src}>
+              <figure className="liquid-media overflow-hidden rounded-md bg-black/10" key={photos[0].src}>
                 <div className="relative h-[88px] w-[66px]">
-                  <Image alt={photos[0].alt} className="object-cover object-[50%_36%]" fill sizes="66px" src={photos[0].src} />
+                  <Image alt={photos[0].alt} className="object-contain object-center p-1" fill sizes="66px" src={photos[0].src} />
                 </div>
               </figure>
             </div>
@@ -385,9 +385,9 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
         {photos?.length ? (
           <div className="mt-5 hidden md:block">
             {photos.map((photo) => (
-              <figure className="liquid-media overflow-hidden rounded-md" key={photo.src}>
-                <div className="relative aspect-[4/5] w-full max-w-[108px]">
-                  <Image alt={photo.alt} className="object-cover object-[50%_36%]" fill sizes="108px" src={photo.src} />
+              <figure className="liquid-media overflow-hidden rounded-md bg-black/10" key={photo.src}>
+                <div className="relative aspect-[3/4] w-full max-w-[108px]">
+                  <Image alt={photo.alt} className="object-contain object-center p-1.5" fill sizes="108px" src={photo.src} />
                 </div>
               </figure>
             ))}
@@ -490,9 +490,9 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
   const otherLinks = item.links?.filter(
     (link) => !isPdfLink(link) && !isGitHubRepoLink(link) && !isGitHubPullRequestLink(link)
   );
-  const kind = item.kindDate.includes(" · ")
-    ? item.kindDate.split(" · ", 2)[0]
-    : item.kindDate;
+  const [kind, date] = item.kindDate.includes(" · ")
+    ? item.kindDate.split(" · ", 2)
+    : [item.kindDate, ""];
 
   const hasLeftActions = !!(githubLink?.href || prLink?.href);
 
@@ -503,12 +503,19 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
     >
       {/* Left column */}
       <div className="md:flex md:h-full md:flex-col md:border-r md:border-white/20 md:pr-9">
-        <p className="font-body text-[0.78rem] tracking-wide text-white/65 uppercase md:text-[0.84rem]">
-          {kind}
-        </p>
-        <h2 className="mt-2 font-display text-[1.5rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.82rem] break-keep">
-          {item.title}
-        </h2>
+        <div className="min-w-0 flex-1">
+          <p className="font-body text-[0.78rem] tracking-wide text-white/65 uppercase md:text-[0.84rem] break-keep">
+            {kind}
+          </p>
+          <h2 className="mt-2 font-display text-[1.5rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.82rem] break-keep">
+            {item.title}
+          </h2>
+          {date ? (
+            <p className="mt-1.5 font-body text-[0.8rem] text-white/65 md:text-[0.86rem] break-keep">
+              {date}
+            </p>
+          ) : null}
+        </div>
         <div className="pt-4 md:pt-6">
           {hasLeftActions ? (
             <div className="project-left-actions !mt-0">
