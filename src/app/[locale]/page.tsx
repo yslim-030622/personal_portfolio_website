@@ -36,7 +36,7 @@ export default async function Page({params}: PageProps) {
       id: "hero",
       label: "소개",
       content: (
-        <div className="h-[150svh] bg-bg">
+        <div className="h-[250svh] bg-bg">
           <div className="sticky top-0 h-[100svh]">
             <Hero content={content.hero} />
           </div>
