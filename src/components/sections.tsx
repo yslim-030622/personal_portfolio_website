@@ -140,37 +140,23 @@ function StackCard({
   const reduce = usePrefersReducedMotion();
 
   const PEEK_VH      = 5;
-  const ENTRY_Y      = 120;  // start further down so they pull up continuously
+  const ENTRY_Y      = 100;   // vh — exactly bottom of screen
   const PEEK_OPACITY = 0.90; // high opacity = vivid original colors preserved
   const step         = total > 1 ? 1 / (total - 1) : 1;
 
-  // Create a dense set of keypoints so the transformation is a continuous curve
-  const points: number[] = [];
-  const yValues: string[] = [];
-  
-  // We want the card to be at ENTRY_Y when its turn hasn't started yet,
-  // and smoothly move to its active position exactly when scroll reaches its index.
-  const activeP = total > 1 ? index / (total - 1) : 0;
-  
-  
-  // Add points for every card index to define the path
-  for(let pi = 0; pi < total; pi++) {
-      const p = total > 1 ? pi / (total - 1) : 0;
-      points.push(p);
-      
-      if (pi < index) {
-         // It's still waiting below the viewport.
-         // Make it scale continuously by setting its starting point slightly lower
-         // than ENTRY_Y if it's far away.
-         const distance = index - pi;
-         yValues.push(`${ENTRY_Y + distance * 30}vh`);
-      } else {
-         // It is active or pushed to the background
-         const depth = pi - index;
-         const activeShift = pi * (PEEK_VH / 2);
-         yValues.push(`${activeShift - depth * PEEK_VH}vh`);
-      }
-  }
+    // Uniform progress keypoints: [0, 1/(n-1), 2/(n-1), ..., 1]
+  const points = Array.from({ length: total }, (_, i) => (total > 1 ? i / (total - 1) : 0));
+
+  // Y: cluster-centering formula.
+  // activeShift offsets the active card downward so the entire visible stack
+  // (active + peeked cards above) remains centered in the viewport.
+  // Without it, peeked cards push the visual mass upward.
+  const yValues = points.map((_, pi) => {
+    if (pi < index) return `${ENTRY_Y}vh`;
+    const depth       = pi - index;
+    const activeShift = pi * (PEEK_VH / 2); // shifts active card down to balance peek mass above
+    return `${activeShift - depth * PEEK_VH}vh`;
+  });
 
   // Scale: active at 1, peeked cards shrink slightly
   const scaleValues = points.map((_, pi) => {
@@ -304,7 +290,7 @@ function CardStack({
     <div
       className={`card-stack-scroll relative w-full ${className ?? ""}`}
       ref={containerRef}
-      style={{ height: `${cards.length * 50 + 50}vh` }}
+      style={{ height: `${cards.length * 100}vh` }}
     >
       <div className="card-stack-sticky sticky top-0 h-[100svh] flex items-center justify-center overflow-hidden perspective-[1200px]">
         <div className="card-stack-stage relative mx-auto h-full max-w-[1100px] w-full">
