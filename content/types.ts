@@ -14,6 +14,13 @@ export type OptionalLink = {
   ariaLabel?: Bilingual;
 };
 
+export type ProjectPreviewImage = {
+  src: string;
+  alt: Bilingual;
+  width: number;
+  height: number;
+};
+
 export type EmptySlot = {
   status: "empty";
   note?: string;
@@ -46,6 +53,7 @@ export type RawProjectEntry =
       kindDate: string;
       description: BilingualParagraph;
       highlights?: BilingualParagraph[];
+      previewImages?: ProjectPreviewImage[];
       tech: string[];
       links?: OptionalLink[];
     }
@@ -146,6 +154,12 @@ export type LocalizedProjectEntry =
       kindDate: string;
       description: string;
       highlights?: string[];
+      previewImages?: {
+        src: string;
+        alt: string;
+        width: number;
+        height: number;
+      }[];
       tech: string[];
       links?: LocalizedOptionalLink[];
     }

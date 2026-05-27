@@ -53,7 +53,7 @@ function getSectionState(offset: number) {
   return {
     y: "0%",
     scale: Math.max(0.86, 1 - depth * 0.04),
-    opacity: Math.max(0.0, 1 - depth * 0.55),
+    opacity: Math.max(0.0, 1 - depth * 0.8),
     transition: {
       y:       {duration: CARD_EXIT_DURATION, ease: CARD_EXIT_EASE},
       scale:   {duration: CARD_EXIT_DURATION, ease: CARD_EXIT_EASE},

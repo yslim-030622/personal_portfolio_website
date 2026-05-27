@@ -10,7 +10,6 @@ import type {
 import type {MotionValue} from "motion/react";
 import {NotesAccordion} from "./notes-accordion";
 import {PresentationPreview} from "./presentation-preview";
-import {usePrefersReducedMotion} from "./use-prefers-reduced-motion";
 import {motion, useMotionValue, useSpring, useTransform} from "motion/react";
 import Image from "next/image";
 import {Children, type ReactNode, useRef, useState, useEffect} from "react";
@@ -108,7 +107,7 @@ function GitHubButton({
   return (
     <a
       aria-label={link.ariaLabel ?? fallbackAriaLabel}
-      className="card-github-btn inline-flex items-center gap-2 rounded-md px-3.5 py-2 text-[0.82rem] text-white transition-all duration-200"
+      className="card-github-btn inline-flex items-center gap-2 rounded-md px-3.5 py-2 text-[0.82rem] text-white transition-all duration-200 lowercase"
       href={link.href}
       rel="noreferrer"
       target="_blank"
@@ -119,6 +118,36 @@ function GitHubButton({
   );
 }
 
+
+const TECH_ICON_SLUGS: Record<string, string> = {
+  "Python": "python",
+  "Swift": "swift",
+  "FastAPI": "fastapi",
+  "PostgreSQL": "postgresql",
+  "Docker": "docker",
+  "TypeScript": "typescript",
+  "Spring Boot": "springboot",
+  "MySQL": "mysql",
+  "GitLab CI": "gitlab",
+  "C": "c",
+  "Rust": "rust",
+};
+
+function TechIcon({name}: {name: string}) {
+  const slug = TECH_ICON_SLUGS[name] ?? name.toLowerCase().replace(/\s+/g, "");
+  return (
+    <span title={name} className="tech-icon-wrap inline-flex items-center justify-center">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`https://cdn.simpleicons.org/${slug}/FFFFFF`}
+        alt={name}
+        width={22}
+        height={22}
+        className="tech-icon-img"
+      />
+    </span>
+  );
+}
 
 const STACK_CARD_COLORS = ['#E8314A', '#5C6BC0'];
 const WORK_CARD_COLORS = STACK_CARD_COLORS;
@@ -137,11 +166,8 @@ function StackCard({
   total: number;
   scrollYProgress: MotionValue<number>;
 }) {
-  const reduce = usePrefersReducedMotion();
-
   const PEEK_VH      = 5;
   const ENTRY_Y      = 100;   // vh — exactly bottom of screen
-  const PEEK_OPACITY = 0.90; // high opacity = vivid original colors preserved
   const step         = total > 1 ? 1 / (total - 1) : 1;
 
     // Uniform progress keypoints: [0, 1/(n-1), 2/(n-1), ..., 1]
@@ -192,7 +218,8 @@ function StackCard({
   for (let pi = index + 1; pi < total; pi++) {
     const currP      = pi * step;
     const depth      = pi - index;
-    const peekOp     = Math.max(0.65, PEEK_OPACITY - (depth - 1) * 0.07);
+    // Dim the background cards significantly to reduce visual clutter and emphasize the blur
+    const peekOp     = Math.max(0.0, 0.45 - (depth - 1) * 0.25);
 
     // Instead of fading to 0 and reappearing, just dim smoothly to peekOp
     opacityIns.push(currP);       
@@ -237,8 +264,7 @@ function CardStack({
   const cards = Children.toArray(children);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollYProgress = useMotionValue(0);
-  // Add a very buttery smooth spring to the scroll progress
-  // Low mass makes it responsive, appropriate damping prevents rubber-banding
+  // Shared spring keeps card-switch resistance identical across deck sections.
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 120,
     damping: 24,
@@ -318,68 +344,64 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
 
   return (
     <article
-      className="card-colored liquid-card group grid items-center gap-5 rounded-[28px] p-6 text-center transition duration-300 md:grid-cols-[240px_1fr] md:gap-9 md:p-9"
+      className="card-colored liquid-card group grid items-start gap-5 rounded-[28px] p-6 transition duration-300 md:grid-cols-[260px_1fr] md:gap-9 md:p-9"
       style={{"--card-color": colorValue} as React.CSSProperties}
     >
-      <div
-        className={
-          photos?.length
-            ? "grid grid-cols-[minmax(0,1fr)_96px] items-center gap-4 md:block md:border-r md:border-white/20 md:pr-9"
-            : "md:border-r md:border-white/20 md:pr-9"
-        }
-      >
-        <div>
-          {item.companyUrl ? (
-            <a
-              className="inline-block font-display text-[1.58rem] font-medium leading-tight text-white transition-colors duration-200 hover:text-white/80 md:text-[1.95rem]"
-              href={item.companyUrl}
-              rel="noreferrer"
-              target="_blank"
-            >
-              {item.company}
-            </a>
-          ) : (
-            <h2 className="font-display text-[1.58rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.95rem]">
-              {item.company}
-            </h2>
-          )}
-          <p className="mt-3 font-body text-[1.02rem] leading-[1.5] text-white/90 md:text-[1.12rem]">
-            {item.role}
-          </p>
-          <p className="mt-4 font-body text-[0.92rem] leading-snug text-white/70 md:text-[1rem]">
-            {item.dates}
-          </p>
-          <p className="mt-1.5 font-body text-[0.9rem] tracking-normal text-white/65 md:text-[0.98rem]">
-            {item.location}
-          </p>
+      {/* Left column */}
+      <div className="md:flex md:h-full md:flex-col md:border-r md:border-white/20 md:pr-9">
+        <div className={photos?.length ? "flex items-start gap-4 md:block" : ""}>
+          <div className="min-w-0 flex-1">
+            {item.companyUrl ? (
+              <a
+                className="font-display text-[1.5rem] font-medium leading-tight text-white transition-colors duration-200 hover:text-white/80 md:text-[1.82rem]"
+                href={item.companyUrl}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {item.company}
+              </a>
+            ) : (
+              <h2 className="font-display text-[1.5rem] font-medium leading-tight text-white group-hover:text-white/80 md:text-[1.82rem] break-keep">
+                {item.company}
+              </h2>
+            )}
+            <p className="mt-2 font-body text-[0.88rem] leading-snug text-white/90 md:mt-3 md:text-[0.94rem]">
+              {item.role}
+            </p>
+            <p className="mt-1.5 font-body text-[0.8rem] text-white/65 md:text-[0.86rem]">
+              {item.dates}{item.location ? ` · ${item.location}` : ""}
+            </p>
+          </div>
+          {photos?.length ? (
+            <div className="shrink-0 md:hidden">
+              <figure className="liquid-media overflow-hidden rounded-md" key={photos[0].src}>
+                <div className="relative h-[88px] w-[66px]">
+                  <Image alt={photos[0].alt} className="object-cover object-[50%_36%]" fill sizes="66px" src={photos[0].src} />
+                </div>
+              </figure>
+            </div>
+          ) : null}
         </div>
         {photos?.length ? (
-          <div className="grid w-full max-w-[96px] gap-3 md:mx-auto md:mt-5 md:max-w-[128px]">
+          <div className="mt-5 hidden md:block">
             {photos.map((photo) => (
-              <figure
-                className="liquid-media relative overflow-hidden rounded-md"
-                key={photo.src}
-              >
-                <div className="relative aspect-[4/5]">
-                  <Image
-                    alt={photo.alt}
-                    className="object-cover object-[50%_36%]"
-                    fill
-                    sizes="150px"
-                    src={photo.src}
-                  />
+              <figure className="liquid-media overflow-hidden rounded-md" key={photo.src}>
+                <div className="relative aspect-[4/5] w-full max-w-[108px]">
+                  <Image alt={photo.alt} className="object-cover object-[50%_36%]" fill sizes="108px" src={photo.src} />
                 </div>
               </figure>
             ))}
           </div>
         ) : null}
       </div>
-      <div>
-        <p className="mx-auto max-w-[58ch] font-body text-[0.94rem] leading-[1.68] text-white/90 md:text-[1.18rem] md:leading-[1.76]">
+
+      {/* Right column */}
+      <div className="min-w-0">
+        <p className="font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76]">
           {item.paragraph}
         </p>
         {previewLinks?.map((link) => (
-          <PresentationPreview className="mx-auto mt-6" key={link.label} link={link} />
+          <PresentationPreview className="mt-6" key={link.label} link={link} />
         ))}
         {(() => {
           const githubLink = textLinks?.find(isGitHubRepoLink);
@@ -388,17 +410,13 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
           return (
             <>
               {githubLink?.href || prLink?.href ? (
-                <div className="mt-6 flex flex-wrap justify-center gap-2.5">
-                  {githubLink ? (
-                    <GitHubButton fallbackAriaLabel={`${item.company} GitHub repository`} link={githubLink} />
-                  ) : null}
-                  {prLink ? (
-                    <GitHubButton fallbackAriaLabel={`${item.company} pull request on GitHub`} link={prLink} />
-                  ) : null}
+                <div className="mt-6 flex flex-wrap gap-2.5">
+                  {githubLink ? <GitHubButton fallbackAriaLabel={`${item.company} GitHub repository`} link={githubLink} /> : null}
+                  {prLink ? <GitHubButton fallbackAriaLabel={`${item.company} pull request on GitHub`} link={prLink} /> : null}
                 </div>
               ) : null}
               {otherLinks?.length ? (
-                <div className="mt-6 flex flex-wrap justify-center gap-4 text-[0.8rem] uppercase text-white md:text-[0.88rem]">
+                <div className="mt-6 flex flex-wrap gap-4 text-[0.8rem] uppercase text-white md:text-[0.86rem]">
                   {otherLinks.map((link) => (
                     <ExternalLink key={link.label} link={link} />
                   ))}
@@ -438,6 +456,33 @@ export function WorkSection({
 
 type FilledProjectEntry = Extract<LocalizedProjectEntry, {status: "filled"}>;
 
+function ProjectScreenshotPreview({
+  title,
+  images
+}: {
+  title: string;
+  images: NonNullable<FilledProjectEntry["previewImages"]>;
+}) {
+  if (!images.length) {
+    return null;
+  }
+
+  return (
+    <div className="clearsplit-showcase mt-6 overflow-hidden rounded-[26px]">
+      <div aria-label={`${title} app screenshots`} className="clearsplit-showcase-stage">
+        <Image
+          alt={`${title} app screens preview`}
+          className="object-contain"
+          fill
+          priority
+          sizes="(max-width: 768px) 84vw, 720px"
+          src="/clearsplit/clearsplit-showcase.png"
+        />
+      </div>
+    </div>
+  );
+}
+
 function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: string}) {
   const previewLinks = item.links?.filter(isPdfLink);
   const githubLink = item.links?.find((link) => !isPdfLink(link) && isGitHubRepoLink(link));
@@ -445,57 +490,57 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
   const otherLinks = item.links?.filter(
     (link) => !isPdfLink(link) && !isGitHubRepoLink(link) && !isGitHubPullRequestLink(link)
   );
-  const [kind, date] = item.kindDate.includes(" · ")
-    ? item.kindDate.split(" · ", 2)
-    : [item.kindDate, ""];
+  const kind = item.kindDate.includes(" · ")
+    ? item.kindDate.split(" · ", 2)[0]
+    : item.kindDate;
+
+  const hasLeftActions = !!(githubLink?.href || prLink?.href);
 
   return (
     <article
-      className="card-colored liquid-card group rounded-[28px] p-6 text-center transition duration-300 md:grid md:grid-cols-[240px_1fr] md:items-center md:gap-9 md:p-9"
+      className="project-card card-colored liquid-card group grid items-start gap-5 rounded-[28px] p-6 transition duration-300 md:grid-cols-[260px_1fr] md:gap-9 md:p-9"
       style={{"--card-color": colorValue} as React.CSSProperties}
     >
-      <div className="min-w-0 md:flex md:h-full md:flex-col md:justify-center md:border-r md:border-white/20 md:pr-9">
-        <p className="font-body text-[0.84rem] tracking-wide text-white/65 uppercase md:text-[0.92rem]">
+      {/* Left column */}
+      <div className="md:flex md:h-full md:flex-col md:border-r md:border-white/20 md:pr-9">
+        <p className="font-body text-[0.78rem] tracking-wide text-white/65 uppercase md:text-[0.84rem]">
           {kind}
         </p>
-        <h2 className="mt-2.5 font-display text-[1.34rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.82rem]">
+        <h2 className="mt-2 font-display text-[1.5rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.82rem] break-keep">
           {item.title}
         </h2>
-        {date ? (
-          <p className="mt-2 font-body text-[0.88rem] tracking-normal text-white/65 md:text-[0.96rem]">
-            {date}
-          </p>
-        ) : null}
-        <div className="mt-5 flex flex-wrap justify-center gap-1.5">
-          {item.tech.map((tech) => (
-            <span
-              className="liquid-pill inline-block rounded-md px-2.5 py-[3px] font-sans text-[0.76rem] text-white/80 md:text-[0.82rem]"
-              key={tech}
-            >
-              {tech}
-            </span>
-          ))}
+        <div className="pt-4 md:pt-6">
+          {hasLeftActions ? (
+            <div className="project-left-actions !mt-0">
+              {githubLink ? (
+                <GitHubButton fallbackAriaLabel={`${item.title} GitHub repository`} link={githubLink} />
+              ) : null}
+              {prLink ? (
+                <GitHubButton fallbackAriaLabel={`${item.title} pull request on GitHub`} link={prLink} />
+              ) : null}
+            </div>
+          ) : null}
+          <div className={`project-tech-stack ${!hasLeftActions ? '!mt-0' : ''}`}>
+            {item.tech.map((tech) => (
+              <TechIcon key={tech} name={tech} />
+            ))}
+          </div>
         </div>
       </div>
-      <div className="mt-3 min-w-0 md:mt-0">
-        <p className="mx-auto max-w-[58ch] font-body text-[0.94rem] leading-[1.68] text-white/90 md:text-[1.18rem] md:leading-[1.76]">
+
+      {/* Right column */}
+      <div className="project-card-body min-w-0">
+        <p className="project-description font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76]">
           {item.description}
         </p>
-        {previewLinks?.map((link) => (
-          <PresentationPreview className="mx-auto mt-6" key={link.label} link={link} />
-        ))}
-        {githubLink?.href || prLink?.href ? (
-          <div className="mt-6 flex flex-wrap justify-center gap-2.5">
-            {githubLink ? (
-              <GitHubButton fallbackAriaLabel={`${item.title} GitHub repository`} link={githubLink} />
-            ) : null}
-            {prLink ? (
-              <GitHubButton fallbackAriaLabel={`${item.title} pull request on GitHub`} link={prLink} />
-            ) : null}
-          </div>
+        {item.previewImages?.length ? (
+          <ProjectScreenshotPreview images={item.previewImages} title={item.title} />
         ) : null}
+        {previewLinks?.map((link) => (
+          <PresentationPreview className="mt-6" key={link.label} link={link} />
+        ))}
         {otherLinks?.length ? (
-          <div className="mt-6 flex flex-wrap justify-center gap-4 text-[0.86rem] text-white md:text-[0.94rem]">
+          <div className="mt-6 flex flex-wrap gap-4 text-[0.8rem] uppercase text-white md:text-[0.86rem]">
             {otherLinks.map((link) => (
               <ExternalLink key={link.label} link={link} />
             ))}

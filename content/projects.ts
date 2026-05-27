@@ -20,10 +20,10 @@ export const projects: RawProjectEntry[] = [
   {
     status: "filled",
     title: "ClearSplit",
-    kindDate: "Full Stack · 2025–2026",
+    kindDate: "Full Stack Project · 2025–2026",
     description: {
-      en: "Living with roommates in college meant a lot of grocery runs and group dinners. Every time we split the bill, one person did the math and everyone else just had to trust it. Mistakes happened and there was no easy way to catch them. I built ClearSplit so anyone in the group can upload a receipt, see exactly which items they're being charged for, and settle up without the guesswork.",
-      ko: "대학 생활을 하면서 룸메이트들과 함께 장을 보거나 외식을 하는 일이 잦았는데, 비용을 나눌 때마다 한 명이 계산하고 나머지는 그냥 믿는 상황이 종종 있었습니다. 실수가 생겨도 확인할 방법이 없고, 맞아도 찜찜한 게 남았습니다. 영수증을 찍으면 항목별로 자동 인식해 각자가 정확히 얼마를 내야 하는지, 그 이유까지 투명하게 보여주는 앱을 만들었습니다."
+      en: "Clearsplit is a full iOS app to solve expense splitting problems with my roommate. I put a lot of effort to build a backend structure behind the app. Visit my GitHub!",
+      ko: "Clearsplit은 룸메이트와의 비용 정산 문제를 해결하기 위해 만든 완성형 iOS 앱입니다. 앱 뒤에서 동작하는 백엔드 구조를 설계하고 구현하는 데 많은 노력을 들였습니다. GitHub도 방문해 주세요!"
     },
     highlights: [
       {
@@ -39,7 +39,69 @@ export const projects: RawProjectEntry[] = [
         ko: "백엔드는 Azure에 배포되어 있으며, iOS 앱과 연동됩니다."
       }
     ],
-    tech: ["Python", "Swift", "FastAPI", "PostgreSQL", "Redis", "Docker"],
+    previewImages: [
+      {
+        src: "/clearsplit/screenshots/01_login.png",
+        alt: {en: "ClearSplit login screen", ko: "ClearSplit 로그인 화면"},
+        width: 1206,
+        height: 2622
+      },
+      {
+        src: "/clearsplit/screenshots/02_create_session.png",
+        alt: {en: "ClearSplit create session screen", ko: "ClearSplit 세션 생성 화면"},
+        width: 1206,
+        height: 2622
+      },
+      {
+        src: "/clearsplit/screenshots/03_upload_receipt.png",
+        alt: {en: "ClearSplit receipt upload screen", ko: "ClearSplit 영수증 업로드 화면"},
+        width: 1206,
+        height: 2622
+      },
+      {
+        src: "/clearsplit/screenshots/04_receipt_preview.png",
+        alt: {en: "ClearSplit receipt preview screen", ko: "ClearSplit 영수증 미리보기 화면"},
+        width: 1206,
+        height: 2622
+      },
+      {
+        src: "/clearsplit/screenshots/05_review_items.png",
+        alt: {en: "ClearSplit item review screen", ko: "ClearSplit 항목 검토 화면"},
+        width: 1206,
+        height: 2622
+      },
+      {
+        src: "/clearsplit/screenshots/06_group_overview.png",
+        alt: {en: "ClearSplit group overview screen", ko: "ClearSplit 그룹 개요 화면"},
+        width: 1206,
+        height: 2622
+      },
+      {
+        src: "/clearsplit/screenshots/07_shopping_sessions.png",
+        alt: {en: "ClearSplit shopping sessions screen", ko: "ClearSplit 쇼핑 세션 목록 화면"},
+        width: 1206,
+        height: 2622
+      },
+      {
+        src: "/clearsplit/screenshots/08_group_overview_full.png",
+        alt: {en: "ClearSplit full group overview screen", ko: "ClearSplit 전체 그룹 개요 화면"},
+        width: 1206,
+        height: 2622
+      },
+      {
+        src: "/clearsplit/screenshots/09_balances_settlement.png",
+        alt: {en: "ClearSplit balances and settlement screen", ko: "ClearSplit 잔액 및 정산 화면"},
+        width: 1206,
+        height: 2622
+      },
+      {
+        src: "/clearsplit/screenshots/10_profile.png",
+        alt: {en: "ClearSplit profile screen", ko: "ClearSplit 프로필 화면"},
+        width: 1206,
+        height: 2622
+      }
+    ],
+    tech: ["Python", "Swift", "PostgreSQL", "Docker"],
     links: clearSplitLinks
   },
   {
@@ -68,7 +130,7 @@ export const projects: RawProjectEntry[] = [
         ko: "Spring Boot, MySQL, Chrome Extension, Docker 환경에서 기능을 통합하고 테스트했습니다."
       }
     ],
-    tech: ["TypeScript", "Spring Boot", "MySQL", "Canvas API", "Docker", "GitLab CI"],
+    tech: ["TypeScript", "Spring Boot", "MySQL", "Docker", "GitLab CI"],
     links: [
       ...projectLinks,
       {
@@ -125,7 +187,7 @@ export const projects: RawProjectEntry[] = [
       en: "Contributed to Meta's open-source Python type checker, Pyrefly, by improving code search results so they better surface the actual implementation location. I worked on an assigned issue, submitted a PR, and had it reviewed and merged.",
       ko: "Meta의 오픈소스 Python 타입 체커 Pyrefly에서, 코드 검색 결과가 실제 구현 위치를 더 잘 보여주도록 개선한 이슈를 맡아 PR을 올렸고 리뷰 후 머지되었습니다."
     },
-    tech: ["Rust", "Python", "Type Checking", "Open Source"],
+    tech: ["Rust", "Python"],
     links: [
       {
         label: {en: "Link to PR", ko: "PR 링크 바로가기"},

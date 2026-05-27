@@ -1,14 +1,7 @@
 "use client";
 
 import {useLocale, useTranslations} from "next-intl";
-import {useEffect, useMemo, useState, type ReactNode} from "react";
-
-type Theme = "dark" | "light";
-
-function themeForCurrentHour(): Theme {
-  const hour = new Date().getHours();
-  return hour >= 7 && hour < 18 ? "light" : "dark";
-}
+import {useEffect, useState, type ReactNode} from "react";
 
 function SegmentedSwitch<T extends string>({
   options,
@@ -63,18 +56,12 @@ export function Navigation({
 }) {
   const locale = useLocale();
   const t = useTranslations("nav");
-  const [theme, setTheme] = useState<Theme>("dark");
   const [scrolled, setScrolled] = useState(false);
   const [currentSection, setCurrentSection] = useState(0);
-  const themeParts = useMemo(() => t("themeToggle").split(" · "), [t]);
   const currentTitle = currentSection > 0 ? sectionTitles[currentSection] : undefined;
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("ysl-theme");
-    const next = stored === "light" || stored === "dark" ? stored : themeForCurrentHour();
-    document.documentElement.dataset.theme = next;
-    const frame = window.requestAnimationFrame(() => setTheme(next));
-    return () => window.cancelAnimationFrame(frame);
+    document.documentElement.dataset.theme = "light";
   }, []);
 
   useEffect(() => {
@@ -87,17 +74,9 @@ export function Navigation({
     return () => document.removeEventListener("fp-section-change", onSection);
   }, []);
 
-  const setThemeValue = (value: Theme) => {
-    document.documentElement.classList.add("theme-transitioning");
-    setTheme(value);
-    document.documentElement.dataset.theme = value;
-    window.localStorage.setItem("ysl-theme", value);
-    setTimeout(() => document.documentElement.classList.remove("theme-transitioning"), 500);
-  };
-
   return (
     <header
-      className={`fixed left-0 right-0 top-0 z-50 px-5 py-3 transition-all duration-300 md:px-8 ${
+      className={`fixed left-0 right-0 top-0 z-50 px-5 py-1.5 transition-all duration-300 md:px-8 ${
         scrolled
           ? "border-b border-border/50 bg-bg/80 backdrop-blur-md"
           : "border-b border-transparent bg-transparent"
@@ -110,7 +89,7 @@ export function Navigation({
             currentTitle ? "opacity-100" : "opacity-0"
           }`}
         >
-          {currentTitle ?? "\u00a0"}
+          {currentTitle ?? " "}
         </p>
         <div className="flex items-center gap-3">
           <SegmentedSwitch
@@ -122,15 +101,6 @@ export function Navigation({
             onChange={(val) => {
               window.location.href = val === "en" ? "/en" : "/ko";
             }}
-          />
-
-          <SegmentedSwitch
-            options={[
-              {label: themeParts[0], value: "light", ariaLabel: t("switchToLight")},
-              {label: themeParts[1], value: "dark", ariaLabel: t("switchToDark")},
-            ]}
-            value={theme}
-            onChange={setThemeValue}
           />
         </div>
       </nav>

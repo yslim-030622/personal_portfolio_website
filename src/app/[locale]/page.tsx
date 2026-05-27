@@ -36,8 +36,8 @@ export default async function Page({params}: PageProps) {
       id: "hero",
       label: "소개",
       content: (
-        <div className="h-[250svh] bg-bg">
-          <div className="sticky top-0 h-[100svh]">
+        <div className="md:h-[160svh]">
+          <div className="hero-section-bg md:sticky md:top-0 md:h-[100svh]">
             <Hero content={content.hero} />
           </div>
         </div>
@@ -48,7 +48,9 @@ export default async function Page({params}: PageProps) {
       label: "주요 경력",
       navTitle: content.sectionEyebrows.work,
       content: (
-        <WorkSection eyebrow={content.sectionEyebrows.work} items={content.work} />
+        <div className="work-section-bg">
+          <WorkSection eyebrow={content.sectionEyebrows.work} items={content.work} />
+        </div>
       ),
     },
     {

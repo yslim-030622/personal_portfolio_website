@@ -108,6 +108,12 @@ export function getPortfolioContent(
             kindDate: entry.kindDate,
             description: text(entry.description, locale),
             highlights: entry.highlights?.map((highlight) => text(highlight, locale)),
+            previewImages: entry.previewImages?.map((image) => ({
+              src: image.src,
+              alt: text(image.alt, locale),
+              width: image.width,
+              height: image.height
+            })),
             tech: entry.tech,
             links: entry.links ? localizeLinks(entry.links, locale) : undefined
           }
