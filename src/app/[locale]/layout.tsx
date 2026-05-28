@@ -29,7 +29,7 @@ function assertLocale(locale: string): Locale {
 }
 
 function ThemeScript() {
-  const code = `try{var t=localStorage.getItem("ysl-theme");if(t!=="light"&&t!=="dark"){var h=new Date().getHours();t=h>=7&&h<18?"light":"dark";}document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme="dark";}`;
+  const code = `document.documentElement.dataset.theme="light";`;
 
   return <script dangerouslySetInnerHTML={{__html: code}} />;
 }
@@ -100,7 +100,7 @@ export default async function LocaleLayout({children, params}: LayoutProps) {
   return (
     <html
       className={fontVariablesForLocale(locale)}
-      data-theme="dark"
+      data-theme="light"
       lang={locale}
       suppressHydrationWarning
     >

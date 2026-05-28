@@ -141,9 +141,6 @@ html[lang="ko"] .font-display {
   letter-spacing: -0.025em;
 }
 
-html[lang="ko"] h2.font-display {
-  font-weight: 700;
-}
 
 @media (max-width: 1023px) {
   html[lang="ko"] .hero-headline {
