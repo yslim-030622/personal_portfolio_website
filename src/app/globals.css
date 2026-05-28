@@ -18,8 +18,8 @@
   --glass-bg: rgb(255 255 255 / 0.22);
   --glass-border: rgb(255 255 255 / 0.38);
   --glass-highlight: rgb(255 255 255 / 0.72);
-  --glass-shadow: -4px 4px 12px rgb(15 23 42 / 0.06), -12px 12px 32px rgb(15 23 42 / 0.12), -24px 24px 64px rgb(15 23 42 / 0.16);
-  --glass-shadow-lg: -6px 6px 16px rgb(15 23 42 / 0.10), -16px 16px 40px rgb(15 23 42 / 0.16), -32px 32px 80px rgb(15 23 42 / 0.22);
+  --glass-shadow: -4px 4px 12px rgb(15 23 42 / 0.12), -12px 12px 32px rgb(15 23 42 / 0.22), -24px 24px 64px rgb(15 23 42 / 0.28);
+  --glass-shadow-lg: -6px 6px 16px rgb(15 23 42 / 0.18), -16px 16px 40px rgb(15 23 42 / 0.26), -32px 32px 80px rgb(15 23 42 / 0.36);
   --blur: 30px;
   --blur-sm: 18px;
   --blur-lg: 48px;
@@ -37,8 +37,8 @@ html[data-theme="dark"] {
   --glass-bg: rgb(255 255 255 / 0.52);
   --glass-border: rgb(255 255 255 / 0.72);
   --glass-highlight: rgb(255 255 255 / 0.88);
-  --glass-shadow: -4px 4px 12px rgb(15 23 42 / 0.06), -12px 12px 32px rgb(15 23 42 / 0.12), -24px 24px 64px rgb(15 23 42 / 0.16);
-  --glass-shadow-lg: -6px 6px 16px rgb(15 23 42 / 0.10), -16px 16px 40px rgb(15 23 42 / 0.16), -32px 32px 80px rgb(15 23 42 / 0.22);
+  --glass-shadow: -4px 4px 12px rgb(15 23 42 / 0.12), -12px 12px 32px rgb(15 23 42 / 0.22), -24px 24px 64px rgb(15 23 42 / 0.28);
+  --glass-shadow-lg: -6px 6px 16px rgb(15 23 42 / 0.18), -16px 16px 40px rgb(15 23 42 / 0.26), -32px 32px 80px rgb(15 23 42 / 0.36);
   color-scheme: light;
 }
 
@@ -53,8 +53,8 @@ html[data-theme="light"] {
   --glass-bg: rgb(255 255 255 / 0.52);
   --glass-border: rgb(255 255 255 / 0.72);
   --glass-highlight: rgb(255 255 255 / 0.88);
-  --glass-shadow: -4px 4px 12px rgb(15 23 42 / 0.06), -12px 12px 32px rgb(15 23 42 / 0.12), -24px 24px 64px rgb(15 23 42 / 0.14);
-  --glass-shadow-lg: -6px 6px 16px rgb(15 23 42 / 0.10), -16px 16px 40px rgb(15 23 42 / 0.16), -32px 32px 80px rgb(15 23 42 / 0.20);
+  --glass-shadow: -4px 4px 12px rgb(15 23 42 / 0.10), -12px 12px 32px rgb(15 23 42 / 0.20), -24px 24px 64px rgb(15 23 42 / 0.24);
+  --glass-shadow-lg: -6px 6px 16px rgb(15 23 42 / 0.16), -16px 16px 40px rgb(15 23 42 / 0.24), -32px 32px 80px rgb(15 23 42 / 0.32);
   color-scheme: light;
 }
 
@@ -275,9 +275,9 @@ html[lang="ko"] .font-display {
   overflow: hidden;
   border-radius: 32px;
   box-shadow:
-    -4px 4px 12px rgb(0 0 0 / 0.10),
-    -12px 12px 32px rgb(0 0 0 / 0.14),
-    -32px 32px 72px rgb(0 0 0 / 0.20);
+    -4px 4px 12px rgb(0 0 0 / 0.18),
+    -12px 12px 32px rgb(0 0 0 / 0.24),
+    -32px 32px 72px rgb(0 0 0 / 0.32);
 }
 
 
@@ -332,9 +332,9 @@ html[data-theme="dark"] .card-stack-drag > .liquid-card.card-colored {
   background: var(--card-color, #4f46e5) !important;
   border: 1px solid color-mix(in srgb, var(--card-color) 50%, rgb(255 255 255 / 0.20)) !important;
   box-shadow:
-    -4px 4px 12px rgb(0 0 0 / 0.16),
-    -12px 12px 32px rgb(0 0 0 / 0.22),
-    -32px 32px 64px rgb(0 0 0 / 0.28);
+    -4px 4px 12px rgb(0 0 0 / 0.24),
+    -12px 12px 32px rgb(0 0 0 / 0.34),
+    -32px 32px 64px rgb(0 0 0 / 0.44);
 }
 
 .liquid-card.card-colored::before {
@@ -348,9 +348,9 @@ html[data-theme="dark"] .card-stack-drag > .liquid-card.card-colored {
 .liquid-card.card-colored:hover {
   border-color: color-mix(in srgb, var(--card-color) 40%, rgb(255 255 255 / 0.30)) !important;
   box-shadow:
-    -6px 6px 16px rgb(0 0 0 / 0.20),
-    -16px 16px 40px rgb(0 0 0 / 0.28),
-    -40px 40px 80px rgb(0 0 0 / 0.36);
+    -6px 6px 16px rgb(0 0 0 / 0.30),
+    -16px 16px 40px rgb(0 0 0 / 0.40),
+    -40px 40px 80px rgb(0 0 0 / 0.50);
   transform: translate3d(0, -2px, 0);
 }
 
@@ -358,9 +358,9 @@ html[data-theme="dark"] .card-stack-drag > .liquid-card.card-colored {
 html[data-theme="light"] .liquid-card.card-colored,
 html[data-theme="light"] .card-stack-drag > .liquid-card.card-colored {
   box-shadow:
-    -4px 4px 12px rgb(15 23 42 / 0.10),
-    -12px 12px 32px rgb(15 23 42 / 0.16),
-    -32px 32px 64px rgb(15 23 42 / 0.18);
+    -4px 4px 12px rgb(15 23 42 / 0.16),
+    -12px 12px 32px rgb(15 23 42 / 0.26),
+    -32px 32px 64px rgb(15 23 42 / 0.34);
 }
 
 html[data-theme="light"] .card-stack-drag {
@@ -369,23 +369,30 @@ html[data-theme="light"] .card-stack-drag {
 
 html[data-theme="light"] .card-stack-drag > .liquid-card {
   box-shadow:
-    -2px 2px 8px rgb(15 23 42 / 0.05),
-    -8px 8px 24px rgb(15 23 42 / 0.08),
-    -24px 24px 56px rgb(15 23 42 / 0.10);
+    -2px 2px 8px rgb(15 23 42 / 0.08),
+    -8px 8px 24px rgb(15 23 42 / 0.14),
+    -24px 24px 56px rgb(15 23 42 / 0.20);
 }
 
 html[data-theme="light"] .liquid-card.card-colored:hover {
   box-shadow:
-    -6px 6px 16px rgb(15 23 42 / 0.14),
-    -16px 16px 40px rgb(15 23 42 / 0.20),
-    -40px 40px 80px rgb(15 23 42 / 0.24);
+    -6px 6px 16px rgb(15 23 42 / 0.22),
+    -16px 16px 40px rgb(15 23 42 / 0.32),
+    -40px 40px 80px rgb(15 23 42 / 0.42);
 }
 
 html[data-theme="dark"] .liquid-card.card-colored {
   box-shadow:
-    -4px 4px 12px rgb(0 0 0 / 0.28),
-    -12px 12px 32px rgb(0 0 0 / 0.36),
-    -32px 32px 64px rgb(0 0 0 / 0.46);
+    -4px 4px 12px rgb(0 0 0 / 0.40),
+    -12px 12px 32px rgb(0 0 0 / 0.50),
+    -32px 32px 64px rgb(0 0 0 / 0.65);
+}
+
+html[data-theme="dark"] .liquid-card.card-colored:hover {
+  box-shadow:
+    -6px 6px 16px rgb(0 0 0 / 0.48),
+    -16px 16px 40px rgb(0 0 0 / 0.58),
+    -40px 40px 80px rgb(0 0 0 / 0.75);
 }
 
 .card-colored .work-card-ornament {
