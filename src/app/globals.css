@@ -1304,8 +1304,7 @@ html[data-theme="dark"] .work-section-bg {
 
 .card-stack-scroll-arrow {
   animation: scroll-bounce 1.8s ease-in-out infinite;
-  color: rgb(255 255 255 / 0.70);
-  filter: drop-shadow(0 1px 4px rgb(0 0 0 / 0.25));
+  color: var(--fg);
 }
 
 .projects-section-bg {

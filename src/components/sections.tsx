@@ -274,6 +274,7 @@ function CardStack({
   const scrollYProgress = useMotionValue(0);
 
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -300,6 +301,7 @@ function CardStack({
       }
 
       let progress = rawProgress;
+      let transitioning = false;
 
       // Create plateaus (flat zones) so the card stops definitively
       if (cards.length > 1) {
@@ -317,12 +319,14 @@ function CardStack({
           adjustedFraction = 1;
         } else {
           adjustedFraction = (fraction - margin) / (1 - 2 * margin);
+          transitioning = true;
         }
         
         progress = (base + adjustedFraction) * step;
       }
       
       scrollYProgress.set(progress);
+      setIsTransitioning(transitioning);
       
       if (cards.length <= 1) { setActiveIndex(0); return; }
       const step = 1 / (cards.length - 1);
@@ -345,7 +349,7 @@ function CardStack({
 
   const isLastCard = activeIndex === cards.length - 1;
   // Show arrow even on last card if there's a pause zone (indicates more content below)
-  const showScrollArrow = !isLastCard || pauseVH > 0;
+  const showScrollArrow = (!isLastCard || pauseVH > 0) && !isTransitioning;
 
   return (
     <div
