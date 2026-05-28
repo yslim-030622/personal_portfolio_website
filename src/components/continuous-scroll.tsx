@@ -15,35 +15,40 @@ export function ContinuousScroll({sections}: {sections: PageSection[]}) {
   }, []);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // Find the entry that is intersecting the most
-        let maxIntersectionRatio = 0;
-        let activeIndex = -1;
+    let lastActiveIndex = -1;
 
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > maxIntersectionRatio) {
-            maxIntersectionRatio = entry.intersectionRatio;
-            activeIndex = sectionRefs.current.findIndex((el) => el === entry.target);
-          }
-        });
+    const update = () => {
+      // Use 35% from the top of viewport as the probe point.
+      // This works reliably for sections of any height, unlike IntersectionObserver
+      // which breaks for very tall sections whose max intersectionRatio never crosses
+      // a threshold (e.g. a 210vh section through a 40vh observation window tops out
+      // at ~0.19 and gets stuck between the 0.1 and 0.2 thresholds).
+      const probeY = window.scrollY + window.innerHeight * 0.35;
+      let activeIndex = -1;
 
-        if (activeIndex !== -1) {
-          document.dispatchEvent(new CustomEvent("fp-section-change", {detail: {index: activeIndex}}));
+      sectionRefs.current.forEach((el, i) => {
+        if (!el) return;
+        const sectionTop = window.scrollY + el.getBoundingClientRect().top;
+        const sectionBottom = sectionTop + el.offsetHeight;
+        if (probeY >= sectionTop && probeY < sectionBottom) {
+          activeIndex = i;
         }
-      },
-      {
-        root: null,
-        rootMargin: "-20% 0px -40% 0px", // adjust margins so middle of screen triggers
-        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+      });
+
+      if (activeIndex !== -1 && activeIndex !== lastActiveIndex) {
+        lastActiveIndex = activeIndex;
+        document.dispatchEvent(new CustomEvent("fp-section-change", {detail: {index: activeIndex}}));
       }
-    );
+    };
 
-    sectionRefs.current.forEach((el) => {
-      if (el) observer.observe(el);
-    });
+    update();
+    window.addEventListener("scroll", update, {passive: true});
+    window.addEventListener("resize", update, {passive: true});
 
-    return () => observer.disconnect();
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
   }, []);
 
   return (
