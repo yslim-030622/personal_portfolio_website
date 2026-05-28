@@ -53,7 +53,6 @@ export const work: RawWorkEntry[] = [
     status: "filled",
     company: "MoDoc AI",
     companyUrl: "https://www.modoc-ai.com/",
-    logo: "/modoc-ai-logo.png",
     dates: {en: "May 2026–Present", ko: "2026년 5월–현재"},
     location: {en: "Boston remote", ko: "보스턴 원격"},
     role: {en: "AI Automation Developer", ko: "AI Automation Developer"},

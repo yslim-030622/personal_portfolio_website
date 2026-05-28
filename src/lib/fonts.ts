@@ -1,5 +1,14 @@
-import {Cormorant_Garamond, Fraunces, Geist, Plus_Jakarta_Sans} from "next/font/google";
+import {Cormorant_Garamond, Fraunces, Geist, Instrument_Serif, Plus_Jakarta_Sans} from "next/font/google";
 import localFont from "next/font/local";
+
+export const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
+  variable: "--font-instrument-serif",
+  display: "swap",
+  preload: true
+});
 
 export const cormorantGaramond = Cormorant_Garamond({
   subsets: ["latin"],
@@ -42,6 +51,7 @@ export const pretendard = localFont({
 });
 
 const englishFontVariables = [
+  instrumentSerif.variable,
   cormorantGaramond.variable,
   fraunces.variable,
   geist.variable,

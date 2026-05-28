@@ -12,7 +12,9 @@ import {NotesAccordion} from "./notes-accordion";
 import {PresentationPreview} from "./presentation-preview";
 import {motion, useMotionValue, useTransform} from "motion/react";
 import Image from "next/image";
-import {Children, type ReactNode, useRef, useState, useEffect} from "react";
+import {Children, type ReactNode, useRef, useState, useEffect, createContext, useContext} from "react";
+
+const CardActiveContext = createContext(false);
 
 type SectionProps = {
   eyebrow: string;
@@ -237,20 +239,22 @@ function StackCard({
   
 
   return (
-    <div
-      aria-label={`Card ${index + 1} of ${total}`}
-      aria-hidden={!isActive}
-      className="card-stack-item"
-      data-active={isActive}
-      style={{ zIndex, pointerEvents: isActive ? "auto" : "none" }}
-    >
-      <motion.div
-        className="card-stack-drag will-change-transform"
-        style={{ y, scale, rotateX, opacity, transformOrigin: "center center" }}
+    <CardActiveContext.Provider value={isActive}>
+      <div
+        aria-label={`Card ${index + 1} of ${total}`}
+        aria-hidden={!isActive}
+        className="card-stack-item"
+        data-active={isActive}
+        style={{ zIndex, pointerEvents: isActive ? "auto" : "none" }}
       >
-        {children}
-      </motion.div>
-    </div>
+        <motion.div
+          className="card-stack-drag will-change-transform"
+          style={{ y, scale, rotateX, opacity, transformOrigin: "center center" }}
+        >
+          {children}
+        </motion.div>
+      </div>
+    </CardActiveContext.Provider>
   );
 }
 
@@ -269,7 +273,7 @@ function CardStack({
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollYProgress = useMotionValue(0);
 
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(-1);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -278,19 +282,23 @@ function CardStack({
     const update = () => {
       // Find the distance from top of container to top of viewport
       const rect = container.getBoundingClientRect();
-      
+
+      // Don't activate any card until the sticky card has reached the top of the viewport
+      // Use a small tolerance for sub-pixel rounding (rect.top is often ~0.2 at the boundary)
+      if (rect.top > 2) return;
+
       // Calculate how far we've scrolled inside this specific container
       // Rect.top is 0 when the container hits the top of the viewport
       // activeScrollHeight is the scroll amount needed to fully switch all cards
       const activeScrollHeight = (cards.length - 1) * window.innerHeight * (scrollVH / 100);
-      
+
       let rawProgress = 0;
       if (activeScrollHeight > 0) {
         rawProgress = Math.max(0, Math.min(1, -rect.top / activeScrollHeight));
       } else {
         rawProgress = 1;
       }
-      
+
       let progress = rawProgress;
 
       // Create plateaus (flat zones) so the card stops definitively
@@ -493,12 +501,19 @@ function ProjectScreenshotPreview({
   images: NonNullable<FilledProjectEntry["previewImages"]>;
   className?: string;
 }) {
+  const isActive = useContext(CardActiveContext);
+
   if (!images.length) {
     return null;
   }
 
   return (
-    <div className={`clearsplit-showcase overflow-hidden rounded-[26px] ${className ?? "mt-6"}`}>
+    <motion.div
+      className={`clearsplit-showcase overflow-hidden rounded-[26px] ${className ?? "mt-6"}`}
+      initial={{opacity: 0, y: 20}}
+      animate={isActive ? {opacity: 1, y: 0} : {opacity: 0, y: 20}}
+      transition={{duration: 0.72, delay: 0.22, ease: [0.22, 1, 0.36, 1]}}
+    >
       <div aria-label={`${title} app screenshots`} className="clearsplit-showcase-stage">
         <Image
           alt={`${title} app screens preview`}
@@ -509,7 +524,7 @@ function ProjectScreenshotPreview({
           src={images[0].src}
         />
       </div>
-    </div>
+    </motion.div>
   );
 }
 

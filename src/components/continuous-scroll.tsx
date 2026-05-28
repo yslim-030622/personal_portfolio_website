@@ -8,6 +8,13 @@ export function ContinuousScroll({sections}: {sections: PageSection[]}) {
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      history.scrollRestoration = "manual";
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         // Find the entry that is intersecting the most

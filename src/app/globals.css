@@ -59,7 +59,7 @@ html[data-theme="light"] {
 }
 
 html[lang="en"] {
-  --font-display: var(--font-cormorant-garamond), var(--font-fraunces), var(--font-noto-serif-kr, serif);
+  --font-display: var(--font-instrument-serif), var(--font-cormorant-garamond), serif;
   --font-sans: var(--font-geist), var(--font-pretendard, sans-serif);
   --font-body: var(--font-plus-jakarta-sans), var(--font-geist), sans-serif;
 }

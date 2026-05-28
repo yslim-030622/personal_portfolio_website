@@ -12,38 +12,29 @@ function SegmentedSwitch<T extends string>({
   value: T;
   onChange: (val: T) => void;
 }) {
-  const activeIndex = options.findIndex((o) => o.value === value);
-
   return (
-    <div
-      className="liquid-switch relative inline-flex h-11 items-stretch overflow-hidden rounded-xl p-1"
-    >
-      <div
-        aria-hidden="true"
-        className="liquid-switch-thumb pointer-events-none absolute inset-y-1 rounded-lg transition-all duration-300"
-        style={{
-          width: `calc(${100 / options.length}% - 8px)`,
-          left: `calc(${(activeIndex * 100) / options.length}% + 4px)`,
-        }}
-      />
+    <div className="inline-flex items-center gap-0">
       {options.map((opt, i) => (
-        <button
-          aria-label={opt.ariaLabel}
-          className={`relative z-10 min-w-11 px-3 text-[0.76rem] font-medium tracking-[0.16em] transition-colors duration-200 ${
-            value === opt.value ? "text-fg" : "text-fg-muted hover:text-fg"
-          }`}
-          key={String(opt.value)}
-          onClick={() => onChange(opt.value)}
-          type="button"
-        >
-          {opt.label}
+        <div key={String(opt.value)} className="inline-flex items-center">
+          <button
+            aria-label={opt.ariaLabel}
+            className={`text-[0.78rem] font-semibold tracking-[0.12em] transition-colors duration-200 ${
+              value === opt.value
+                ? "text-fg"
+                : "text-fg-muted hover:text-fg"
+            }`}
+            onClick={() => onChange(opt.value)}
+            type="button"
+          >
+            {opt.label}
+          </button>
           {i < options.length - 1 && (
             <span
               aria-hidden="true"
-              className="liquid-switch-divider pointer-events-none absolute right-0 top-1/2 h-5 w-px -translate-y-1/2"
+              className="mx-2.5 h-4 w-px bg-fg-muted/40"
             />
           )}
-        </button>
+        </div>
       ))}
     </div>
   );
@@ -100,8 +91,8 @@ export function Navigation({
         <div className="flex items-center gap-3">
           <SegmentedSwitch
             options={[
-              {label: "ENG", value: "en", ariaLabel: t("switchToEnglish")},
               {label: "KOR", value: "ko", ariaLabel: t("switchToKorean")},
+              {label: "ENG", value: "en", ariaLabel: t("switchToEnglish")},
             ]}
             value={locale as "en" | "ko"}
             onChange={(val) => {
