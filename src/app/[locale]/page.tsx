@@ -37,7 +37,7 @@ export default async function Page({params}: PageProps) {
       content: (
         <div className="md:h-[100svh]">
           <div className="hero-section-bg md:sticky md:top-0 md:h-[100svh]">
-            <Hero content={content.hero} />
+            <Hero content={content.hero} locale={locale} />
           </div>
         </div>
       ),
@@ -57,7 +57,7 @@ export default async function Page({params}: PageProps) {
       label: "프로젝트",
       navTitle: content.sectionEyebrows.projects,
       content: (
-        <div className="projects-section-bg">
+        <div className="projects-section-bg pb-8 md:pb-20">
           <ProjectsSection
             eyebrow={content.sectionEyebrows.projects}
             items={content.projects}

@@ -7,6 +7,7 @@ import {WaveHand} from "@/components/wave-hand";
 
 type HeroProps = {
   content: LocalizedPortfolioContent["hero"];
+  locale?: string;
 };
 
 type Token = {type: "word" | "space"; content: string};
@@ -94,23 +95,24 @@ function HeadlineWords({
   );
 }
 
-export function Hero({content}: HeroProps) {
+export function Hero({content, locale}: HeroProps) {
+  const isKorean = locale === "ko";
   return (
     <section
-      className="relative mx-auto grid w-full max-w-[1480px] content-start items-start overflow-hidden overflow-x-hidden px-6 pb-0 pt-10 md:min-h-[100svh] md:grid-cols-[minmax(0,50vw)_minmax(0,50vw)] md:content-start md:items-start md:px-10 md:pb-10 md:pt-12 lg:pt-14 xl:px-14"
+      className="relative mx-auto grid w-full max-w-[1480px] content-start items-start overflow-hidden overflow-x-hidden px-6 pb-0 pt-10 md:min-h-[100svh] md:grid-cols-[minmax(0,50vw)_minmax(0,50vw)] md:content-start md:items-start md:px-10 md:pb-10 md:pt-12 lg:pt-14 xl:px-20 2xl:px-28"
     >
       <div className="relative z-10 min-w-0 max-w-[540px] md:max-w-none md:pr-8 xl:pr-12">
         <h1
-          className="hero-headline mt-3 max-w-[17ch] font-display text-[clamp(3.1rem,6vw,5.65rem)] font-medium leading-[1.02] tracking-normal text-fg md:mt-4 md:max-w-[18ch] md:leading-[0.98] lg:max-w-[18.5ch]"
+          className="hero-headline mt-3 max-w-[17ch] font-display font-medium leading-[1.02] tracking-normal text-fg md:mt-4 md:max-w-[18ch] md:leading-[0.98] lg:max-w-[18.5ch]"
         >
-          <span className="block text-left">
+          <span className={`block text-left whitespace-nowrap ${isKorean ? "text-[clamp(2rem,3.8vw,3.7rem)]" : "text-[clamp(3.1rem,6vw,5.65rem)]"}`}>
             <HeadlineWords
               before={content.headline.before.replace(/\n/g, "")}
               italic=""
               after=""
             />
           </span>
-          <span className="block text-right md:text-left">
+          <span className={`block text-left text-[clamp(3.1rem,6vw,5.65rem)] whitespace-nowrap`}>
             <HeadlineWords
               before=""
               italic={content.headline.italic}
@@ -178,11 +180,11 @@ export function Hero({content}: HeroProps) {
       </figure>
 
       <div
-        className="pointer-events-none absolute bottom-7 left-0 right-0 hidden items-center justify-center md:flex"
+        className="pointer-events-none absolute bottom-7 left-0 right-0 flex items-center justify-center"
         aria-hidden="true"
       >
-        <div className="hero-scroll-arrow text-fg/35">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div className="hero-scroll-arrow">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 5v14M5 12l7 7 7-7" />
           </svg>
         </div>

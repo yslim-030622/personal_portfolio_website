@@ -75,8 +75,8 @@ export function Navigation({
     <header
       className={`fixed left-0 right-0 top-0 z-50 px-5 py-1.5 transition-all duration-300 md:px-8 ${
         scrolled
-          ? "border-b border-border/50 bg-bg/80 backdrop-blur-md"
-          : "border-b border-transparent bg-transparent"
+          ? "nav-scrolled bg-bg/80 backdrop-blur-md"
+          : "bg-transparent"
       }`}
     >
       <nav className="flex min-h-11 w-full items-center justify-between gap-4 text-[0.9rem] uppercase tracking-normal text-fg">

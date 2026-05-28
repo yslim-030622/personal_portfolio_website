@@ -32,7 +32,7 @@ export const hero = {
   },
   subline: {
     en: "Hi! My full name is Yeongseok Lim but you can call me Eddie :) I was born in South Korea, continued my education in the U.S. starting in high school. I recently graduated from the University of Wisconsin-Madison with a degree in Computer Science. I'm interested in backend systems and AI, and this site is where I document what I build. I'm exploring new career opportunities where I can apply the skills I've developed. Let's stay connected!",
-    ko: "저는 한국에서 태어나 미국에서 고등학교부터 재학했고, 최근 위스콘신 대학교에서 컴퓨터 과학 전공으로 졸업했습니다. 요즘은 특히 백엔드 시스템과 인공지능에 관심이 많고, 이 웹사이트는 제가 만든 것과 그에 관한 느낀 점들을 정리하는 공간입니다. 현재는 제가 보유한 역량을 바탕으로 구직 중입니다. 아래 연락처로 연락주신다면 답장 드리겠습니다!"
+    ko: "저는 한국에서 태어나 미국에서 고등학교부터 재학했고, 최근 위스콘신 대학교에서 컴퓨터 과학 전공으로 졸업했습니다. 제가 관심을 가지고 있는 분야는 백엔드 시스템과 인공지능이고, 이 웹사이트는 제가 만든 것과 그에 관한 느낀 점들을 정리하는 공간입니다. 현재는 제가 보유한 역량을 바탕으로 구직 중입니다. 아래 연락처로 연락주신다면 답장 드리겠습니다!"
   },
   image: {
     src: "/photo1.jpg",

@@ -343,6 +343,10 @@ function CardStack({
     return <div className={className ?? ""}>{cards}</div>;
   }
 
+  const isLastCard = activeIndex === cards.length - 1;
+  // Show arrow even on last card if there's a pause zone (indicates more content below)
+  const showScrollArrow = !isLastCard || pauseVH > 0;
+
   return (
     <div
       className={`card-stack-scroll relative w-full ${className ?? ""} z-10`}
@@ -363,6 +367,18 @@ function CardStack({
             </StackCard>
           ))}
         </div>
+        <motion.div
+          className="pointer-events-none absolute bottom-7 left-0 right-0 flex items-center justify-center z-30"
+          aria-hidden="true"
+          animate={{ opacity: showScrollArrow ? 1 : 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <div className="card-stack-scroll-arrow">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 5v14M5 12l7 7 7-7" />
+            </svg>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
@@ -383,12 +399,12 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
       style={{"--card-color": colorValue} as React.CSSProperties}
     >
       {/* Left column */}
-      <div className="md:flex md:h-full md:flex-col md:border-r md:border-white/20 md:pr-9">
+      <div className="border-b border-white/20 pb-5 md:flex md:h-full md:flex-col md:border-b-0 md:border-r md:pb-0 md:pr-9">
         <div className={photos?.length ? "flex items-start gap-4 md:block" : ""}>
           <div className="min-w-0 flex-1">
             {item.companyUrl ? (
               <a
-                className="font-display text-[1.5rem] font-medium leading-tight text-white transition-colors duration-200 hover:text-white/80 md:text-[1.82rem] break-keep"
+                className="card-title-glass font-display text-[1.5rem] font-medium leading-tight text-white transition-colors duration-200 hover:text-white/80 md:text-[1.82rem] break-keep"
                 href={item.companyUrl}
                 rel="noreferrer"
                 target="_blank"
@@ -396,7 +412,7 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
                 {item.company}
               </a>
             ) : (
-              <h2 className="font-display text-[1.5rem] font-medium leading-tight text-white group-hover:text-white/80 md:text-[1.82rem] break-keep">
+              <h2 className="card-title-glass font-display text-[1.5rem] font-medium leading-tight text-white group-hover:text-white/80 md:text-[1.82rem] break-keep">
                 {item.company}
               </h2>
             )}
@@ -535,24 +551,18 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
   const otherLinks = item.links?.filter(
     (link) => !isPdfLink(link) && !isGitHubRepoLink(link) && !isGitHubPullRequestLink(link)
   );
-  const [kind] = item.kindDate.includes(" · ")
-    ? item.kindDate.split(" · ", 2)
-    : [item.kindDate, ""];
 
   const hasLeftActions = !!(githubLink?.href || prLink?.href);
 
   return (
     <article
-      className="project-card card-colored liquid-card group grid items-start gap-5 rounded-[28px] p-6 transition duration-300 md:grid-cols-[260px_1fr] md:gap-9 md:p-9"
+      className="project-card card-colored liquid-card group grid items-start gap-5 rounded-[28px] p-6 transition duration-300 md:grid-cols-[minmax(0,240px)_1fr] md:gap-9 md:p-9"
       style={{"--card-color": colorValue} as React.CSSProperties}
     >
       {/* Left column */}
-      <div className="md:border-r md:border-white/20 md:pr-9">
+      <div className="border-b border-white/20 pb-5 md:flex md:h-full md:flex-col md:border-b-0 md:border-r md:pb-0 md:pr-9">
         <div className="min-w-0">
-          <p className="font-body text-[0.78rem] tracking-wide text-white/65 uppercase md:text-[0.84rem] break-keep">
-            {kind}
-          </p>
-          <h2 className="mt-2 font-display text-[1.5rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.82rem] break-keep">
+          <h2 className="card-title-glass font-display text-[1.5rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.82rem] break-keep">
             {item.title}
           </h2>
         </div>
@@ -577,20 +587,18 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
 
       {/* Right column */}
       <div className="project-card-body min-w-0 flex flex-col">
-        <div className="order-1 md:order-2">
-          {item.previewImages?.length ? (
-            <ProjectScreenshotPreview className="mt-2 md:mt-6" images={item.previewImages} title={item.title} />
-          ) : null}
-        </div>
-        <p className="project-description order-2 md:order-1 font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] mt-5 md:mt-0 break-keep">
+        <p className="project-description font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] break-keep">
           {item.description}
         </p>
-        <div className="order-3">
+        {item.previewImages?.length ? (
+          <ProjectScreenshotPreview className="mt-4 md:mt-5" images={item.previewImages} title={item.title} />
+        ) : null}
+        <div className="mt-4 md:mt-5">
           {previewLinks?.map((link) => (
-            <PresentationPreview className="mt-6" key={link.label} link={link} />
+            <PresentationPreview key={link.label} link={link} />
           ))}
           {otherLinks?.length ? (
-            <div className="mt-6 flex flex-wrap gap-4 text-[0.8rem] uppercase text-white md:text-[0.86rem]">
+            <div className="mt-4 flex flex-wrap gap-4 text-[0.8rem] uppercase text-white md:text-[0.86rem]">
               {otherLinks.map((link) => (
                 <ExternalLink key={link.label} link={link} />
               ))}

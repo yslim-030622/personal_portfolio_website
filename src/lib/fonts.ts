@@ -1,4 +1,4 @@
-import {Cormorant_Garamond, Fraunces, Geist, Instrument_Serif, Plus_Jakarta_Sans} from "next/font/google";
+import {Cormorant_Garamond, Fraunces, Geist, Instrument_Serif, Nanum_Myeongjo, Plus_Jakarta_Sans} from "next/font/google";
 import localFont from "next/font/local";
 
 export const instrumentSerif = Instrument_Serif({
@@ -50,6 +50,23 @@ export const pretendard = localFont({
   preload: true
 });
 
+export const notoSerifKR = localFont({
+  src: "../app/fonts/NotoSerifKRPortfolio.woff2",
+  variable: "--font-noto-serif-kr",
+  weight: "400 900",
+  style: "normal",
+  display: "swap",
+  preload: true
+});
+
+export const nanumMyeongjo = Nanum_Myeongjo({
+  subsets: ["latin"],
+  weight: ["400", "700", "800"],
+  variable: "--font-nanum-myeongjo",
+  display: "swap",
+  preload: false,
+});
+
 const englishFontVariables = [
   instrumentSerif.variable,
   cormorantGaramond.variable,
@@ -58,7 +75,7 @@ const englishFontVariables = [
   plusJakartaSans.variable,
 ].join(" ");
 
-const koreanFontVariables = pretendard.variable;
+const koreanFontVariables = [pretendard.variable, notoSerifKR.variable, nanumMyeongjo.variable].join(" ");
 
 export function fontVariablesForLocale(locale: "en" | "ko") {
   return locale === "ko" ? koreanFontVariables : englishFontVariables;
