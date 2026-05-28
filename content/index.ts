@@ -90,11 +90,18 @@ export function getPortfolioContent(
             role: text(entry.role, locale),
             paragraph: text(entry.paragraph, locale),
             highlights: entry.highlights?.map((highlight) => text(highlight, locale)),
+            logo: entry.logo,
             photos: entry.photos?.map((photo) => ({
               src: photo.src,
               alt: text(photo.alt, locale),
               width: photo.width,
               height: photo.height
+            })),
+            previewImages: entry.previewImages?.map((image) => ({
+              src: image.src,
+              alt: text(image.alt, locale),
+              width: image.width,
+              height: image.height
             })),
             links: entry.links ? localizeLinks(entry.links, locale) : undefined
           }

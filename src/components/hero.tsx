@@ -97,7 +97,7 @@ function HeadlineWords({
 export function Hero({content}: HeroProps) {
   return (
     <section
-      className="mx-auto grid w-full max-w-[1480px] content-start items-start overflow-hidden overflow-x-hidden px-6 pb-0 pt-10 md:min-h-[100svh] md:grid-cols-[minmax(0,50vw)_minmax(0,50vw)] md:content-start md:items-start md:px-10 md:pb-10 md:pt-12 lg:pt-14 xl:px-14"
+      className="relative mx-auto grid w-full max-w-[1480px] content-start items-start overflow-hidden overflow-x-hidden px-6 pb-0 pt-10 md:min-h-[100svh] md:grid-cols-[minmax(0,50vw)_minmax(0,50vw)] md:content-start md:items-start md:px-10 md:pb-10 md:pt-12 lg:pt-14 xl:px-14"
     >
       <div className="relative z-10 min-w-0 max-w-[540px] md:max-w-none md:pr-8 xl:pr-12">
         <h1
@@ -177,6 +177,16 @@ export function Hero({content}: HeroProps) {
         </div>
       </figure>
 
+      <div
+        className="pointer-events-none absolute bottom-7 left-0 right-0 hidden items-center justify-center md:flex"
+        aria-hidden="true"
+      >
+        <div className="hero-scroll-arrow text-fg/35">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 5v14M5 12l7 7 7-7" />
+          </svg>
+        </div>
+      </div>
     </section>
   );
 }

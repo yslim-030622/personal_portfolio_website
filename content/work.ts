@@ -9,8 +9,8 @@ export const work: RawWorkEntry[] = [
     location: {en: "Seoul", ko: "서울"},
     role: {en: "Software Engineer Intern", ko: "Software Engineer Intern"},
     paragraph: {
-      en: "Fasoo is a Korean enterprise software company specializing in data security and document control. On the SAST cloud team, I built a runtime anomaly detection system that automatically flags static analysis jobs taking abnormally long to complete.",
-      ko: "Fasoo는 데이터 보안과 문서 제어를 전문으로 하는 한국 엔터프라이즈 소프트웨어 기업입니다. SAST 클라우드 팀에서 정적 분석 작업 중 비정상적으로 오래 걸리는 요청을 자동으로 탐지하는 이상 탐지 시스템을 만들었습니다."
+      en: "Fasoo is a Korean software company specializing in document and data security. For about 10 weeks, I built an anomaly detection pipeline for a static analyzer on the development team.",
+      ko: "파수는 문서, 데이터 보안에 특화되어 있는 소프트웨어 기업입니다. 저는 개발 1팀에서 약 10주 동안 정적 분석기의 이상 탐지 기준 수립 및 파이프라인 구축을 담당하였습니다."
     },
     highlights: [
       {
@@ -53,12 +53,13 @@ export const work: RawWorkEntry[] = [
     status: "filled",
     company: "MoDoc AI",
     companyUrl: "https://www.modoc-ai.com/",
+    logo: "/modoc-ai-logo.png",
     dates: {en: "May 2026–Present", ko: "2026년 5월–현재"},
     location: {en: "Boston remote", ko: "보스턴 원격"},
     role: {en: "AI Automation Developer", ko: "AI Automation Developer"},
     paragraph: {
-      en: "Collaboration between LikeLion Madison (UW–Madison student club) and MoDoc AI, a health-tech startup. I'm building an automated pipeline that converts medical blog contents into short-form videos and uploads them to YouTube.",
-      ko: "UW–Madison 학생 개발 동아리 멋쟁이사자처럼과 헬스테크 스타트업 MoDoc AI의 협업 프로젝트입니다. 의료 블로그 콘텐츠를 숏폼 영상으로 변환하고 유튜브 업로드까지 자동화하는 파이프라인을 만들고 있습니다."
+      en: "Collaboration project between LikeLion Madison Chapter and MoDoc AI, a health-tech startup. I'm building an automated pipeline that converts child medical text content into short videos and uploads them to YouTube.",
+      ko: "학교 산하 멋쟁이사자처럼 동아리와 헬스케어 스타트업 MoDoc AI 간의 산학협력 프로젝트입니다. 아이들 대상의 의료 콘텐츠를 숏폼 영상으로 변환을 자동화하고, 포스팅하는 파이프라인을 만들었습니다."
     },
     highlights: [
       {
@@ -72,6 +73,17 @@ export const work: RawWorkEntry[] = [
       {
         en: "Automated YouTube uploads as the final step of the end-to-end pipeline.",
         ko: "파이프라인의 마지막 단계로 유튜브 업로드까지 자동화했습니다."
+      }
+    ],
+    previewImages: [
+      {
+        src: "/modoc_ai_preview.png",
+        alt: {
+          en: "MoDoc AI automated video pipeline preview",
+          ko: "MoDoc AI 자동화 영상 파이프라인 미리보기"
+        },
+        width: 2138,
+        height: 1374
       }
     ],
     links: [

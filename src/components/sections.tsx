@@ -10,7 +10,7 @@ import type {
 import type {MotionValue} from "motion/react";
 import {NotesAccordion} from "./notes-accordion";
 import {PresentationPreview} from "./presentation-preview";
-import {motion, useMotionValue, useSpring, useTransform} from "motion/react";
+import {motion, useMotionValue, useTransform} from "motion/react";
 import Image from "next/image";
 import {Children, type ReactNode, useRef, useState, useEffect} from "react";
 
@@ -151,7 +151,7 @@ function TechIcon({name}: {name: string}) {
 
 const STACK_CARD_COLORS = ['#E8314A', '#5C6BC0'];
 const WORK_CARD_COLORS = STACK_CARD_COLORS;
-const PROJECT_CARD_COLORS = ['#2B4A70', '#1F5C5A', '#B87B22', '#9B2335'];
+const PROJECT_CARD_COLORS = ['#4A7FA5', '#B05C6B', '#5A8F72', '#7C6B9A'];
 
 function StackCard({
   children,
@@ -257,19 +257,17 @@ function StackCard({
 function CardStack({
   children,
   className,
+  pauseVH = 0,
+  scrollVH = 100,
 }: {
   children: ReactNode;
   className?: string;
+  pauseVH?: number;
+  scrollVH?: number;
 }) {
   const cards = Children.toArray(children);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollYProgress = useMotionValue(0);
-  // Shared spring keeps card-switch resistance identical across deck sections.
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 24,
-    mass: 0.2,
-  });
 
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -283,19 +281,44 @@ function CardStack({
       
       // Calculate how far we've scrolled inside this specific container
       // Rect.top is 0 when the container hits the top of the viewport
-      // maxScroll is the scrollable height of the container
-      const maxScroll = rect.height - window.innerHeight;
+      // activeScrollHeight is the scroll amount needed to fully switch all cards
+      const activeScrollHeight = (cards.length - 1) * window.innerHeight * (scrollVH / 100);
       
-      let progress = 0;
-      if (maxScroll > 0) {
-        progress = Math.max(0, Math.min(1, -rect.top / maxScroll));
+      let rawProgress = 0;
+      if (activeScrollHeight > 0) {
+        rawProgress = Math.max(0, Math.min(1, -rect.top / activeScrollHeight));
+      } else {
+        rawProgress = 1;
+      }
+      
+      let progress = rawProgress;
+
+      // Create plateaus (flat zones) so the card stops definitively
+      if (cards.length > 1) {
+        const step = 1 / (cards.length - 1);
+        const p = rawProgress / step;
+        const base = Math.floor(p);
+        const fraction = p - base;
+        
+        const margin = 0.12;
+        
+        let adjustedFraction;
+        if (fraction < margin) {
+          adjustedFraction = 0;
+        } else if (fraction > 1 - margin) {
+          adjustedFraction = 1;
+        } else {
+          adjustedFraction = (fraction - margin) / (1 - 2 * margin);
+        }
+        
+        progress = (base + adjustedFraction) * step;
       }
       
       scrollYProgress.set(progress);
       
       if (cards.length <= 1) { setActiveIndex(0); return; }
       const step = 1 / (cards.length - 1);
-      setActiveIndex(Math.max(0, Math.min(Math.round(progress / step), cards.length - 1)));
+      setActiveIndex(Math.max(0, Math.min(Math.round(rawProgress / step), cards.length - 1)));
     };
 
     update();
@@ -306,7 +329,7 @@ function CardStack({
       window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
     };
-  }, [cards.length, scrollYProgress]);
+  }, [cards.length, scrollYProgress, scrollVH]);
 
   if (cards.length <= 1) {
     return <div className={className ?? ""}>{cards}</div>;
@@ -316,7 +339,7 @@ function CardStack({
     <div
       className={`card-stack-scroll relative w-full ${className ?? ""} z-10`}
       ref={containerRef}
-      style={{ height: `${cards.length * 100}vh` }}
+      style={{ height: `calc(${(cards.length - 1) * scrollVH}vh + 100vh + ${pauseVH}vh)` }}
     >
       <div className="card-stack-sticky sticky top-0 h-[100svh] flex items-center justify-center perspective-[1200px]">
         <div className="card-stack-stage relative mx-auto h-full max-w-[1100px] w-full">
@@ -326,7 +349,7 @@ function CardStack({
               index={i}
               activeIndex={activeIndex}
               total={cards.length}
-              scrollYProgress={smoothProgress}
+              scrollYProgress={scrollYProgress}
             >
               {child}
             </StackCard>
@@ -340,11 +363,15 @@ function CardStack({
 function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string}) {
   const previewLinks = item.links?.filter(isPdfLink);
   const textLinks = item.links?.filter((link) => !isPdfLink(link));
+  const githubLink = textLinks?.find(isGitHubRepoLink);
+  const prLink = textLinks?.find(isGitHubPullRequestLink);
+  const otherLinks = textLinks?.filter((l) => !isGitHubRepoLink(l) && !isGitHubPullRequestLink(l));
   const photos = item.photos;
+  const logo = item.logo;
 
   return (
     <article
-      className="card-colored liquid-card group grid items-start gap-5 rounded-[28px] p-6 transition duration-300 md:grid-cols-[260px_1fr] md:gap-9 md:p-9"
+      className="card-colored liquid-card group grid items-start content-start gap-5 rounded-[28px] p-6 transition duration-300 md:grid-cols-[260px_1fr] md:gap-9 md:p-9"
       style={{"--card-color": colorValue} as React.CSSProperties}
     >
       {/* Left column */}
@@ -365,6 +392,11 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
                 {item.company}
               </h2>
             )}
+            {logo ? (
+              <div className="mt-2.5">
+                <Image alt={item.company + " logo"} src={logo} width={90} height={28} className="h-7 w-auto object-contain object-left opacity-90" />
+              </div>
+            ) : null}
             <p className="mt-2 font-body text-[0.88rem] leading-snug text-white/90 md:mt-3 md:text-[0.94rem] break-keep">
               {item.role}
             </p>
@@ -374,20 +406,26 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
           </div>
           {photos?.length ? (
             <div className="shrink-0 md:hidden">
-              <figure className="liquid-media overflow-hidden rounded-md bg-black/10" key={photos[0].src}>
-                <div className="relative h-[88px] w-[66px]">
-                  <Image alt={photos[0].alt} className="object-contain object-center p-1" fill sizes="66px" src={photos[0].src} />
+              <figure className="overflow-hidden rounded-md shadow-sm" key={photos[0].src}>
+                <div className="relative h-[100px] w-[75px]">
+                  <Image alt={photos[0].alt} className="object-cover object-center" fill sizes="75px" src={photos[0].src} />
                 </div>
               </figure>
             </div>
           ) : null}
         </div>
+        {githubLink?.href || prLink?.href ? (
+          <div className="mt-4 flex flex-wrap gap-2.5">
+            {githubLink ? <GitHubButton fallbackAriaLabel={`${item.company} GitHub repository`} link={githubLink} /> : null}
+            {prLink ? <GitHubButton fallbackAriaLabel={`${item.company} pull request on GitHub`} link={prLink} /> : null}
+          </div>
+        ) : null}
         {photos?.length ? (
-          <div className="mt-5 hidden md:block">
+          <div className="mt-6 hidden md:block">
             {photos.map((photo) => (
-              <figure className="liquid-media overflow-hidden rounded-md bg-black/10" key={photo.src}>
-                <div className="relative aspect-[3/4] w-full max-w-[108px]">
-                  <Image alt={photo.alt} className="object-contain object-center p-1.5" fill sizes="108px" src={photo.src} />
+              <figure className="overflow-hidden rounded-lg shadow-md" key={photo.src}>
+                <div className="relative aspect-[3/4] w-full max-w-[160px]">
+                  <Image alt={photo.alt} className="object-cover object-center" fill sizes="160px" src={photo.src} />
                 </div>
               </figure>
             ))}
@@ -397,151 +435,11 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
 
       {/* Right column */}
       <div className="min-w-0">
-        <p className="font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76]">
+        <p className="font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] break-keep">
           {item.paragraph}
         </p>
-        {previewLinks?.map((link) => (
-          <PresentationPreview className="mt-6" key={link.label} link={link} />
-        ))}
-        {(() => {
-          const githubLink = textLinks?.find(isGitHubRepoLink);
-          const prLink = textLinks?.find(isGitHubPullRequestLink);
-          const otherLinks = textLinks?.filter((l) => !isGitHubRepoLink(l) && !isGitHubPullRequestLink(l));
-          return (
-            <>
-              {githubLink?.href || prLink?.href ? (
-                <div className="mt-6 flex flex-wrap gap-2.5">
-                  {githubLink ? <GitHubButton fallbackAriaLabel={`${item.company} GitHub repository`} link={githubLink} /> : null}
-                  {prLink ? <GitHubButton fallbackAriaLabel={`${item.company} pull request on GitHub`} link={prLink} /> : null}
-                </div>
-              ) : null}
-              {otherLinks?.length ? (
-                <div className="mt-6 flex flex-wrap gap-4 text-[0.8rem] uppercase text-white md:text-[0.86rem]">
-                  {otherLinks.map((link) => (
-                    <ExternalLink key={link.label} link={link} />
-                  ))}
-                </div>
-              ) : null}
-            </>
-          );
-        })()}
-      </div>
-    </article>
-  );
-}
-
-export function WorkSection({
-  eyebrow,
-  items
-}: {
-  eyebrow: string;
-  items: LocalizedWorkEntry[];
-}) {
-  const filled = items.filter(isFilledEntry);
-
-  return (
-    <Section className="deck-section" eyebrow={eyebrow} animateContent={false}>
-      <CardStack>
-        {filled.map((item, idx) => (
-          <WorkItem
-            item={item}
-            colorValue={WORK_CARD_COLORS[idx % WORK_CARD_COLORS.length]}
-            key={`${item.company}-${item.dates}`}
-          />
-        ))}
-      </CardStack>
-    </Section>
-  );
-}
-
-type FilledProjectEntry = Extract<LocalizedProjectEntry, {status: "filled"}>;
-
-function ProjectScreenshotPreview({
-  title,
-  images
-}: {
-  title: string;
-  images: NonNullable<FilledProjectEntry["previewImages"]>;
-}) {
-  if (!images.length) {
-    return null;
-  }
-
-  return (
-    <div className="clearsplit-showcase mt-6 overflow-hidden rounded-[26px]">
-      <div aria-label={`${title} app screenshots`} className="clearsplit-showcase-stage">
-        <Image
-          alt={`${title} app screens preview`}
-          className="object-contain"
-          fill
-          priority
-          sizes="(max-width: 768px) 84vw, 720px"
-          src="/clearsplit/clearsplit-showcase.png"
-        />
-      </div>
-    </div>
-  );
-}
-
-function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: string}) {
-  const previewLinks = item.links?.filter(isPdfLink);
-  const githubLink = item.links?.find((link) => !isPdfLink(link) && isGitHubRepoLink(link));
-  const prLink = item.links?.find((link) => !isPdfLink(link) && isGitHubPullRequestLink(link));
-  const otherLinks = item.links?.filter(
-    (link) => !isPdfLink(link) && !isGitHubRepoLink(link) && !isGitHubPullRequestLink(link)
-  );
-  const [kind, date] = item.kindDate.includes(" · ")
-    ? item.kindDate.split(" · ", 2)
-    : [item.kindDate, ""];
-
-  const hasLeftActions = !!(githubLink?.href || prLink?.href);
-
-  return (
-    <article
-      className="project-card card-colored liquid-card group grid items-start gap-5 rounded-[28px] p-6 transition duration-300 md:grid-cols-[260px_1fr] md:gap-9 md:p-9"
-      style={{"--card-color": colorValue} as React.CSSProperties}
-    >
-      {/* Left column */}
-      <div className="md:flex md:h-full md:flex-col md:border-r md:border-white/20 md:pr-9">
-        <div className="min-w-0 flex-1">
-          <p className="font-body text-[0.78rem] tracking-wide text-white/65 uppercase md:text-[0.84rem] break-keep">
-            {kind}
-          </p>
-          <h2 className="mt-2 font-display text-[1.5rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.82rem] break-keep">
-            {item.title}
-          </h2>
-          {date ? (
-            <p className="mt-1.5 font-body text-[0.8rem] text-white/65 md:text-[0.86rem] break-keep">
-              {date}
-            </p>
-          ) : null}
-        </div>
-        <div className="pt-4 md:pt-6">
-          {hasLeftActions ? (
-            <div className="project-left-actions !mt-0">
-              {githubLink ? (
-                <GitHubButton fallbackAriaLabel={`${item.title} GitHub repository`} link={githubLink} />
-              ) : null}
-              {prLink ? (
-                <GitHubButton fallbackAriaLabel={`${item.title} pull request on GitHub`} link={prLink} />
-              ) : null}
-            </div>
-          ) : null}
-          <div className={`project-tech-stack ${!hasLeftActions ? '!mt-0' : ''}`}>
-            {item.tech.map((tech) => (
-              <TechIcon key={tech} name={tech} />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Right column */}
-      <div className="project-card-body min-w-0">
-        <p className="project-description font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76]">
-          {item.description}
-        </p>
         {item.previewImages?.length ? (
-          <ProjectScreenshotPreview images={item.previewImages} title={item.title} />
+          <ProjectScreenshotPreview className="mt-6" images={item.previewImages} title={item.company} />
         ) : null}
         {previewLinks?.map((link) => (
           <PresentationPreview className="mt-6" key={link.label} link={link} />
@@ -558,6 +456,137 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
   );
 }
 
+export function WorkSection({
+  eyebrow,
+  items,
+  pauseVH = 0
+}: {
+  eyebrow: string;
+  items: LocalizedWorkEntry[];
+  pauseVH?: number;
+}) {
+  const filled = items.filter(isFilledEntry);
+
+  return (
+    <Section className="deck-section" eyebrow={eyebrow} animateContent={false}>
+      <CardStack pauseVH={pauseVH} scrollVH={65}>
+        {filled.map((item, idx) => (
+          <WorkItem
+            item={item}
+            colorValue={WORK_CARD_COLORS[idx % WORK_CARD_COLORS.length]}
+            key={`${item.company}-${item.dates}`}
+          />
+        ))}
+      </CardStack>
+    </Section>
+  );
+}
+
+type FilledProjectEntry = Extract<LocalizedProjectEntry, {status: "filled"}>;
+
+function ProjectScreenshotPreview({
+  title,
+  images,
+  className
+}: {
+  title: string;
+  images: NonNullable<FilledProjectEntry["previewImages"]>;
+  className?: string;
+}) {
+  if (!images.length) {
+    return null;
+  }
+
+  return (
+    <div className={`clearsplit-showcase overflow-hidden rounded-[26px] ${className ?? "mt-6"}`}>
+      <div aria-label={`${title} app screenshots`} className="clearsplit-showcase-stage">
+        <Image
+          alt={`${title} app screens preview`}
+          className="object-contain"
+          fill
+          priority
+          sizes="(max-width: 768px) 84vw, 720px"
+          src={images[0].src}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: string}) {
+  const previewLinks = item.links?.filter(isPdfLink);
+  const githubLink = item.links?.find((link) => !isPdfLink(link) && isGitHubRepoLink(link));
+  const prLink = item.links?.find((link) => !isPdfLink(link) && isGitHubPullRequestLink(link));
+  const otherLinks = item.links?.filter(
+    (link) => !isPdfLink(link) && !isGitHubRepoLink(link) && !isGitHubPullRequestLink(link)
+  );
+  const [kind] = item.kindDate.includes(" · ")
+    ? item.kindDate.split(" · ", 2)
+    : [item.kindDate, ""];
+
+  const hasLeftActions = !!(githubLink?.href || prLink?.href);
+
+  return (
+    <article
+      className="project-card card-colored liquid-card group grid items-start gap-5 rounded-[28px] p-6 transition duration-300 md:grid-cols-[260px_1fr] md:gap-9 md:p-9"
+      style={{"--card-color": colorValue} as React.CSSProperties}
+    >
+      {/* Left column */}
+      <div className="md:border-r md:border-white/20 md:pr-9">
+        <div className="min-w-0">
+          <p className="font-body text-[0.78rem] tracking-wide text-white/65 uppercase md:text-[0.84rem] break-keep">
+            {kind}
+          </p>
+          <h2 className="mt-2 font-display text-[1.5rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.82rem] break-keep">
+            {item.title}
+          </h2>
+        </div>
+        <div className="pt-4 md:pt-5">
+          <div className="project-tech-stack !mt-0">
+            {item.tech.map((tech) => (
+              <TechIcon key={tech} name={tech} />
+            ))}
+          </div>
+          {hasLeftActions ? (
+            <div className="project-left-actions">
+              {githubLink ? (
+                <GitHubButton fallbackAriaLabel={`${item.title} GitHub repository`} link={githubLink} />
+              ) : null}
+              {prLink ? (
+                <GitHubButton fallbackAriaLabel={`${item.title} pull request on GitHub`} link={prLink} />
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Right column */}
+      <div className="project-card-body min-w-0 flex flex-col">
+        <div className="order-1 md:order-2">
+          {item.previewImages?.length ? (
+            <ProjectScreenshotPreview className="mt-2 md:mt-6" images={item.previewImages} title={item.title} />
+          ) : null}
+        </div>
+        <p className="project-description order-2 md:order-1 font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] mt-5 md:mt-0 break-keep">
+          {item.description}
+        </p>
+        <div className="order-3">
+          {previewLinks?.map((link) => (
+            <PresentationPreview className="mt-6" key={link.label} link={link} />
+          ))}
+          {otherLinks?.length ? (
+            <div className="mt-6 flex flex-wrap gap-4 text-[0.8rem] uppercase text-white md:text-[0.86rem]">
+              {otherLinks.map((link) => (
+                <ExternalLink key={link.label} link={link} />
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export function ProjectsSection({
   eyebrow,
   items
@@ -569,7 +598,7 @@ export function ProjectsSection({
 
   return (
     <Section className="deck-section" eyebrow={eyebrow} animateContent={false}>
-      <CardStack>
+      <CardStack scrollVH={65}>
         {filled.map((item, idx) => (
           <ProjectItem
             item={item}

@@ -1291,6 +1291,23 @@ html[data-theme="dark"] .work-section-bg {
   background: var(--bg);
 }
 
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.35; }
+  50% { transform: translateY(7px); opacity: 0.65; }
+}
+
+.hero-scroll-arrow {
+  animation: scroll-bounce 1.8s ease-in-out infinite;
+}
+
+.projects-section-bg {
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 15%, #D8EDF4 45%, #B8D8E6 75%, #A8CCDA 100%);
+}
+
+html[data-theme="dark"] .projects-section-bg {
+  background: var(--bg);
+}
+
 html[data-theme="light"] .footer-logo-dark { display: none; }
 html[data-theme="dark"] .footer-logo-light { display: none; }
 html:not([data-theme]) .footer-logo-dark { display: none; }

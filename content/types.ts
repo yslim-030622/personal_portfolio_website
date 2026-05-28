@@ -36,12 +36,14 @@ export type RawWorkEntry =
       role: Bilingual;
       paragraph: BilingualParagraph;
       highlights?: BilingualParagraph[];
+      logo?: string;
       photos?: {
         src: string;
         alt: Bilingual;
         width: number;
         height: number;
       }[];
+      previewImages?: ProjectPreviewImage[];
       links?: OptionalLink[];
     }
   | EmptySlot;
@@ -137,7 +139,14 @@ export type LocalizedWorkEntry =
       role: string;
       paragraph: string;
       highlights?: string[];
+      logo?: string;
       photos?: {
+        src: string;
+        alt: string;
+        width: number;
+        height: number;
+      }[];
+      previewImages?: {
         src: string;
         alt: string;
         width: number;

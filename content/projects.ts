@@ -22,8 +22,8 @@ export const projects: RawProjectEntry[] = [
     title: "ClearSplit",
     kindDate: "Full Stack Project · 2025–2026",
     description: {
-      en: "Clearsplit is a full iOS app to solve expense splitting problems with my roommate. I put a lot of effort to build a backend structure behind the app. Visit my GitHub!",
-      ko: "Clearsplit은 룸메이트와의 비용 정산 문제를 해결하기 위해 만든 완성형 iOS 앱입니다. 앱 뒤에서 동작하는 백엔드 구조를 설계하고 구현하는 데 많은 노력을 들였습니다. GitHub도 방문해 주세요!"
+      en: "ClearSplit is an iOS app I developed to solve expense splitting problems with my roommate during college. I especially put a lot of effort into building the backend structure for this app. This is one of my favorite projects, please visit my GitHub!",
+      ko: "Clearsplit은 대학 생활 동안 여러 룸메이트들과 함께 살면서, 정산 문제를 해결하고자 만든 iOS 앱입니다. 특히 백엔드 개발 과정에서 많은 공을 들였으며, 많은 것을 배울 수 있었던 프로젝트였습니다. 깃허브에 놀러오세요!"
     },
     highlights: [
       {
@@ -41,64 +41,10 @@ export const projects: RawProjectEntry[] = [
     ],
     previewImages: [
       {
-        src: "/clearsplit/screenshots/01_login.png",
-        alt: {en: "ClearSplit login screen", ko: "ClearSplit 로그인 화면"},
-        width: 1206,
-        height: 2622
-      },
-      {
-        src: "/clearsplit/screenshots/02_create_session.png",
-        alt: {en: "ClearSplit create session screen", ko: "ClearSplit 세션 생성 화면"},
-        width: 1206,
-        height: 2622
-      },
-      {
-        src: "/clearsplit/screenshots/03_upload_receipt.png",
-        alt: {en: "ClearSplit receipt upload screen", ko: "ClearSplit 영수증 업로드 화면"},
-        width: 1206,
-        height: 2622
-      },
-      {
-        src: "/clearsplit/screenshots/04_receipt_preview.png",
-        alt: {en: "ClearSplit receipt preview screen", ko: "ClearSplit 영수증 미리보기 화면"},
-        width: 1206,
-        height: 2622
-      },
-      {
-        src: "/clearsplit/screenshots/05_review_items.png",
-        alt: {en: "ClearSplit item review screen", ko: "ClearSplit 항목 검토 화면"},
-        width: 1206,
-        height: 2622
-      },
-      {
-        src: "/clearsplit/screenshots/06_group_overview.png",
-        alt: {en: "ClearSplit group overview screen", ko: "ClearSplit 그룹 개요 화면"},
-        width: 1206,
-        height: 2622
-      },
-      {
-        src: "/clearsplit/screenshots/07_shopping_sessions.png",
-        alt: {en: "ClearSplit shopping sessions screen", ko: "ClearSplit 쇼핑 세션 목록 화면"},
-        width: 1206,
-        height: 2622
-      },
-      {
-        src: "/clearsplit/screenshots/08_group_overview_full.png",
-        alt: {en: "ClearSplit full group overview screen", ko: "ClearSplit 전체 그룹 개요 화면"},
-        width: 1206,
-        height: 2622
-      },
-      {
-        src: "/clearsplit/screenshots/09_balances_settlement.png",
-        alt: {en: "ClearSplit balances and settlement screen", ko: "ClearSplit 잔액 및 정산 화면"},
-        width: 1206,
-        height: 2622
-      },
-      {
-        src: "/clearsplit/screenshots/10_profile.png",
-        alt: {en: "ClearSplit profile screen", ko: "ClearSplit 프로필 화면"},
-        width: 1206,
-        height: 2622
+        src: "/clearsplit/clearsplit-showcase.png",
+        alt: {en: "ClearSplit app screenshots", ko: "ClearSplit 앱 스크린샷"},
+        width: 1800,
+        height: 940
       }
     ],
     tech: ["Python", "Swift", "PostgreSQL", "Docker"],
@@ -109,8 +55,8 @@ export const projects: RawProjectEntry[] = [
     title: "Canvas Assistant",
     kindDate: "Group Project · 2026",
     description: {
-      en: "A Chrome Extension that helps students manage reminders, tasks, and assignment information directly inside Canvas LMS. I connected the Spring Boot backend with the Extension UI to build a productivity tool that works within the Canvas page.",
-      ko: "Canvas LMS 위에서 리마인더, 할 일 관리, 과제 정보를 더 쉽게 확인할 수 있도록 만든 Chrome Extension입니다. Spring Boot 백엔드와 Extension UI를 연결해 Canvas 화면 안에서 바로 사용할 수 있는 생산성 도구를 구현했습니다."
+      en: "Canvas is the most widely used LMS in American universities. We built a Chrome extension to enhance it by adding features such as a chatbot and reminders. In a team of six, I served as both Product Owner and backend developer.",
+      ko: "Canvas는 미국에서 가장 많이 쓰이는 러닝 플랫폼입니다. 6명의 팀으로 챗봇, 리마인더 등의 유용한 기능을 추가하는 크롬 확장 프로그램을 개발하였습니다. 이 프로젝트에서 저는 PO인 동시에 백엔드 개발자의 역할을 맡았습니다."
     },
     highlights: [
       {
@@ -149,8 +95,8 @@ export const projects: RawProjectEntry[] = [
     title: "Systems Programming Portfolio",
     kindDate: "Systems · 2025",
     description: {
-      en: "A systems programming portfolio built around core operating system concepts. I implemented a shell for running commands, a filesystem for storing and managing files, a scheduler for choosing which program runs next, and synchronization logic for safely sharing data across threads.",
-      ko: "운영체제의 핵심 기능을 직접 만들어 보며 정리한 시스템 프로그래밍 프로젝트입니다. 명령어를 실행하는 셸, 파일을 저장하고 관리하는 파일시스템, 여러 프로그램의 실행 순서를 정하는 스케줄러, 여러 스레드가 안전하게 데이터를 공유하게 하는 동기화 기능을 C로 구현했습니다."
+      en: "In this project, I implemented a filesystem, shell, and scheduler on top of the xv6 operating system to learn core OS concepts. It was my first experience with C, but it gave me a solid foundation in OS knowledge that every developer needs.",
+      ko: "이 프로젝트에서 저는 xv6 운영체제 위에서 파일 시스템, 셸, 스케줄러 등을 직접 구현하며 운영체제 필수 개념들을 학습하였습니다. 처음 C를 경험해봐서 많이 힘들었지만, 이를 통해 개발자의 필수 요소인 운영체제 지식을 갖출 수 있었습니다."
     },
     highlights: [
       {
@@ -164,6 +110,17 @@ export const projects: RawProjectEntry[] = [
       {
         en: "Focused on the lower-level systems that support application behavior, including execution, storage, scheduling, and shared data access.",
         ko: "사용자에게 보이는 앱 기능보다 그 아래에서 동작하는 실행 환경과 데이터 관리 구조를 이해하는 데 집중했습니다."
+      }
+    ],
+    previewImages: [
+      {
+        src: "/systems_programming_diagram.jpg",
+        alt: {
+          en: "Systems Programming Portfolio architecture diagram",
+          ko: "Systems Programming Portfolio 아키텍처 다이어그램"
+        },
+        width: 2301,
+        height: 1320
       }
     ],
     tech: ["C"],
@@ -184,9 +141,20 @@ export const projects: RawProjectEntry[] = [
     title: "Pyrefly (Meta) contribution",
     kindDate: "Open Source · 2026",
     description: {
-      en: "Contributed to Meta's open-source Python type checker, Pyrefly, by improving code search results so they better surface the actual implementation location. I worked on an assigned issue, submitted a PR, and had it reviewed and merged.",
-      ko: "Meta의 오픈소스 Python 타입 체커 Pyrefly에서, 코드 검색 결과가 실제 구현 위치를 더 잘 보여주도록 개선한 이슈를 맡아 PR을 올렸고 리뷰 후 머지되었습니다."
+      en: "I'm passionate about open source. While browsing Pyrefly's issue board, I found an interesting issue, got it assigned, and had my PR merged. This was my first open source contribution, and I continue to explore other projects today.",
+      ko: "오픈소스에 관심이 많은 저는 Meta에서 운영하는 Pyrefly의 이슈 목록을 둘러보다 흥미로운 이슈를 발견해 assign을 받고 PR을 올려 머지되었습니다. 이는 제 첫 오픈소스 기여이며, 현재도 다양한 오픈소스 프로젝트들을 꾸준히 살펴보고 있습니다."
     },
+    previewImages: [
+      {
+        src: "/open_source_contribution.png",
+        alt: {
+          en: "Pyrefly open source contribution preview",
+          ko: "Pyrefly 오픈소스 기여 미리보기"
+        },
+        width: 2104,
+        height: 1514
+      }
+    ],
     tech: ["Rust", "Python"],
     links: [
       {

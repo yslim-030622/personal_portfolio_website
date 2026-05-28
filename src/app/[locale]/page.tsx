@@ -6,7 +6,6 @@ import {
   Footer,
   NotesSection,
   ProjectsSection,
-  SkillsSection,
   WorkSection
 } from "@/components/sections";
 import {hasLocale} from "next-intl";
@@ -36,7 +35,7 @@ export default async function Page({params}: PageProps) {
       id: "hero",
       label: "소개",
       content: (
-        <div className="md:h-[160svh]">
+        <div className="md:h-[100svh]">
           <div className="hero-section-bg md:sticky md:top-0 md:h-[100svh]">
             <Hero content={content.hero} />
           </div>
@@ -49,7 +48,7 @@ export default async function Page({params}: PageProps) {
       navTitle: content.sectionEyebrows.work,
       content: (
         <div className="work-section-bg">
-          <WorkSection eyebrow={content.sectionEyebrows.work} items={content.work} />
+          <WorkSection eyebrow={content.sectionEyebrows.work} items={content.work} pauseVH={45} />
         </div>
       ),
     },
@@ -58,10 +57,12 @@ export default async function Page({params}: PageProps) {
       label: "프로젝트",
       navTitle: content.sectionEyebrows.projects,
       content: (
-        <ProjectsSection
-          eyebrow={content.sectionEyebrows.projects}
-          items={content.projects}
-        />
+        <div className="projects-section-bg">
+          <ProjectsSection
+            eyebrow={content.sectionEyebrows.projects}
+            items={content.projects}
+          />
+        </div>
       ),
     },
     {
@@ -75,16 +76,6 @@ export default async function Page({params}: PageProps) {
             intro={content.notes.intro}
             items={content.notes.items}
           />
-        </div>
-      ),
-    },
-    {
-      id: "skills",
-      label: "기술",
-      navTitle: content.sectionEyebrows.skills,
-      content: (
-        <div className="min-h-[100svh] bg-bg pt-16 md:pt-20">
-          <SkillsSection eyebrow={content.sectionEyebrows.skills} items={content.skills} />
           <Footer content={content.footer} />
         </div>
       ),

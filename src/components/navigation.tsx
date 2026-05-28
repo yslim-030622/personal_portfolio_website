@@ -65,10 +65,16 @@ export function Navigation({
   }, []);
 
   useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 80);
+    onScroll();
+    window.addEventListener("scroll", onScroll, {passive: true});
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
     const onSection = (e: Event) => {
       const {index} = (e as CustomEvent<{index: number}>).detail;
       setCurrentSection(index);
-      setScrolled(index > 0);
     };
     document.addEventListener("fp-section-change", onSection);
     return () => document.removeEventListener("fp-section-change", onSection);
@@ -85,7 +91,7 @@ export function Navigation({
       <nav className="flex min-h-11 w-full items-center justify-between gap-4 text-[0.9rem] uppercase tracking-normal text-fg">
         <p
           aria-live="polite"
-          className={`max-w-[52vw] truncate font-body text-[0.78rem] tracking-[0.16em] text-fg/70 transition-opacity duration-300 md:max-w-none md:text-[0.86rem] ${
+          className={`max-w-[52vw] truncate font-sans font-bold text-[0.95rem] tracking-[0.08em] text-fg transition-opacity duration-300 md:max-w-none md:text-[1.1rem] ${
             currentTitle ? "opacity-100" : "opacity-0"
           }`}
         >

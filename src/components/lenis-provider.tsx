@@ -20,9 +20,9 @@ export function LenisProvider() {
       }
 
       const lenis = new Lenis({
-        lerp: 0.055,
+        lerp: 0.12,
         smoothWheel: true,
-        wheelMultiplier: 0.82,
+        wheelMultiplier: 0.90,
         touchMultiplier: 1.2
       });
 
