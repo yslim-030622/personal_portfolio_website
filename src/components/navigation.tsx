@@ -82,9 +82,9 @@ export function Navigation({
       <nav className="flex min-h-11 w-full items-center justify-between gap-4 text-[0.9rem] uppercase tracking-normal text-fg">
         <p
           aria-live="polite"
-          className={`max-w-[52vw] truncate font-sans font-bold text-[0.95rem] tracking-[0.08em] text-fg transition-opacity duration-300 md:max-w-none md:text-[1.1rem] ${
-            currentTitle ? "opacity-100" : "opacity-0"
-          }`}
+          className={`max-w-[52vw] truncate text-fg transition-opacity duration-300 md:max-w-none text-[0.95rem] md:text-[1.1rem] ${
+            locale === "en" ? "font-body font-normal tracking-[0.12em]" : "font-sans font-bold tracking-[0.08em]"
+          } ${currentTitle ? "opacity-100" : "opacity-0"}`}
         >
           {currentTitle ?? " "}
         </p>
