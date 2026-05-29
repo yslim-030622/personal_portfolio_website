@@ -26,13 +26,21 @@ export function LenisProvider() {
         touchMultiplier: 1.2
       });
 
+      // Expose lenis instance globally for custom snapping behavior
+      (window as unknown as { lenis?: unknown }).lenis = lenis;
+
       const raf = (time: number) => {
         lenis.raf(time);
         frame = window.requestAnimationFrame(raf);
       };
 
       frame = window.requestAnimationFrame(raf);
-      destroy = () => lenis.destroy();
+      destroy = () => {
+        lenis.destroy();
+        if ((window as unknown as { lenis?: unknown }).lenis === lenis) {
+          delete (window as unknown as { lenis?: unknown }).lenis;
+        }
+      };
     });
 
     return () => {

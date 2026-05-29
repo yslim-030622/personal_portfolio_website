@@ -6,12 +6,91 @@ import {LenisProvider} from "./lenis-provider";
 
 export function ContinuousScroll({sections}: {sections: PageSection[]}) {
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
+  const isSnapping = useRef(false);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       history.scrollRestoration = "manual";
       window.scrollTo(0, 0);
     }
+  }, []);
+
+  useEffect(() => {
+    const handleScrollSnap = () => {
+      if (isSnapping.current) return;
+
+      const currentScroll = window.scrollY;
+      const heroEl = document.getElementById("hero");
+      const workEl = document.getElementById("work");
+      if (!heroEl || !workEl) return;
+
+      const workTop = workEl.offsetTop;
+      const threshold = 50; // 자석처럼 스냅 작동할 문턱값 (px)
+
+      // 1. Hero -> Work 스냅
+      if (
+        lastScrollY.current <= threshold &&
+        currentScroll > threshold &&
+        currentScroll < workTop - 120
+      ) {
+        isSnapping.current = true;
+        const targetScroll = workTop;
+
+        const onSnapComplete = () => {
+          isSnapping.current = false;
+          lastScrollY.current = window.scrollY;
+        };
+
+        const globalLenis = (window as unknown as { lenis?: { scrollTo: (target: unknown, options?: unknown) => void } }).lenis;
+        if (globalLenis) {
+          globalLenis.scrollTo(workEl, {
+            onComplete: onSnapComplete,
+            duration: 1.1,
+            easing: (t: number) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)), // EaseOutExpo
+          });
+        } else {
+          window.scrollTo({top: targetScroll, behavior: "smooth"});
+          setTimeout(onSnapComplete, 850);
+        }
+        return;
+      }
+
+      // 2. Work -> Hero 스냅
+      if (
+        lastScrollY.current >= workTop - threshold &&
+        currentScroll < workTop - threshold &&
+        currentScroll > threshold
+      ) {
+        isSnapping.current = true;
+        const targetScroll = 0;
+
+        const onSnapComplete = () => {
+          isSnapping.current = false;
+          lastScrollY.current = window.scrollY;
+        };
+
+        const globalLenis = (window as unknown as { lenis?: { scrollTo: (target: unknown, options?: unknown) => void } }).lenis;
+        if (globalLenis) {
+          globalLenis.scrollTo(0, {
+            onComplete: onSnapComplete,
+            duration: 1.1,
+            easing: (t: number) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)), // EaseOutExpo
+          });
+        } else {
+          window.scrollTo({top: targetScroll, behavior: "smooth"});
+          setTimeout(onSnapComplete, 850);
+        }
+        return;
+      }
+
+      lastScrollY.current = currentScroll;
+    };
+
+    window.addEventListener("scroll", handleScrollSnap, {passive: true});
+    return () => {
+      window.removeEventListener("scroll", handleScrollSnap);
+    };
   }, []);
 
   useEffect(() => {
