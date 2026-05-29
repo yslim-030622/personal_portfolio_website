@@ -463,6 +463,15 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
             <p className="mt-1.5 font-body text-[0.8rem] text-white/65 md:text-[0.86rem] break-keep">
               {item.dates}{item.location ? ` · ${item.location}` : ""}
             </p>
+            {githubLink?.href || prLink?.href || previewLinks?.length ? (
+              <div className="mt-3 flex flex-wrap gap-2.5">
+                {githubLink ? <GitHubButton fallbackAriaLabel={`${item.company} GitHub repository`} link={githubLink} /> : null}
+                {prLink ? <GitHubButton fallbackAriaLabel={`${item.company} pull request on GitHub`} link={prLink} /> : null}
+                {previewLinks?.map((link) => (
+                  <PdfButton key={link.label} link={link} fallbackAriaLabel={`${item.company} PDF presentation`} />
+                ))}
+              </div>
+            ) : null}
           </div>
           {photos?.length ? (
             <div className="shrink-0 md:hidden">
@@ -474,15 +483,6 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
             </div>
           ) : null}
         </div>
-        {githubLink?.href || prLink?.href || previewLinks?.length ? (
-          <div className="mt-2 flex flex-wrap gap-2.5">
-            {githubLink ? <GitHubButton fallbackAriaLabel={`${item.company} GitHub repository`} link={githubLink} /> : null}
-            {prLink ? <GitHubButton fallbackAriaLabel={`${item.company} pull request on GitHub`} link={prLink} /> : null}
-            {previewLinks?.map((link) => (
-              <PdfButton key={link.label} link={link} fallbackAriaLabel={`${item.company} PDF presentation`} />
-            ))}
-          </div>
-        ) : null}
         {photos?.length ? (
           <div className="mt-6 hidden md:block">
             {photos.map((photo) => (
@@ -753,22 +753,9 @@ export function Footer({content}: {content: LocalizedPortfolioContent["footer"]}
             content.line1
           )}
         </p>
-        <div className="footer-logo">
-          <Image
-            alt="Yeongseok Lim"
-            className="footer-logo-light h-6 w-auto"
-            height={48}
-            src="/yeongseok-lim-orange.png"
-            width={192}
-          />
-          <Image
-            alt="Yeongseok Lim"
-            className="footer-logo-dark h-6 w-auto"
-            height={48}
-            src="/yeongseok-lim-white.png"
-            width={192}
-          />
-        </div>
+        <span className="font-display text-[1.05rem] italic tracking-wide text-accent/70">
+          Yeongseok Lim
+        </span>
       </div>
     </footer>
   );

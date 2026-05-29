@@ -4,7 +4,6 @@ import {Navigation} from "@/components/navigation";
 import {ContinuousScroll} from "@/components/continuous-scroll";
 import {
   Footer,
-  NotesSection,
   ProjectsSection,
   WorkSection
 } from "@/components/sections";
@@ -61,20 +60,6 @@ export default async function Page({params}: PageProps) {
           <ProjectsSection
             eyebrow={content.sectionEyebrows.projects}
             items={content.projects}
-          />
-        </div>
-      ),
-    },
-    {
-      id: "notes",
-      label: "노트",
-      navTitle: content.sectionEyebrows.notes,
-      content: (
-        <div className="min-h-[100svh] bg-bg pt-16 md:pt-20">
-          <NotesSection
-            eyebrow={content.sectionEyebrows.notes}
-            intro={content.notes.intro}
-            items={content.notes.items}
           />
           <Footer content={content.footer} />
         </div>
