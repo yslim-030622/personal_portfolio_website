@@ -483,9 +483,9 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
           </div>
           {photos?.length ? (
             <div className="shrink-0 md:hidden">
-              <figure className="overflow-hidden rounded-md shadow-sm" key={photos[0].src}>
-                <div className="relative h-[100px] w-[75px]">
-                  <Image alt={photos[0].alt} className="object-cover object-center" fill sizes="75px" src={photos[0].src} />
+              <figure className="overflow-hidden rounded-lg" key={photos[0].src}>
+                <div className="relative h-[88px] w-[66px]">
+                  <Image alt={photos[0].alt} className="object-cover object-top" fill sizes="66px" src={photos[0].src} />
                 </div>
               </figure>
             </div>
@@ -510,10 +510,10 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
           {item.paragraph}
         </p>
         {item.previewImages?.length ? (
-          <ProjectScreenshotPreview className="order-1 mb-5 mt-2 md:mb-0 md:mt-0 md:mb-5" images={item.previewImages} title={item.company} />
+          <ProjectScreenshotPreview className="order-1 mb-5 mt-5" images={item.previewImages} title={item.company} />
         ) : null}
         {previewLinks?.map((link) => (
-          <div key={link.label} className="order-1 mb-5 mt-0 md:mb-5 md:mt-0">
+          <div key={link.label} className="order-1 mb-6 mt-2 md:mt-5">
             <PresentationPreview link={link} />
           </div>
         ))}
@@ -651,14 +651,14 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
 
       {/* Right column */}
       <div className="project-card-body min-w-0 flex flex-col">
-        <p className="project-description order-2 md:order-1 font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] break-keep">
+        <p className="project-description order-2 font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] break-keep md:mt-1">
           {item.description}
         </p>
         {item.previewImages?.length ? (
-          <ProjectScreenshotPreview className="order-1 md:order-2 mb-5 mt-2 md:mb-0 md:mt-5" images={item.previewImages} title={item.title} />
+          <ProjectScreenshotPreview className="order-1 mb-6 mt-2 md:mt-5" images={item.previewImages} title={item.title} />
         ) : null}
         {previewLinks?.map((link) => (
-          <div key={link.label} className="order-1 md:order-2 mb-5 mt-2 md:mb-0 md:mt-5">
+          <div key={link.label} className="order-1 mb-6 mt-2 md:mt-5">
             <PresentationPreview link={link} />
           </div>
         ))}
@@ -748,22 +748,26 @@ export function Footer({content}: {content: LocalizedPortfolioContent["footer"]}
   const dateMatch = content.line1.match(/^(.*?)(\d{4}-\d{2}-\d{2})(\.)?$/);
 
   return (
-    <footer className="mx-auto max-w-[1100px] px-5 pb-3 pt-3 md:px-8">
-      <div className="border-t border-border pt-3 flex items-center justify-between">
-        <p className="text-sm leading-7 text-fg-muted">
+    <footer className="bg-white border-t-2 border-border/60">
+      <div className="w-full px-5 py-1.5 md:px-8 flex items-center justify-between gap-4">
+        <p className="text-sm md:text-base leading-7 text-fg-muted whitespace-nowrap">
           {dateMatch ? (
             <>
               {dateMatch[1]}
-              <span className="text-fg">{dateMatch[2]}</span>
+              <span className="text-fg font-medium">{dateMatch[2]}</span>
               {dateMatch[3]}
             </>
           ) : (
             content.line1
           )}
         </p>
-        <span className="font-display text-[1.05rem] italic tracking-wide text-accent/70">
-          Yeongseok Lim
-        </span>
+        <Image
+          src="/signature.png"
+          alt="Yeongseok Lim signature"
+          width={300}
+          height={120}
+          className="h-20 md:h-24 w-auto object-contain object-right opacity-70 -mr-4 md:-mr-8"
+        />
       </div>
     </footer>
   );

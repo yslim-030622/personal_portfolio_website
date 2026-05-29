@@ -48,6 +48,13 @@ export default async function Page({params}: PageProps) {
       content: (
         <div className="work-section-bg">
           <WorkSection eyebrow={content.sectionEyebrows.work} items={content.work} pauseVH={45} />
+          <div className="flex items-center justify-center py-8 md:py-12">
+            <div className="card-stack-scroll-arrow">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14M5 12l7 7 7-7" />
+              </svg>
+            </div>
+          </div>
         </div>
       ),
     },
@@ -56,11 +63,12 @@ export default async function Page({params}: PageProps) {
       label: "프로젝트",
       navTitle: content.sectionEyebrows.projects,
       content: (
-        <div className="projects-section-bg pb-8 md:pb-20">
+        <div className="projects-section-bg pt-8 md:pt-14">
           <ProjectsSection
             eyebrow={content.sectionEyebrows.projects}
             items={content.projects}
           />
+          <div className="h-20 md:h-32" />
           <Footer content={content.footer} />
         </div>
       ),

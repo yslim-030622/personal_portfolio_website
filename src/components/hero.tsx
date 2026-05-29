@@ -113,20 +113,20 @@ export function Hero({content, locale}: HeroProps) {
 
   return (
     <section
-      className="relative mx-auto grid w-full max-w-[1480px] content-start items-start overflow-hidden overflow-x-hidden px-6 pb-0 pt-10 min-h-[100svh] md:grid-cols-[minmax(0,50vw)_minmax(0,50vw)] md:content-start md:items-start md:px-10 md:pb-10 md:pt-12 lg:pt-14 xl:px-20 2xl:px-28"
+      className="relative mx-auto grid w-full max-w-[1480px] content-start items-start overflow-hidden overflow-x-hidden px-6 pb-0 pt-10 min-h-[100svh] md:grid-cols-[minmax(0,50vw)_minmax(0,50vw)] md:content-start md:items-center md:px-10 md:pb-10 md:pt-12 lg:pt-14 xl:px-20 2xl:px-28"
     >
       <div className="relative z-10 min-w-0 max-w-[540px] md:max-w-none md:pr-8 xl:pr-12">
         <h1
           className="hero-headline mt-3 max-w-[17ch] font-display font-normal leading-[1.02] tracking-normal text-fg md:mt-4 md:max-w-[18ch] md:leading-[0.98] lg:max-w-[18.5ch]"
         >
-          <span className={`block text-left whitespace-nowrap ${isKorean ? "text-[clamp(2rem,3.8vw,3.7rem)]" : "text-[clamp(3.1rem,6vw,5.65rem)]"}`}>
+          <span className={`block text-left whitespace-nowrap ${isKorean ? "text-[clamp(2.8rem,5vw,4.8rem)]" : "text-[clamp(3.1rem,6vw,5.65rem)]"}`}>
             <HeadlineWords
               before={content.headline.before.replace(/\n/g, "")}
               italic=""
               after=""
             />
           </span>
-          <span className={`block text-left whitespace-nowrap ml-[1em] ${isKorean ? "text-[clamp(2rem,3.8vw,3.7rem)]" : "text-[clamp(3.1rem,6vw,5.65rem)]"}`}>
+          <span className={`block text-left whitespace-nowrap ml-[1em] ${isKorean ? "text-[clamp(2.8rem,5vw,4.8rem)] mt-3 md:mt-4" : "text-[clamp(3.1rem,6vw,5.65rem)]"}`}>
             <HeadlineWords
               before=""
               italic={content.headline.italic}

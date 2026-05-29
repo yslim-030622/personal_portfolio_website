@@ -85,7 +85,10 @@ export async function generateMetadata({
       images: [getAbsoluteUrl(locale === "en" ? "/og" : "/ko/og")]
     },
     icons: {
-      icon: "/favicon.svg"
+      icon: [
+        {url: "/favicon.ico", sizes: "any"},
+        {url: "/favicon.svg", type: "image/svg+xml"}
+      ]
     }
   };
 }

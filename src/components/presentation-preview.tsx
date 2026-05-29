@@ -14,10 +14,10 @@ export function PresentationPreview({
   }
 
   return (
-    <div className={`clearsplit-showcase overflow-hidden rounded-[26px] ${className ?? "mt-6"}`}>
+    <div className={`clearsplit-showcase overflow-hidden rounded-[26px] mt-6 ${className ?? ""}`}>
       <div className="clearsplit-showcase-stage bg-white">
         <iframe
-          className="absolute inset-0 h-full w-full border-0 bg-white"
+          className="absolute inset-0 h-full w-full border-0 bg-white pointer-events-none"
           loading="lazy"
           src={`${link.href}#toolbar=0&navpanes=0&view=FitH`}
           title={link.ariaLabel ?? link.label}

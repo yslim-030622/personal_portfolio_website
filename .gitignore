@@ -13,6 +13,7 @@ public/resume.pdf
 .gstack/
 .omx/
 .omx-*.png
+.antigravitycli/
 photo1.JPG
 !public/photo1.jpg
 IMG_*.JPG

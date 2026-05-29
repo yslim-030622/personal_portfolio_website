@@ -29,7 +29,7 @@
 html[data-theme="dark"] {
   --bg: #f4fbff;
   --bg-elev: #eef8fd;
-  --fg: #111018;
+  --fg: #1E293B;
   --fg-muted: #4a6070;
   --border: #c2dff0;
   --accent: #2d7db3;
@@ -45,7 +45,7 @@ html[data-theme="dark"] {
 html[data-theme="light"] {
   --bg: #f4fbff;
   --bg-elev: #eef8fd;
-  --fg: #111018;
+  --fg: #1E293B;
   --fg-muted: #4a6070;
   --border: #c2dff0;
   --accent: #2d7db3;
@@ -118,7 +118,7 @@ html[lang="ko"] :where(h1, h2, h3, p, a, button, span, li) {
 html[lang="ko"] .hero-headline {
   max-width: 10.5em;
   font-family: var(--font-pretendard), sans-serif;
-  font-size: 4.9rem;
+  font-size: 5.4rem;
   font-weight: 700;
   line-height: 1.06;
   letter-spacing: -0.04em;
@@ -152,6 +152,13 @@ html[lang="ko"] .font-display {
   html[lang="ko"] .hero-name-glow {
     font-size: clamp(3.7rem, 15.5vw, 4.8rem);
     line-height: 0.98;
+  }
+}
+
+@media (min-width: 1024px) {
+  html[lang="ko"] .hero-subline {
+    font-size: 1.46rem;
+    line-height: 1.6;
   }
 }
 
@@ -1093,7 +1100,13 @@ html[data-theme="dark"] .hero-name-accent::after {
 }
 
 .hero-photo-frame::after {
-  display: none;
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  content: "";
+  background: radial-gradient(ellipse at 50% 40%, transparent 28%, rgba(0, 0, 0, 0.55) 78%, rgba(0, 0, 0, 0.78) 100%);
 }
 
 .hero-photo-image {
