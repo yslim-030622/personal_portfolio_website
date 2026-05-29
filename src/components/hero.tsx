@@ -37,8 +37,8 @@ function HeadlineWords({
   const italicTokens = tokenize(italic);
   const afterTokens = tokenize(after);
 
-  const BASE_DELAY = 30;
-  const PER_WORD = 38;
+  const BASE_DELAY = 120;
+  const PER_WORD = 55;
   let wordIdx = startWordIndex;
 
   const renderToken = (token: Token, isItalic: boolean, key: string) => {
@@ -138,21 +138,21 @@ export function Hero({content, locale}: HeroProps) {
 
         <p
           className="hero-reveal hero-subline mt-6 hidden max-w-[42ch] font-display text-[1.34rem] font-normal leading-[1.58] text-fg/88 [hyphens:none] [overflow-wrap:break-word] md:mt-8 md:block xl:max-w-[44ch] xl:text-[1.42rem]"
-          style={{animationDelay: "120ms"}}
+          style={{animationDelay: "450ms"}}
         >
           {content.subline}
         </p>
 
         <div
           className="hero-reveal mt-6 hidden md:flex"
-          style={{animationDelay: "280ms"}}
+          style={{animationDelay: "650ms"}}
         >
           <HeroLinks links={content.links} />
         </div>
 
       </div>
 
-      <div className="hero-photo-reveal mt-5 max-w-[540px] md:hidden" style={{animationDelay: "60ms"}}>
+      <div className="hero-photo-reveal mt-5 max-w-[540px] md:hidden" style={{animationDelay: "300ms"}}>
         <figure className="hero-photo hero-photo-mobile overflow-hidden rounded-[6px]">
           <div className="hero-photo-frame relative h-[48vh] min-h-[260px] w-full overflow-hidden">
             <Image
@@ -178,7 +178,7 @@ export function Hero({content, locale}: HeroProps) {
 
       <figure
         className="hero-photo-reveal hero-photo hero-photo-desktop pointer-events-none relative hidden h-[min(78svh,820px)] min-h-[620px] w-full md:mt-5 md:block"
-        style={{animationDelay: "80ms"}}
+        style={{animationDelay: "380ms"}}
       >
         <div className="hero-photo-frame relative h-full w-full overflow-hidden">
             <Image
