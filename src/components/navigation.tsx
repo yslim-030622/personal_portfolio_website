@@ -134,7 +134,7 @@ export function Navigation({
           <p
             aria-live="polite"
             className={`max-w-[52vw] truncate text-fg transition-opacity duration-300 md:max-w-none text-[0.95rem] md:text-[1.1rem] ${
-              locale === "en" ? "font-body font-normal tracking-[0.12em]" : "font-sans font-bold tracking-[0.08em]"
+              locale === "en" ? "font-body font-bold tracking-[0.12em]" : "font-sans font-bold tracking-[0.08em]"
             } ${currentTitle ? "opacity-100" : "opacity-0"}`}
           >
             {currentTitle ?? " "}

@@ -389,7 +389,7 @@ function CardStack({
   }
 
   const isLastCard = activeIndex === cards.length - 1;
-  const showScrollArrow = isSectionSticky && !isPastEnd && (!isLastCard || pauseVH > 0) && !isTransitioning;
+  const showScrollArrow = isSectionSticky && !isPastEnd && !isLastCard && !isTransitioning;
 
   return (
     <div
