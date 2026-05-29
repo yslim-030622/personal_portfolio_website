@@ -305,6 +305,7 @@ function CardStack({
   const [activeIndex, setActiveIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isSectionSticky, setIsSectionSticky] = useState(false);
+  const [isPastEnd, setIsPastEnd] = useState(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -318,6 +319,7 @@ function CardStack({
       // Use a small tolerance for sub-pixel rounding (rect.top is often ~0.2 at the boundary)
       if (rect.top > 2) {
         setIsSectionSticky(false);
+        setIsPastEnd(false);
         return;
       }
       setIsSectionSticky(true);
@@ -326,6 +328,11 @@ function CardStack({
       // Rect.top is 0 when the container hits the top of the viewport
       // activeScrollHeight is the scroll amount needed to fully switch all cards
       const activeScrollHeight = (cards.length - 1) * window.innerHeight * (scrollVH / 100);
+
+      // Once we've scrolled past the active+pause zone the sticky element starts
+      // moving up out of the viewport — hide the arrow to avoid it floating mid-screen.
+      const totalScrollHeight = activeScrollHeight + window.innerHeight * (pauseVH / 100);
+      setIsPastEnd(-rect.top >= totalScrollHeight);
 
       let rawProgress = 0;
       if (activeScrollHeight > 0) {
@@ -375,15 +382,14 @@ function CardStack({
       window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
     };
-  }, [cards.length, scrollYProgress, scrollVH]);
+  }, [cards.length, scrollYProgress, scrollVH, pauseVH]);
 
   if (cards.length <= 1) {
     return <div className={className ?? ""}>{cards}</div>;
   }
 
   const isLastCard = activeIndex === cards.length - 1;
-  // Show arrow even on last card if there's a pause zone (indicates more content below)
-  const showScrollArrow = isSectionSticky && (!isLastCard || pauseVH > 0) && !isTransitioning;
+  const showScrollArrow = isSectionSticky && !isPastEnd && (!isLastCard || pauseVH > 0) && !isTransitioning;
 
   return (
     <div

@@ -142,8 +142,8 @@ export function Navigation({
           <div className="flex items-center gap-3">
             <SegmentedSwitch
               options={[
-                {label: "KOR", value: "ko", ariaLabel: t("switchToKorean")},
                 {label: "ENG", value: "en", ariaLabel: t("switchToEnglish")},
+                {label: "KOR", value: "ko", ariaLabel: t("switchToKorean")},
               ]}
               value={locale as "en" | "ko"}
               onChange={(val) => {
