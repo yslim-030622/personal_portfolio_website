@@ -1,10 +1,10 @@
 import type {RawPortfolioContent} from "./types";
 
 export const sectionEyebrows = {
-  work: {en: "01 — Work Experience", ko: "01 — 주요 경력"},
-  projects: {en: "02 — Projects", ko: "02 — 프로젝트"},
-  notes: {en: "03 — Coursework", ko: "03 — 수강 과목"},
-  skills: {en: "04 — Tools", ko: "04 — 자주 쓰는 도구들"}
+  work: {en: "Work Experience", ko: "주요 경력"},
+  projects: {en: "Projects", ko: "프로젝트"},
+  notes: {en: "Coursework", ko: "수강 과목"},
+  skills: {en: "Tools", ko: "자주 쓰는 도구들"}
 } satisfies RawPortfolioContent["sectionEyebrows"];
 
 export const hero = {

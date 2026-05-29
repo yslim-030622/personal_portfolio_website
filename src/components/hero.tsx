@@ -126,7 +126,7 @@ export function Hero({content, locale}: HeroProps) {
               after=""
             />
           </span>
-          <span className={`block text-left whitespace-nowrap ${isKorean ? "text-[clamp(2rem,3.8vw,3.7rem)]" : "text-[clamp(3.1rem,6vw,5.65rem)]"}`}>
+          <span className={`block text-left whitespace-nowrap ml-[0.5em] ${isKorean ? "text-[clamp(2rem,3.8vw,3.7rem)]" : "text-[clamp(3.1rem,6vw,5.65rem)]"}`}>
             <HeadlineWords
               before=""
               italic={content.headline.italic}

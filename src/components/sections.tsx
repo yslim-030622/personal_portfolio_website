@@ -198,6 +198,7 @@ function StackCard({
   const PEEK_VH      = 5;
   const ENTRY_Y      = 100;   // vh — exactly bottom of screen
   const PEEK_OPACITY = 0.90; // high opacity = vivid original colors preserved
+  const NAV_OFFSET   = 3;    // vh — shift stack down to clear the fixed nav bar
   const step         = total > 1 ? 1 / (total - 1) : 1;
 
     // Uniform progress keypoints: [0, 1/(n-1), 2/(n-1), ..., 1]
@@ -206,12 +207,13 @@ function StackCard({
   // Y: cluster-centering formula.
   // activeShift offsets the active card downward so the entire visible stack
   // (active + peeked cards above) remains centered in the viewport.
-  // Without it, peeked cards push the visual mass upward.
+  // NAV_OFFSET shifts the whole stack down to prevent peeked cards from
+  // crowding the fixed navigation bar at the top.
   const yValues = points.map((_, pi) => {
     if (pi < index) return `${ENTRY_Y}vh`;
     const depth       = pi - index;
     const activeShift = pi * (PEEK_VH / 2); // shifts active card down to balance peek mass above
-    return `${activeShift - depth * PEEK_VH}vh`;
+    return `${activeShift - depth * PEEK_VH + NAV_OFFSET}vh`;
   });
 
   // Scale: active at 1, peeked cards shrink slightly
