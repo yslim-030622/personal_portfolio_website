@@ -120,6 +120,33 @@ function GitHubButton({
   );
 }
 
+function PdfButton({
+  link,
+  fallbackAriaLabel
+}: {
+  link: LocalizedOptionalLink;
+  fallbackAriaLabel: string;
+}) {
+  if (!link.href) {
+    return null;
+  }
+
+  return (
+    <a
+      aria-label={link.ariaLabel ?? fallbackAriaLabel}
+      className="card-github-btn inline-flex items-center gap-2 rounded-md px-3.5 py-2 text-[0.82rem] text-white transition-all duration-200 lowercase"
+      href={link.href}
+      rel="noreferrer"
+      target="_blank"
+    >
+      <svg aria-hidden="true" fill="currentColor" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM13 9V3.5L18.5 9H13z"/>
+      </svg>
+      {link.label ?? "open pdf"}
+    </a>
+  );
+}
+
 
 const TECH_ICON_SLUGS: Record<string, string> = {
   "Python": "python",
@@ -151,7 +178,7 @@ function TechIcon({name}: {name: string}) {
   );
 }
 
-const STACK_CARD_COLORS = ['#E8314A', '#5C6BC0'];
+const STACK_CARD_COLORS = ['#5B6EAE', '#64748B'];
 const WORK_CARD_COLORS = STACK_CARD_COLORS;
 const PROJECT_CARD_COLORS = ['#4A7FA5', '#B05C6B', '#5A8F72', '#7C6B9A'];
 
@@ -273,8 +300,9 @@ function CardStack({
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollYProgress = useMotionValue(0);
 
-  const [activeIndex, setActiveIndex] = useState(-1);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isSectionSticky, setIsSectionSticky] = useState(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -286,7 +314,11 @@ function CardStack({
 
       // Don't activate any card until the sticky card has reached the top of the viewport
       // Use a small tolerance for sub-pixel rounding (rect.top is often ~0.2 at the boundary)
-      if (rect.top > 2) return;
+      if (rect.top > 2) {
+        setIsSectionSticky(false);
+        return;
+      }
+      setIsSectionSticky(true);
 
       // Calculate how far we've scrolled inside this specific container
       // Rect.top is 0 when the container hits the top of the viewport
@@ -349,7 +381,7 @@ function CardStack({
 
   const isLastCard = activeIndex === cards.length - 1;
   // Show arrow even on last card if there's a pause zone (indicates more content below)
-  const showScrollArrow = (!isLastCard || pauseVH > 0) && !isTransitioning;
+  const showScrollArrow = isSectionSticky && (!isLastCard || pauseVH > 0) && !isTransitioning;
 
   return (
     <div
@@ -442,18 +474,21 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
             </div>
           ) : null}
         </div>
-        {githubLink?.href || prLink?.href ? (
-          <div className="mt-4 flex flex-wrap gap-2.5">
+        {githubLink?.href || prLink?.href || previewLinks?.length ? (
+          <div className="mt-2 flex flex-wrap gap-2.5">
             {githubLink ? <GitHubButton fallbackAriaLabel={`${item.company} GitHub repository`} link={githubLink} /> : null}
             {prLink ? <GitHubButton fallbackAriaLabel={`${item.company} pull request on GitHub`} link={prLink} /> : null}
+            {previewLinks?.map((link) => (
+              <PdfButton key={link.label} link={link} fallbackAriaLabel={`${item.company} PDF presentation`} />
+            ))}
           </div>
         ) : null}
         {photos?.length ? (
           <div className="mt-6 hidden md:block">
             {photos.map((photo) => (
               <figure className="overflow-hidden rounded-lg shadow-md" key={photo.src}>
-                <div className="relative aspect-[3/4] w-full max-w-[160px]">
-                  <Image alt={photo.alt} className="object-cover object-center" fill sizes="160px" src={photo.src} />
+                <div className="relative aspect-[3/4] w-full max-w-[180px]">
+                  <Image alt={photo.alt} className="object-cover object-top" fill sizes="180px" src={photo.src} />
                 </div>
               </figure>
             ))}
@@ -462,23 +497,27 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
       </div>
 
       {/* Right column */}
-      <div className="min-w-0">
-        <p className="font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] break-keep">
+      <div className="min-w-0 flex flex-col">
+        <p className="order-2 font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] break-keep">
           {item.paragraph}
         </p>
         {item.previewImages?.length ? (
-          <ProjectScreenshotPreview className="mt-6" images={item.previewImages} title={item.company} />
+          <ProjectScreenshotPreview className="order-1 mb-5 mt-2 md:mb-0 md:mt-0 md:mb-5" images={item.previewImages} title={item.company} />
         ) : null}
         {previewLinks?.map((link) => (
-          <PresentationPreview className="mt-6" key={link.label} link={link} />
-        ))}
-        {otherLinks?.length ? (
-          <div className="mt-6 flex flex-wrap gap-4 text-[0.8rem] uppercase text-white md:text-[0.86rem]">
-            {otherLinks.map((link) => (
-              <ExternalLink key={link.label} link={link} />
-            ))}
+          <div key={link.label} className="order-1 mb-5 mt-0 md:mb-5 md:mt-0">
+            <PresentationPreview link={link} />
           </div>
-        ) : null}
+        ))}
+        <div className="order-3">
+          {otherLinks?.length ? (
+            <div className="mt-6 flex flex-wrap gap-4 text-[0.8rem] uppercase text-white md:text-[0.86rem]">
+              {otherLinks.map((link) => (
+                <ExternalLink key={link.label} link={link} />
+              ))}
+            </div>
+          ) : null}
+        </div>
       </div>
     </article>
   );
@@ -522,6 +561,16 @@ function ProjectScreenshotPreview({
   className?: string;
 }) {
   const isActive = useContext(CardActiveContext);
+  const hasPlayedRef = useRef(false);
+  const [hasPlayed, setHasPlayed] = useState(false);
+
+  useEffect(() => {
+    if (isActive && !hasPlayedRef.current) {
+      hasPlayedRef.current = true;
+      const id = setTimeout(() => setHasPlayed(true), 0);
+      return () => clearTimeout(id);
+    }
+  }, [isActive]);
 
   if (!images.length) {
     return null;
@@ -531,7 +580,7 @@ function ProjectScreenshotPreview({
     <motion.div
       className={`clearsplit-showcase overflow-hidden rounded-[26px] ${className ?? "mt-6"}`}
       initial={{opacity: 0, y: 20}}
-      animate={isActive ? {opacity: 1, y: 0} : {opacity: 0, y: 20}}
+      animate={hasPlayed || isActive ? {opacity: 1, y: 0} : {opacity: 0, y: 20}}
       transition={{duration: 0.72, delay: 0.22, ease: [0.22, 1, 0.36, 1]}}
     >
       <div aria-label={`${title} app screenshots`} className="clearsplit-showcase-stage">
@@ -556,7 +605,7 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
     (link) => !isPdfLink(link) && !isGitHubRepoLink(link) && !isGitHubPullRequestLink(link)
   );
 
-  const hasLeftActions = !!(githubLink?.href || prLink?.href);
+  const hasLeftActions = !!(githubLink?.href || prLink?.href || previewLinks?.length);
 
   return (
     <article
@@ -570,20 +619,23 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
             {item.title}
           </h2>
         </div>
-        <div className="pt-4 md:pt-5">
-          <div className="project-tech-stack !mt-0">
+        <div className="pt-4 md:pt-5 flex flex-wrap items-center gap-2.5 md:gap-3">
+          <div className="project-tech-stack card-glass-pane rounded-md px-3.5 py-2 !mt-0">
             {item.tech.map((tech) => (
               <TechIcon key={tech} name={tech} />
             ))}
           </div>
           {hasLeftActions ? (
-            <div className="project-left-actions">
+            <div className="project-left-actions !mt-0">
               {githubLink ? (
                 <GitHubButton fallbackAriaLabel={`${item.title} GitHub repository`} link={githubLink} />
               ) : null}
               {prLink ? (
                 <GitHubButton fallbackAriaLabel={`${item.title} pull request on GitHub`} link={prLink} />
               ) : null}
+              {previewLinks?.map((link) => (
+                <PdfButton key={link.label} link={link} fallbackAriaLabel={`${item.title} PDF presentation`} />
+              ))}
             </div>
           ) : null}
         </div>
@@ -591,16 +643,18 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
 
       {/* Right column */}
       <div className="project-card-body min-w-0 flex flex-col">
-        <p className="project-description font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] break-keep">
+        <p className="project-description order-2 md:order-1 font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] break-keep">
           {item.description}
         </p>
         {item.previewImages?.length ? (
-          <ProjectScreenshotPreview className="mt-4 md:mt-5" images={item.previewImages} title={item.title} />
+          <ProjectScreenshotPreview className="order-1 md:order-2 mb-5 mt-2 md:mb-0 md:mt-5" images={item.previewImages} title={item.title} />
         ) : null}
-        <div className="mt-4 md:mt-5">
-          {previewLinks?.map((link) => (
-            <PresentationPreview key={link.label} link={link} />
-          ))}
+        {previewLinks?.map((link) => (
+          <div key={link.label} className="order-1 md:order-2 mb-5 mt-2 md:mb-0 md:mt-5">
+            <PresentationPreview link={link} />
+          </div>
+        ))}
+        <div className="order-3 mt-4 md:mt-5">
           {otherLinks?.length ? (
             <div className="mt-4 flex flex-wrap gap-4 text-[0.8rem] uppercase text-white md:text-[0.86rem]">
               {otherLinks.map((link) => (
@@ -711,7 +765,7 @@ export function Footer({content}: {content: LocalizedPortfolioContent["footer"]}
             alt="Yeongseok Lim"
             className="footer-logo-dark h-6 w-auto"
             height={48}
-            src="/yeongseok-lim-white-new.png"
+            src="/yeongseok-lim-white.png"
             width={192}
           />
         </div>

@@ -75,7 +75,7 @@ export function Navigation({
     <header
       className={`fixed left-0 right-0 top-0 z-50 px-5 py-1.5 transition-all duration-300 md:px-8 ${
         scrolled
-          ? "nav-scrolled bg-bg/80 backdrop-blur-md"
+          ? "nav-scrolled bg-bg/40 backdrop-blur-xl"
           : "bg-transparent"
       }`}
     >

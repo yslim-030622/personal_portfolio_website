@@ -263,7 +263,7 @@ html[lang="ko"] .font-display {
   margin: auto;
   width: min(88vw, 1040px);
   max-width: 100%;
-  height: clamp(460px, 68svh, 560px);
+  height: clamp(520px, 76svh, 680px);
   pointer-events: auto;
   user-select: none;
   filter: drop-shadow(0 24px 28px rgb(24 20 13 / 0.18));
@@ -444,7 +444,7 @@ html[data-theme="dark"] .liquid-card.card-colored:hover {
   background: rgb(255 255 255 / 0.18);
 }
 
-.card-github-btn {
+.card-github-btn, .card-glass-pane {
   background: rgb(255 255 255 / 0.15);
   border: 1px solid rgb(255 255 255 / 0.22);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.10);
@@ -922,21 +922,12 @@ html[lang="ko"] .hero-name-accent {
   font-size: 1em;
   font-weight: 800;
   letter-spacing: -0.04em;
-  color: var(--fg);
-  text-shadow: none;
 }
 
-html[data-theme="light"][lang="ko"] .hero-name-accent {
-  color: var(--fg);
-  text-shadow: none;
-}
-
-html[data-theme="light"][lang="ko"] .hero-name-accent::before {
-  display: none;
-}
-
-html[data-theme="light"][lang="ko"] .hero-name-accent::after {
-  display: none;
+@media (min-width: 768px) {
+  html[lang="ko"] .hero-name-accent {
+    font-size: 1.28em;
+  }
 }
 
 html[data-theme="light"] .hero-headline {

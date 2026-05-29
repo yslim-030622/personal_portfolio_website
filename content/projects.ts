@@ -80,7 +80,7 @@ export const projects: RawProjectEntry[] = [
     links: [
       ...projectLinks,
       {
-        label: {en: "portfolio preview", ko: "포트폴리오 미리보기"},
+        label: {en: "portfolio", ko: "포트폴리오"},
         href: "/docs/canvas-assistant-final-demo.pdf",
         external: true,
         ariaLabel: {
@@ -114,7 +114,7 @@ export const projects: RawProjectEntry[] = [
     ],
     previewImages: [
       {
-        src: "/systems_programming_diagram.jpg",
+        src: "/systems-programming-diagram.jpg",
         alt: {
           en: "Systems Programming Portfolio architecture diagram",
           ko: "Systems Programming Portfolio 아키텍처 다이어그램"
@@ -146,7 +146,7 @@ export const projects: RawProjectEntry[] = [
     },
     previewImages: [
       {
-        src: "/open_source_contribution.png",
+        src: "/open-source-contribution.png",
         alt: {
           en: "Pyrefly open source contribution preview",
           ko: "Pyrefly 오픈소스 기여 미리보기"

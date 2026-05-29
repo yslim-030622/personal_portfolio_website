@@ -39,7 +39,7 @@ export const work: RawWorkEntry[] = [
     ],
     links: [
       {
-        label: {en: "portfolio preview", ko: "포트폴리오 미리보기"},
+        label: {en: "portfolio", ko: "포트폴리오"},
         href: {en: "/docs/fasoo-internship-en.pdf", ko: "/docs/fasoo-internship-ko.pdf"},
         external: true,
         ariaLabel: {
@@ -76,7 +76,7 @@ export const work: RawWorkEntry[] = [
     ],
     previewImages: [
       {
-        src: "/modoc_ai_preview.png",
+        src: "/modoc-ai-preview.png",
         alt: {
           en: "MoDoc AI automated video pipeline preview",
           ko: "MoDoc AI 자동화 영상 파이프라인 미리보기"
