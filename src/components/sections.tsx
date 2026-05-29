@@ -10,7 +10,7 @@ import type {
 import type {MotionValue} from "motion/react";
 import {NotesAccordion} from "./notes-accordion";
 import {PresentationPreview} from "./presentation-preview";
-import {motion, useMotionValue, useTransform} from "motion/react";
+import {motion, useMotionValue, useTransform, useSpring} from "motion/react";
 import Image from "next/image";
 import {Children, type ReactNode, useRef, useState, useEffect, createContext, useContext} from "react";
 
@@ -49,7 +49,7 @@ function Section({eyebrow, children, className, animateContent = true}: SectionP
           initial={{opacity: 0, y: 64}}
           whileInView={{opacity: 1, y: 0}}
           viewport={VP}
-          transition={{duration: 0.72, delay: 0.14, ease: EASE}}
+          transition={{duration: 0.88, delay: 0.18, ease: EASE}}
         >
           {children}
         </motion.div>
@@ -198,21 +198,19 @@ function StackCard({
   const PEEK_VH      = 5;
   const ENTRY_Y      = 100;   // vh — exactly bottom of screen
   const PEEK_OPACITY = 0.90; // high opacity = vivid original colors preserved
-  const NAV_OFFSET   = 3;    // vh — shift stack down to clear the fixed nav bar
+  const NAV_OFFSET   = 0;    // perfectly center vertically
   const step         = total > 1 ? 1 / (total - 1) : 1;
 
     // Uniform progress keypoints: [0, 1/(n-1), 2/(n-1), ..., 1]
   const points = Array.from({ length: total }, (_, i) => (total > 1 ? i / (total - 1) : 0));
 
   // Y: cluster-centering formula.
-  // activeShift offsets the active card downward so the entire visible stack
-  // (active + peeked cards above) remains centered in the viewport.
-  // NAV_OFFSET shifts the whole stack down to prevent peeked cards from
-  // crowding the fixed navigation bar at the top.
   const yValues = points.map((_, pi) => {
     if (pi < index) return `${ENTRY_Y}vh`;
     const depth       = pi - index;
-    const activeShift = pi * (PEEK_VH / 2); // shifts active card down to balance peek mass above
+    // activeShift offsets the active card downward so the entire visible stack
+    // (active + peeked cards above) remains centered in the viewport.
+    const activeShift = pi * (PEEK_VH / 2); 
     return `${activeShift - depth * PEEK_VH + NAV_OFFSET}vh`;
   });
 
@@ -301,11 +299,13 @@ function CardStack({
   const cards = Children.toArray(children);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollYProgress = useMotionValue(0);
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 200, damping: 26, mass: 0.6 });
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isSectionSticky, setIsSectionSticky] = useState(false);
   const [isPastEnd, setIsPastEnd] = useState(false);
+  const snapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -344,31 +344,51 @@ function CardStack({
       let progress = rawProgress;
       let transitioning = false;
 
-      // Create plateaus (flat zones) so the card stops definitively
+        // Create plateaus (flat zones) so the card stops definitively
       if (cards.length > 1) {
         const step = 1 / (cards.length - 1);
         const p = rawProgress / step;
         const base = Math.floor(p);
         const fraction = p - base;
         
-        const margin = 0.12;
-        
+        const margin = 0.18; // Reduced from 0.25 to 0.18 to make the catch less rigid and softer
+
         let adjustedFraction;
         if (fraction < margin) {
           adjustedFraction = 0;
         } else if (fraction > 1 - margin) {
           adjustedFraction = 1;
         } else {
-          adjustedFraction = (fraction - margin) / (1 - 2 * margin);
+          const t = (fraction - margin) / (1 - 2 * margin);
+          adjustedFraction = t * t * (3 - 2 * t);
           transitioning = true;
         }
-        
+
         progress = (base + adjustedFraction) * step;
+
+        // Snap-on-stop: 빠르게 스크롤해도 다음 카드에 한번 걸리도록
+        // 스크롤이 멈춘 후 190ms 안에 전환 구간에 있으면 가장 가까운 카드로 snap
+        const rawCardIndex = rawProgress / step;
+        const nearestCard = Math.max(0, Math.min(cards.length - 1, Math.round(rawCardIndex)));
+        const distFromNearest = Math.abs(rawCardIndex - nearestCard);
+
+        if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
+
+        if (distFromNearest > 0.04 && rect.top <= 0 && -rect.top < activeScrollHeight) {
+          snapTimerRef.current = setTimeout(() => {
+            const c = containerRef.current;
+            if (!c) return;
+            const freshRect = c.getBoundingClientRect();
+            const containerAbsTop = window.scrollY + freshRect.top;
+            const targetScrollY = containerAbsTop + nearestCard * (scrollVH / 100) * window.innerHeight;
+            window.scrollTo({ top: targetScrollY, behavior: "smooth" });
+          }, 190);
+        }
       }
-      
+
       scrollYProgress.set(progress);
       setIsTransitioning(transitioning);
-      
+
       if (cards.length <= 1) { setActiveIndex(0); return; }
       const step = 1 / (cards.length - 1);
       setActiveIndex(Math.max(0, Math.min(Math.round(rawProgress / step), cards.length - 1)));
@@ -381,6 +401,7 @@ function CardStack({
     return () => {
       window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
+      if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
     };
   }, [cards.length, scrollYProgress, scrollVH, pauseVH]);
 
@@ -405,7 +426,7 @@ function CardStack({
               index={i}
               activeIndex={activeIndex}
               total={cards.length}
-              scrollYProgress={scrollYProgress}
+              scrollYProgress={smoothProgress}
             >
               {child}
             </StackCard>
@@ -439,11 +460,11 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
 
   return (
     <article
-      className="card-colored liquid-card group grid items-start content-start gap-5 rounded-[28px] p-6 transition duration-300 md:grid-cols-[260px_1fr] md:gap-9 md:p-9"
+      className="card-colored liquid-card group grid gap-3 rounded-[28px] p-5 transition duration-300 md:grid-cols-[260px_1fr] md:gap-9 md:p-9"
       style={{"--card-color": colorValue} as React.CSSProperties}
     >
       {/* Left column */}
-      <div className="border-b border-white/20 pb-5 md:flex md:h-full md:flex-col md:border-b-0 md:border-r md:pb-0 md:pr-9">
+      <div className="border-b border-white/20 pb-3 md:flex md:h-full md:flex-col md:border-b-0 md:border-r md:pb-0 md:pr-9">
         <div className={photos?.length ? "flex items-start gap-4 md:block" : ""}>
           <div className="min-w-0 flex-1">
             {item.companyUrl ? (
@@ -484,8 +505,8 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
           {photos?.length ? (
             <div className="shrink-0 md:hidden">
               <figure className="overflow-hidden rounded-lg" key={photos[0].src}>
-                <div className="relative h-[88px] w-[66px]">
-                  <Image alt={photos[0].alt} className="object-cover object-top" fill sizes="66px" src={photos[0].src} />
+                <div className="relative h-32 w-24">
+                  <Image alt={photos[0].alt} className="object-cover object-top" fill sizes="96px" src={photos[0].src} />
                 </div>
               </figure>
             </div>
@@ -505,21 +526,21 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
       </div>
 
       {/* Right column */}
-      <div className="min-w-0 flex flex-col">
-        <p className="order-2 font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] break-keep">
+      <div className="project-card-body min-w-0 flex flex-col h-full md:justify-center">
+        <p className="order-1 md:order-2 font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] break-keep md:mt-0">
           {item.paragraph}
         </p>
         {item.previewImages?.length ? (
-          <ProjectScreenshotPreview className="order-1 mb-5 mt-5" images={item.previewImages} title={item.company} />
+          <ProjectScreenshotPreview className="order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0" images={item.previewImages} title={item.company} />
         ) : null}
         {previewLinks?.map((link) => (
-          <div key={link.label} className="order-1 mb-6 mt-2 md:mt-5">
+          <div key={link.label} className="order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0">
             <PresentationPreview link={link} />
           </div>
         ))}
-        <div className="order-3">
+        <div className="order-3 mt-4 md:mt-0">
           {otherLinks?.length ? (
-            <div className="mt-6 flex flex-wrap gap-4 text-[0.8rem] uppercase text-white md:text-[0.86rem]">
+            <div className="mt-4 flex flex-wrap gap-4 text-[0.8rem] uppercase text-white md:text-[0.86rem]">
               {otherLinks.map((link) => (
                 <ExternalLink key={link.label} link={link} />
               ))}
@@ -544,7 +565,7 @@ export function WorkSection({
 
   return (
     <Section className="deck-section" eyebrow={eyebrow} animateContent={false}>
-      <CardStack pauseVH={pauseVH} scrollVH={65}>
+      <CardStack pauseVH={pauseVH} scrollVH={95}>
         {filled.map((item, idx) => (
           <WorkItem
             item={item}
@@ -617,11 +638,11 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
 
   return (
     <article
-      className="project-card card-colored liquid-card group grid items-start gap-5 rounded-[28px] p-6 transition duration-300 md:grid-cols-[minmax(0,240px)_1fr] md:gap-9 md:p-9"
+      className="project-card card-colored liquid-card group grid gap-5 rounded-[28px] p-6 transition duration-300 md:grid-cols-[minmax(0,240px)_1fr] md:gap-9 md:p-9"
       style={{"--card-color": colorValue} as React.CSSProperties}
     >
       {/* Left column */}
-      <div className="border-b border-white/20 pb-5 md:flex md:h-full md:flex-col md:border-b-0 md:border-r md:pb-0 md:pr-9">
+      <div className="border-b border-white/20 pb-3 md:flex md:h-full md:flex-col md:border-b-0 md:border-r md:pb-0 md:pr-9">
         <div className="min-w-0">
           <h2 className="card-title-glass font-display text-[1.5rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.82rem] break-keep">
             {item.title}
@@ -650,19 +671,19 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
       </div>
 
       {/* Right column */}
-      <div className="project-card-body min-w-0 flex flex-col">
-        <p className="project-description order-2 font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] break-keep md:mt-1">
+      <div className="project-card-body min-w-0 flex flex-col h-full md:justify-center">
+        <p className="project-description order-1 md:order-2 font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] break-keep md:mt-0">
           {item.description}
         </p>
         {item.previewImages?.length ? (
-          <ProjectScreenshotPreview className="order-1 mb-6 mt-2 md:mt-5" images={item.previewImages} title={item.title} />
+          <ProjectScreenshotPreview className="order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0" images={item.previewImages} title={item.title} />
         ) : null}
         {previewLinks?.map((link) => (
-          <div key={link.label} className="order-1 mb-6 mt-2 md:mt-5">
+          <div key={link.label} className="order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0">
             <PresentationPreview link={link} />
           </div>
         ))}
-        <div className="order-3 mt-4 md:mt-5">
+        <div className="order-3 mt-4 md:mt-0">
           {otherLinks?.length ? (
             <div className="mt-4 flex flex-wrap gap-4 text-[0.8rem] uppercase text-white md:text-[0.86rem]">
               {otherLinks.map((link) => (
@@ -687,7 +708,7 @@ export function ProjectsSection({
 
   return (
     <Section className="deck-section" eyebrow={eyebrow} animateContent={false}>
-      <CardStack scrollVH={65}>
+      <CardStack scrollVH={80}>
         {filled.map((item, idx) => (
           <ProjectItem
             item={item}
@@ -745,28 +766,18 @@ export function SkillsSection({
 }
 
 export function Footer({content}: {content: LocalizedPortfolioContent["footer"]}) {
-  const dateMatch = content.line1.match(/^(.*?)(\d{4}-\d{2}-\d{2})(\.)?$/);
-
   return (
-    <footer className="bg-white border-t-2 border-border/60">
-      <div className="w-full px-5 py-1.5 md:px-8 flex items-center justify-between gap-4">
-        <p className="text-sm md:text-base leading-7 text-fg-muted whitespace-nowrap">
-          {dateMatch ? (
-            <>
-              {dateMatch[1]}
-              <span className="text-fg font-medium">{dateMatch[2]}</span>
-              {dateMatch[3]}
-            </>
-          ) : (
-            content.line1
-          )}
+    <footer className="border-t border-fg/20 bg-transparent">
+      <div className="w-full px-[clamp(1.25rem,4vw,2rem)] py-[clamp(0.6rem,1.5vw,1rem)] flex items-center justify-between gap-4">
+        <p className="text-[clamp(0.85rem,1.6vw,1.05rem)] leading-tight text-fg/70 whitespace-nowrap">
+          {content.line1}
         </p>
         <Image
-          src="/signature.png"
+          src="/signatureupdated.png"
           alt="Yeongseok Lim signature"
           width={300}
           height={120}
-          className="h-20 md:h-24 w-auto object-contain object-right opacity-70 -mr-4 md:-mr-8"
+          className="h-[clamp(3.5rem,6vw,5.5rem)] w-auto object-contain object-right opacity-80 filter brightness-0 -mr-[clamp(0.5rem,2vw,1.5rem)]"
         />
       </div>
     </footer>

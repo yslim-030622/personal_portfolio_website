@@ -2,8 +2,8 @@ import type {RawPortfolioContent} from "./types";
 
 export const footer = {
   line1: {
-    en: "Last updated {buildDate}.",
-    ko: "마지막 업데이트 {buildDate}."
+    en: "Thanks for visiting!",
+    ko: "방문해주셔서 감사합니다!"
   },
   line2: "ylim76@wisc.edu · linkedin · github"
 } satisfies RawPortfolioContent["footer"];

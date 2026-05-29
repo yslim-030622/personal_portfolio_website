@@ -63,6 +63,8 @@ export const hero = {
     },
     {
       label: {en: "resume.pdf", ko: "resume.pdf"},
+      href: "/Yeongseok_Lim_resume.pdf",
+      external: true,
       ariaLabel: {en: "Resume PDF", ko: "이력서 PDF"}
     }
   ]

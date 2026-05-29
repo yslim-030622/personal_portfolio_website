@@ -19,7 +19,7 @@ function SegmentedSwitch<T extends string>({
         <div key={String(opt.value)} className="inline-flex items-center">
           <button
             aria-label={opt.ariaLabel}
-            className={`text-[0.78rem] font-semibold tracking-[0.12em] transition-colors duration-200 ${
+            className={`text-[clamp(0.78rem,1.2vw,0.95rem)] font-semibold tracking-[0.12em] transition-colors duration-200 ${
               value === opt.value
                 ? "text-fg"
                 : "text-fg-muted hover:text-fg"
@@ -32,7 +32,7 @@ function SegmentedSwitch<T extends string>({
           {i < options.length - 1 && (
             <span
               aria-hidden="true"
-              className="mx-2.5 h-4 w-px bg-fg-muted/40"
+              className="mx-[clamp(0.5rem,1vw,0.8rem)] h-[1.2em] w-px bg-fg-muted/40"
             />
           )}
         </div>

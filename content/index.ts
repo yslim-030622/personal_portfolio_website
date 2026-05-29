@@ -42,9 +42,6 @@ const localizeLinks = (
     ariaLabel: link.ariaLabel ? text(link.ariaLabel, locale) : undefined
   }));
 
-const buildDate = () =>
-  process.env.NEXT_PUBLIC_BUILD_DATE ?? new Date().toISOString().slice(0, 10);
-
 export function getRawPortfolioContent(): RawPortfolioContent {
   return rawContent;
 }
@@ -52,8 +49,6 @@ export function getRawPortfolioContent(): RawPortfolioContent {
 export function getPortfolioContent(
   locale: Locale
 ): LocalizedPortfolioContent {
-  const date = buildDate();
-
   return {
     sectionEyebrows: {
       work: text(rawContent.sectionEyebrows.work, locale),
@@ -139,7 +134,7 @@ export function getPortfolioContent(
       body: text(skill.body, locale)
     })),
     footer: {
-      line1: text(rawContent.footer.line1, locale).replace("{buildDate}", date),
+      line1: text(rawContent.footer.line1, locale),
       line2: rawContent.footer.line2
     },
     seo: {

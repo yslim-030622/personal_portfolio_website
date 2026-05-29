@@ -113,9 +113,9 @@ export function Hero({content, locale}: HeroProps) {
 
   return (
     <section
-      className="relative mx-auto grid w-full max-w-[1480px] content-start items-start overflow-hidden overflow-x-hidden px-6 pb-0 pt-10 min-h-[100svh] md:grid-cols-[minmax(0,50vw)_minmax(0,50vw)] md:content-start md:items-center md:px-10 md:pb-10 md:pt-12 lg:pt-14 xl:px-20 2xl:px-28"
+      className="relative mx-auto grid w-full max-w-[1480px] min-h-[100svh] content-center items-center overflow-hidden overflow-x-hidden px-6 py-12 md:h-[100svh] md:grid-cols-[minmax(0,50vw)_minmax(0,50vw)] md:px-10 md:py-0 xl:px-20 2xl:px-28"
     >
-      <div className="relative z-10 min-w-0 max-w-[540px] md:max-w-none md:pr-8 xl:pr-12">
+      <div className="relative z-10 min-w-0 max-w-[540px] md:max-w-none md:overflow-x-hidden md:pr-10 xl:pr-14">
         <h1
           className="hero-headline mt-3 max-w-[17ch] font-display font-normal leading-[1.02] tracking-normal text-fg md:mt-4 md:max-w-[18ch] md:leading-[0.98] lg:max-w-[18.5ch]"
         >
@@ -144,7 +144,7 @@ export function Hero({content, locale}: HeroProps) {
         </p>
 
         <div
-          className="hero-reveal mt-6 hidden md:flex"
+          className="hero-reveal mt-8 hidden md:flex w-full"
           style={{animationDelay: "650ms"}}
         >
           <HeroLinks links={content.links} />
@@ -171,13 +171,13 @@ export function Hero({content, locale}: HeroProps) {
         >
           {content.subline}
         </p>
-        <div className="px-1 py-5">
+        <div className="flex w-full py-5">
           <HeroLinks links={content.links} />
         </div>
       </div>
 
       <figure
-        className="hero-photo-reveal hero-photo hero-photo-desktop pointer-events-none relative hidden h-[min(78svh,820px)] min-h-[620px] w-full md:mt-5 md:block"
+        className="hero-photo-reveal hero-photo hero-photo-desktop pointer-events-none relative hidden h-[min(62svh,600px)] min-h-[360px] w-full md:mt-0 md:block"
         style={{animationDelay: "380ms"}}
       >
         <div className="hero-photo-frame relative h-full w-full overflow-hidden">
