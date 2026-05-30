@@ -299,7 +299,7 @@ function CardStack({
   const cards = Children.toArray(children);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollYProgress = useMotionValue(0);
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 200, damping: 26, mass: 0.6 });
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 110, damping: 22, mass: 0.9 });
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -382,7 +382,7 @@ function CardStack({
             const containerAbsTop = window.scrollY + freshRect.top;
             const targetScrollY = containerAbsTop + nearestCard * (scrollVH / 100) * window.innerHeight;
             window.scrollTo({ top: targetScrollY, behavior: "smooth" });
-          }, 190);
+          }, 280);
         }
       }
 
