@@ -196,22 +196,19 @@ function StackCard({
   scrollYProgress: MotionValue<number>;
 }) {
   const PEEK_VH      = 5;
-  const ENTRY_Y      = 100;   // vh — exactly bottom of screen
-  const PEEK_OPACITY = 0.90; // high opacity = vivid original colors preserved
-  const NAV_OFFSET   = 0;    // perfectly center vertically
+  const ENTRY_Y      = 100;
+  const PEEK_OPACITY = 0.88;
+  const NAV_OFFSET   = 0;
   const step         = total > 1 ? 1 / (total - 1) : 1;
 
-    // Uniform progress keypoints: [0, 1/(n-1), 2/(n-1), ..., 1]
   const points = Array.from({ length: total }, (_, i) => (total > 1 ? i / (total - 1) : 0));
 
-  // Y: cluster-centering formula.
+  // Y: only 1 card peeks above the active card — cards 2+ behind are hidden above viewport
   const yValues = points.map((_, pi) => {
     if (pi < index) return `${ENTRY_Y}vh`;
-    const depth       = pi - index;
-    // activeShift offsets the active card downward so the entire visible stack
-    // (active + peeked cards above) remains centered in the viewport.
-    const activeShift = pi * (PEEK_VH / 2); 
-    return `${activeShift - depth * PEEK_VH + NAV_OFFSET}vh`;
+    const depth = pi - index;
+    if (depth > 1) return `-${ENTRY_Y}vh`;
+    return `${PEEK_VH / 2 - depth * PEEK_VH + NAV_OFFSET}vh`;
   });
 
   // Scale: active at 1, peeked cards shrink slightly
@@ -244,15 +241,12 @@ function StackCard({
     opacityIns.push(index * step); opacityOuts.push(1);
   }
 
-  // When card moves to the background (pi > index)
+  // When card moves to the background: only the immediately previous card peeks
   for (let pi = index + 1; pi < total; pi++) {
-    const currP      = pi * step;
-    const depth      = pi - index;
-    const peekOp     = Math.max(0.65, PEEK_OPACITY - (depth - 1) * 0.07);
-
-    // Instead of fading to 0 and reappearing, just dim smoothly to peekOp
-    opacityIns.push(currP);       
-    opacityOuts.push(peekOp);
+    const currP = pi * step;
+    const depth = pi - index;
+    opacityIns.push(currP);
+    opacityOuts.push(depth === 1 ? PEEK_OPACITY : 0);
   }
 
   const y       = useTransform(scrollYProgress, points,     yValues);
@@ -302,10 +296,8 @@ function CardStack({
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 65, damping: 18, mass: 1.2 });
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [isSectionSticky, setIsSectionSticky] = useState(false);
   const [isPastEnd, setIsPastEnd] = useState(false);
-  const snapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -341,53 +333,7 @@ function CardStack({
         rawProgress = 1;
       }
 
-      let progress = rawProgress;
-      let transitioning = false;
-
-        // Create plateaus (flat zones) so the card stops definitively
-      if (cards.length > 1) {
-        const step = 1 / (cards.length - 1);
-        const p = rawProgress / step;
-        const base = Math.floor(p);
-        const fraction = p - base;
-        
-        const margin = 0.18; // Reduced from 0.25 to 0.18 to make the catch less rigid and softer
-
-        let adjustedFraction;
-        if (fraction < margin) {
-          adjustedFraction = 0;
-        } else if (fraction > 1 - margin) {
-          adjustedFraction = 1;
-        } else {
-          const t = (fraction - margin) / (1 - 2 * margin);
-          adjustedFraction = t * t * (3 - 2 * t);
-          transitioning = true;
-        }
-
-        progress = (base + adjustedFraction) * step;
-
-        // Snap-on-stop: 빠르게 스크롤해도 다음 카드에 한번 걸리도록
-        // 스크롤이 멈춘 후 190ms 안에 전환 구간에 있으면 가장 가까운 카드로 snap
-        const rawCardIndex = rawProgress / step;
-        const nearestCard = Math.max(0, Math.min(cards.length - 1, Math.round(rawCardIndex)));
-        const distFromNearest = Math.abs(rawCardIndex - nearestCard);
-
-        if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
-
-        if (distFromNearest > 0.04 && rect.top <= 0 && -rect.top < activeScrollHeight) {
-          snapTimerRef.current = setTimeout(() => {
-            const c = containerRef.current;
-            if (!c) return;
-            const freshRect = c.getBoundingClientRect();
-            const containerAbsTop = window.scrollY + freshRect.top;
-            const targetScrollY = containerAbsTop + nearestCard * (scrollVH / 100) * window.innerHeight;
-            window.scrollTo({ top: targetScrollY, behavior: "smooth" });
-          }, 380);
-        }
-      }
-
-      scrollYProgress.set(progress);
-      setIsTransitioning(transitioning);
+      scrollYProgress.set(rawProgress);
 
       if (cards.length <= 1) { setActiveIndex(0); return; }
       const step = 1 / (cards.length - 1);
@@ -401,7 +347,6 @@ function CardStack({
     return () => {
       window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
-      if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
     };
   }, [cards.length, scrollYProgress, scrollVH, pauseVH]);
 
@@ -410,7 +355,7 @@ function CardStack({
   }
 
   const isLastCard = activeIndex === cards.length - 1;
-  const showScrollArrow = isSectionSticky && !isPastEnd && !isLastCard && !isTransitioning;
+  const showScrollArrow = isSectionSticky && !isPastEnd && !isLastCard;
 
   return (
     <div
@@ -534,7 +479,7 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
           <ProjectScreenshotPreview className="order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0" images={item.previewImages} title={item.company} />
         ) : null}
         {previewLinks?.map((link) => (
-          <div key={link.label} className="order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0">
+          <div key={link.label} className="hidden md:block order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0">
             <PresentationPreview link={link} />
           </div>
         ))}
@@ -679,7 +624,7 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
           <ProjectScreenshotPreview className="order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0" images={item.previewImages} title={item.title} />
         ) : null}
         {previewLinks?.map((link) => (
-          <div key={link.label} className="order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0">
+          <div key={link.label} className="hidden md:block order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0">
             <PresentationPreview link={link} />
           </div>
         ))}
