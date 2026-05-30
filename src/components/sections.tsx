@@ -10,7 +10,7 @@ import type {
 import type {MotionValue} from "motion/react";
 import {NotesAccordion} from "./notes-accordion";
 import {PresentationPreview} from "./presentation-preview";
-import {motion, useMotionValue, useTransform, useSpring} from "motion/react";
+import {motion, useMotionValue, useTransform} from "motion/react";
 import Image from "next/image";
 import {Children, type ReactNode, useRef, useState, useEffect, createContext, useContext} from "react";
 
@@ -203,12 +203,12 @@ function StackCard({
 
   const points = Array.from({ length: total }, (_, i) => (total > 1 ? i / (total - 1) : 0));
 
-  // Y: only 1 card peeks above the active card — cards 2+ behind are hidden above viewport
+  // Y: original cluster formula — depth>1 cards hidden via opacity=0, not by position
   const yValues = points.map((_, pi) => {
     if (pi < index) return `${ENTRY_Y}vh`;
     const depth = pi - index;
-    if (depth > 1) return `-${ENTRY_Y}vh`;
-    return `${PEEK_VH / 2 - depth * PEEK_VH + NAV_OFFSET}vh`;
+    const activeShift = pi * (PEEK_VH / 2);
+    return `${activeShift - depth * PEEK_VH + NAV_OFFSET}vh`;
   });
 
   // Scale: active at 1, peeked cards shrink slightly
@@ -293,7 +293,6 @@ function CardStack({
   const cards = Children.toArray(children);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollYProgress = useMotionValue(0);
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 65, damping: 18, mass: 1.2 });
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [isSectionSticky, setIsSectionSticky] = useState(false);
@@ -371,7 +370,7 @@ function CardStack({
               index={i}
               activeIndex={activeIndex}
               total={cards.length}
-              scrollYProgress={smoothProgress}
+              scrollYProgress={scrollYProgress}
             >
               {child}
             </StackCard>
