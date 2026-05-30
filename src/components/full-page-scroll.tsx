@@ -4,12 +4,12 @@ import {motion} from "motion/react";
 import {useState, useRef, useEffect, useCallback, type ReactNode} from "react";
 
 // Card enter: spring physics — natural drag/pull feel
-const SPRING_ENTER = {type: "spring" as const, stiffness: 130, damping: 26, mass: 1.1};
+const SPRING_ENTER = {type: "spring" as const, stiffness: 72, damping: 24, mass: 1.4};
 // Card exit: smooth ease-in-out — slides away without snapping
 const CARD_EXIT_EASE: [number, number, number, number] = [0.4, 0, 0.6, 1];
 
-const CARD_EXIT_DURATION = 0.65;
-const ANIMATION_LOCK_MS  = 940;
+const CARD_EXIT_DURATION = 0.78;
+const ANIMATION_LOCK_MS  = 1100;
 
 const SCROLL_THRESHOLD = 180;
 const NAV_COOLDOWN     = 800;
@@ -197,7 +197,7 @@ export function FullPageScroll({sections}: {sections: PageSection[]}) {
     };
     const onEnd = (e: TouchEvent) => {
       const delta = touchStartY.current - e.changedTouches[0].clientY;
-      if (Math.abs(delta) < 70) return;
+      if (Math.abs(delta) < 90) return;
 
       const el = sectionRefs.current[currentRef.current];
       if (!el) return;
