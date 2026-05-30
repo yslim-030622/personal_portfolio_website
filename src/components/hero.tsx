@@ -115,7 +115,7 @@ export function Hero({content, locale}: HeroProps) {
     <section
       className="relative mx-auto grid w-full max-w-[1480px] min-h-[100svh] content-center items-center overflow-hidden overflow-x-hidden px-6 py-12 md:h-[100svh] md:grid-cols-[minmax(0,50vw)_minmax(0,50vw)] md:px-10 md:py-0 xl:px-20 2xl:px-28"
     >
-      <div className="relative z-10 min-w-0 max-w-[540px] md:max-w-none md:overflow-x-hidden md:pr-10 xl:pr-14">
+      <div className="relative z-10 min-w-0 max-w-[540px] md:max-w-none md:pr-10 xl:pr-14">
         <h1
           className="hero-headline mt-3 max-w-[17ch] font-display font-normal leading-[1.02] tracking-normal text-fg md:mt-4 md:max-w-[18ch] md:leading-[0.98] lg:max-w-[18.5ch]"
         >

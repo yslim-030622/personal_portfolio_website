@@ -206,7 +206,10 @@ html[lang="ko"] .font-display {
 .fp-section {
   contain: paint style;
   overscroll-behavior: contain;
-  scrollbar-gutter: stable;
+  scrollbar-width: none;
+}
+.fp-section::-webkit-scrollbar {
+  display: none;
 }
 
 .deck-section {
