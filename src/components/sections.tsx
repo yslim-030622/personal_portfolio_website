@@ -203,12 +203,11 @@ function StackCard({
 
   const points = Array.from({ length: total }, (_, i) => (total > 1 ? i / (total - 1) : 0));
 
-  // Y: original cluster formula — depth>1 cards hidden via opacity=0, not by position
+  // Y: active card always at y=0 (centered), peek at -PEEK_VH, hidden cards use opacity=0
   const yValues = points.map((_, pi) => {
     if (pi < index) return `${ENTRY_Y}vh`;
     const depth = pi - index;
-    const activeShift = pi * (PEEK_VH / 2);
-    return `${activeShift - depth * PEEK_VH + NAV_OFFSET}vh`;
+    return `${-depth * PEEK_VH + NAV_OFFSET}vh`;
   });
 
   // Scale: active at 1, peeked cards shrink slightly

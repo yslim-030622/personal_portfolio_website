@@ -589,7 +589,7 @@ html[data-theme="dark"] .liquid-card.card-colored:hover {
 
   .card-stack-drag {
     width: min(92vw, 1040px);
-    height: clamp(480px, 72svh, 580px);
+    height: clamp(400px, 64svh, 520px);
   }
 
   .card-stack-status {
