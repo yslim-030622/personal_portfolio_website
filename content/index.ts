@@ -8,6 +8,7 @@ import type {
   Locale,
   LocalizedOptionalLink,
   LocalizedPortfolioContent,
+  ProjectPreviewImage,
   RawPortfolioContent
 } from "./types";
 import {work} from "./work";
@@ -40,6 +41,21 @@ const localizePdfLandscape = (
   return pdfLandscape[locale];
 };
 
+const localizePreviewImage = (
+  previewImage: ProjectPreviewImage | Partial<Record<Locale, ProjectPreviewImage>> | undefined,
+  locale: Locale
+): LocalizedOptionalLink["previewImage"] => {
+  if (!previewImage) return undefined;
+  const image = "src" in previewImage ? previewImage : previewImage[locale];
+  if (!image) return undefined;
+  return {
+    src: image.src,
+    alt: text(image.alt, locale),
+    width: image.width,
+    height: image.height
+  };
+};
+
 const localizeLinks = (
   links: RawPortfolioContent["hero"]["links"],
   locale: Locale
@@ -49,7 +65,8 @@ const localizeLinks = (
     href: localizeHref(link.href, locale),
     external: link.external,
     ariaLabel: link.ariaLabel ? text(link.ariaLabel, locale) : undefined,
-    pdfLandscape: localizePdfLandscape(link.pdfLandscape, locale)
+    pdfLandscape: localizePdfLandscape(link.pdfLandscape, locale),
+    previewImage: localizePreviewImage(link.previewImage, locale)
   }));
 
 export function getRawPortfolioContent(): RawPortfolioContent {

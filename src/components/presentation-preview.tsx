@@ -1,6 +1,7 @@
 "use client";
 
 import type {LocalizedOptionalLink} from "@/content";
+import Image from "next/image";
 
 export function PresentationPreview({
   link,
@@ -15,6 +16,7 @@ export function PresentationPreview({
 
   const isLandscape = link.pdfLandscape === true;
   const fragment = isLandscape ? "toolbar=0&navpanes=0&view=Fit&zoom=page-fit" : "toolbar=0&navpanes=0&view=Fit";
+  const previewImage = link.previewImage;
 
   return (
     <div
@@ -22,13 +24,23 @@ export function PresentationPreview({
       data-pdf-landscape={isLandscape ? "true" : undefined}
     >
       <div className="clearsplit-showcase-stage bg-white relative">
-        <iframe
-          className="pdf-preview-frame absolute inset-0 h-full w-full border-0 bg-white pointer-events-none"
-          loading="lazy"
-          scrolling="no"
-          src={`${link.href}#${fragment}`}
-          title={link.ariaLabel ?? link.label}
-        />
+        {previewImage ? (
+          <Image
+            alt={previewImage.alt}
+            className="object-contain"
+            fill
+            sizes="(max-width: 768px) 84vw, 720px"
+            src={previewImage.src}
+          />
+        ) : (
+          <iframe
+            className="pdf-preview-frame absolute inset-0 h-full w-full border-0 bg-white pointer-events-none"
+            loading="lazy"
+            scrolling="no"
+            src={`${link.href}#${fragment}`}
+            title={link.ariaLabel ?? link.label}
+          />
+        )}
         {/* Transparent overlay link that captures clicks/taps over the entire preview area but allows scroll events to bubble up naturally */}
         <a
           href={link.href}

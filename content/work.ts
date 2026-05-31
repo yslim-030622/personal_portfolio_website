@@ -46,7 +46,18 @@ export const work: RawWorkEntry[] = [
           en: "Preview Fasoo internship presentation PDF",
           ko: "Fasoo 인턴 발표 자료 PDF 미리보기"
         },
-        pdfLandscape: {en: false, ko: true}
+        pdfLandscape: {en: false, ko: true},
+        previewImage: {
+          ko: {
+            src: "/docs/previews/fasoo-internship-ko-preview.png",
+            alt: {
+              en: "Fasoo internship Korean presentation preview",
+              ko: "Fasoo 인턴 발표 자료 한국어 미리보기"
+            },
+            width: 1600,
+            height: 899
+          }
+        }
       }
     ]
   },
