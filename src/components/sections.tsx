@@ -247,15 +247,8 @@ function StackCard({
     return Math.max(0.86, 1 - (pi - index) * 0.03);
   };
 
-  // RotateX: peeked cards tilt backward for depth (perspective is set on sticky container)
-  const rotateXAt = (pi: number) => {
-    if (pi <= index) return 0;
-    return Math.min((pi - index) * 2, 5);
-  };
-
   const yValues = points.map((point) => yAt(pointIndex(point)));
   const scaleValues = points.map((point) => scaleAt(pointIndex(point)));
-  const rotateXValues = points.map((point) => rotateXAt(pointIndex(point)));
 
   // Opacity: smooth transition without dipping to 0 when moving to the background
   const opacityIns: number[] = [];
@@ -288,7 +281,6 @@ function StackCard({
 
   const y       = useTransform(scrollYProgress, points,     yValues);
   const scale   = useTransform(scrollYProgress, points,     scaleValues);
-  const rotateX = useTransform(scrollYProgress, points,     rotateXValues);
   const opacity = useTransform(scrollYProgress, opacityIns, opacityOuts);
 
   const zIndex   = index + 1;
@@ -307,7 +299,7 @@ function StackCard({
       >
         <motion.div
           className="card-stack-drag will-change-transform"
-          style={{ y, scale, rotateX, opacity, transformOrigin: "center center" }}
+          style={{ y, scale, opacity, transformOrigin: "center center" }}
         >
           {children}
         </motion.div>
@@ -337,6 +329,7 @@ function CardStack({
   const stateRef = useRef({activeIndex: 0, isSectionSticky: false, isPastEnd: false});
   const snapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isSnappingRef = useRef(false);
+  const scrollSessionStartCard = useRef(0);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -422,15 +415,33 @@ function CardStack({
       if (rect.top > 2 || -rect.top < 8 || -rect.top > activeScrollHeight - 8) return;
 
       const step = 1 / (cards.length - 1);
-      const nearestProgress = Math.max(0, Math.min(1, Math.round(rawProgress / step) * step));
+
+      // On mobile: limit to one card per scroll gesture to prevent flying past multiple cards.
+      // Track where the session started and only allow ±1 from that position.
+      const startCard = scrollSessionStartCard.current;
+      const startProgress = startCard * step;
+      let targetCardIndex: number;
+      if (rawProgress > startProgress + step * 0.1) {
+        targetCardIndex = Math.min(cards.length - 1, startCard + 1);
+      } else if (rawProgress < startProgress - step * 0.1) {
+        targetCardIndex = Math.max(0, startCard - 1);
+      } else {
+        targetCardIndex = startCard;
+      }
+
+      const nearestProgress = targetCardIndex * step;
       const target = stackTop + nearestProgress * activeScrollHeight;
-      if (Math.abs(window.scrollY - target) < 3) return;
+      if (Math.abs(window.scrollY - target) < 3) {
+        scrollSessionStartCard.current = targetCardIndex;
+        return;
+      }
 
       isSnappingRef.current = true;
       window.scrollTo({top: target, behavior: "smooth"});
       window.setTimeout(() => {
         isSnappingRef.current = false;
-      }, 520);
+        scrollSessionStartCard.current = targetCardIndex;
+      }, 700);
     };
 
     const scheduleUpdate = () => {
@@ -443,7 +454,7 @@ function CardStack({
 
     const scheduleSnap = () => {
       if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
-      snapTimerRef.current = setTimeout(snapToNearestCard, 150);
+      snapTimerRef.current = setTimeout(snapToNearestCard, 350);
     };
 
     update();

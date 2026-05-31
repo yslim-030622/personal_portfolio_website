@@ -22,11 +22,11 @@ export function PresentationPreview({
       className={`clearsplit-showcase clearsplit-showcase-pdf overflow-hidden rounded-[26px] mt-6 ${className ?? ""}`}
       data-pdf-landscape={isLandscape ? "true" : undefined}
     >
-      <div className="clearsplit-showcase-stage bg-white relative">
+      <div className="clearsplit-showcase-stage relative">
         {previewImage ? (
           <Image
             alt={previewImage.alt}
-            className="object-contain"
+            className="project-preview-image"
             fill
             sizes="(max-width: 768px) 84vw, 720px"
             src={previewImage.src}
@@ -50,7 +50,7 @@ export function PresentationPreview({
         />
         <div
           className="absolute inset-x-0 bottom-0 h-20 pointer-events-none"
-          style={{zIndex: 10, background: 'linear-gradient(to top, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)'}}
+          style={{zIndex: 10, background: 'linear-gradient(to top, rgba(15,23,42,0.16) 0%, rgba(15,23,42,0) 100%)'}}
         />
       </div>
     </div>

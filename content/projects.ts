@@ -16,6 +16,39 @@ const clearSplitLinks = [
   }
 ];
 
+const sharedComputingProject = {
+  status: "filled",
+  title: "SharedComputing",
+  kindDate: "Distributed Systems · 2026",
+  description: {
+    en: "As the AI era has increased the value of computing resources, I worked with two LikeLion teammates to build a system that orchestrates multiple devices on the same network and trains an image classification model in a distributed way. We implemented it with a master-worker architecture and also built a frontend for monitoring results in real time.",
+    ko: "Ai 시대에 들어서면서 컴퓨팅 자원의 가치는 높아졌습니다. LikeLion 팀원 둘과 함께, 같은 네트워크에 있는 여러 기기를 오케스트레이션 하여 이미지 분류 모델을 분산 학습하는 시스템을 만들었습니다. 마스터-워커 방식을 사용해 구현하였고 실시간으로 결과를 모니터링 할 수 있는 프론트엔드도 개발하였습니다."
+  },
+  previewImages: [
+    {
+      src: "/shared-computing-preview.png",
+      alt: {
+        en: "SharedComputing distributed training dashboard preview",
+        ko: "SharedComputing 분산 학습 대시보드 미리보기"
+      },
+      width: 3154,
+      height: 1832
+    }
+  ],
+  tech: ["Python", "PyTorch", "Swift", "FastAPI"],
+  links: [
+    {
+      label: {en: "github", ko: "github"},
+      href: "https://github.com/twoSquaredHoon/SharedComputing",
+      external: true,
+      ariaLabel: {
+        en: "SharedComputing GitHub repository",
+        ko: "SharedComputing GitHub 저장소"
+      }
+    }
+  ]
+} satisfies RawProjectEntry;
+
 export const projects: RawProjectEntry[] = [
   {
     status: "filled",
@@ -50,6 +83,7 @@ export const projects: RawProjectEntry[] = [
     tech: ["Python", "Swift", "PostgreSQL", "Docker"],
     links: clearSplitLinks
   },
+  sharedComputingProject,
   {
     status: "filled",
     title: "Canvas Assistant",
