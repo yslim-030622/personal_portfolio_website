@@ -203,11 +203,11 @@ function StackCard({
 
   const points = Array.from({ length: total }, (_, i) => (total > 1 ? i / (total - 1) : 0));
 
-  // Y: active card always at y=0 (centered), peek at -PEEK_VH, hidden cards use opacity=0
   const yValues = points.map((_, pi) => {
     if (pi < index) return `${ENTRY_Y}vh`;
-    const depth = pi - index;
-    return `${-depth * PEEK_VH + NAV_OFFSET}vh`;
+    const depth       = pi - index;
+    const activeShift = pi * (PEEK_VH / 2);
+    return `${activeShift - depth * PEEK_VH + NAV_OFFSET}vh`;
   });
 
   // Scale: active at 1, peeked cards shrink slightly
@@ -240,12 +240,12 @@ function StackCard({
     opacityIns.push(index * step); opacityOuts.push(1);
   }
 
-  // When card moves to the background: only the immediately previous card peeks
   for (let pi = index + 1; pi < total; pi++) {
-    const currP = pi * step;
-    const depth = pi - index;
+    const currP  = pi * step;
+    const depth  = pi - index;
+    const peekOp = Math.max(0.65, PEEK_OPACITY - (depth - 1) * 0.07);
     opacityIns.push(currP);
-    opacityOuts.push(depth === 1 ? PEEK_OPACITY : 0);
+    opacityOuts.push(peekOp);
   }
 
   const y       = useTransform(scrollYProgress, points,     yValues);
@@ -477,7 +477,7 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
           <ProjectScreenshotPreview className="order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0" images={item.previewImages} title={item.company} />
         ) : null}
         {previewLinks?.map((link) => (
-          <div key={link.label} className="hidden md:block order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0">
+          <div key={link.label} className="order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0">
             <PresentationPreview link={link} />
           </div>
         ))}
@@ -622,7 +622,7 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
           <ProjectScreenshotPreview className="order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0" images={item.previewImages} title={item.title} />
         ) : null}
         {previewLinks?.map((link) => (
-          <div key={link.label} className="hidden md:block order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0">
+          <div key={link.label} className="order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0">
             <PresentationPreview link={link} />
           </div>
         ))}
