@@ -243,7 +243,7 @@ export function FullPageScroll({sections}: {sections: PageSection[]}) {
             ref={(el) => {
               sectionRefs.current[i] = el;
             }}
-            className="fp-section absolute inset-0 h-[100svh] overflow-y-auto bg-bg"
+            className="fp-section absolute inset-0 h-[100dvh] overflow-y-auto bg-bg"
             animate={{y: state.y, scale: state.scale, opacity: state.opacity}}
             transition={state.transition}
             style={{

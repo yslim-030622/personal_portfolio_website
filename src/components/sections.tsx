@@ -12,7 +12,7 @@ import {NotesAccordion} from "./notes-accordion";
 import {PresentationPreview} from "./presentation-preview";
 import {motion, useMotionValue, useTransform} from "motion/react";
 import Image from "next/image";
-import {Children, type ReactNode, useRef, useState, useEffect, createContext, useContext} from "react";
+import {Children, type ReactNode, useRef, useState, useEffect, createContext, useContext, useMemo} from "react";
 
 const CardActiveContext = createContext(false);
 
@@ -200,27 +200,46 @@ function StackCard({
   const PEEK_OPACITY = 0.90;
   const NAV_OFFSET   = 0;
   const step         = total > 1 ? 1 / (total - 1) : 1;
+  const holdRatio    = 0.38;
 
-  const points = Array.from({ length: total }, (_, i) => (total > 1 ? i / (total - 1) : 0));
+  const points = useMemo(() => {
+    if (total <= 1) return [0];
 
-  const yValues = points.map((_, pi) => {
+    const ranges = [0];
+    for (let i = 0; i < total - 1; i++) {
+      const start = i * step;
+      const hold = Math.min(start + step * holdRatio, (i + 1) * step - 0.0001);
+      const end = (i + 1) * step;
+      if (hold > ranges[ranges.length - 1]) ranges.push(hold);
+      ranges.push(end);
+    }
+    return ranges;
+  }, [holdRatio, step, total]);
+
+  const pointIndex = (progress: number) => Math.min(total - 1, Math.floor(progress / step + 0.0001));
+
+  const yAt = (pi: number) => {
     if (pi < index) return `${ENTRY_Y}vh`;
     const depth       = pi - index;
     const activeShift = pi * (PEEK_VH / 2);
     return `${activeShift - depth * PEEK_VH + NAV_OFFSET}vh`;
-  });
+  };
 
   // Scale: active at 1, peeked cards shrink slightly
-  const scaleValues = points.map((_, pi) => {
+  const scaleAt = (pi: number) => {
     if (pi <= index) return 1;
     return Math.max(0.91, 1 - (pi - index) * 0.03);
-  });
+  };
 
   // RotateX: peeked cards tilt backward for depth (perspective is set on sticky container)
-  const rotateXValues = points.map((_, pi) => {
+  const rotateXAt = (pi: number) => {
     if (pi <= index) return 0;
     return Math.min((pi - index) * 2, 5);
-  });
+  };
+
+  const yValues = points.map((point) => yAt(pointIndex(point)));
+  const scaleValues = points.map((point) => scaleAt(pointIndex(point)));
+  const rotateXValues = points.map((point) => rotateXAt(pointIndex(point)));
 
   // Opacity: smooth transition without dipping to 0 when moving to the background
   const opacityIns: number[] = [];
@@ -242,8 +261,11 @@ function StackCard({
 
   for (let pi = index + 1; pi < total; pi++) {
     const currP  = pi * step;
+    const holdP  = Math.max(0, currP - step * (1 - holdRatio));
     const depth  = pi - index;
     const peekOp = Math.max(0.65, PEEK_OPACITY - (depth - 1) * 0.07);
+    opacityIns.push(holdP);
+    opacityOuts.push(pi === index + 1 ? 1 : peekOp);
     opacityIns.push(currP);
     opacityOuts.push(peekOp);
   }
@@ -296,10 +318,12 @@ function CardStack({
   const [activeIndex, setActiveIndex] = useState(0);
   const [isSectionSticky, setIsSectionSticky] = useState(false);
   const [isPastEnd, setIsPastEnd] = useState(false);
+  const stateRef = useRef({activeIndex: 0, isSectionSticky: false, isPastEnd: false});
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+    let frame = 0;
 
     const update = () => {
       // Find the distance from top of container to top of viewport
@@ -308,11 +332,13 @@ function CardStack({
       // Don't activate any card until the sticky card has reached the top of the viewport
       // Use a small tolerance for sub-pixel rounding (rect.top is often ~0.2 at the boundary)
       if (rect.top > 2) {
-        setIsSectionSticky(false);
-        setIsPastEnd(false);
+        if (stateRef.current.isSectionSticky) {
+          stateRef.current = {...stateRef.current, isSectionSticky: false, isPastEnd: false};
+          setIsSectionSticky(false);
+          setIsPastEnd(false);
+        }
         return;
       }
-      setIsSectionSticky(true);
 
       // Calculate how far we've scrolled inside this specific container
       // Rect.top is 0 when the container hits the top of the viewport
@@ -322,7 +348,15 @@ function CardStack({
       // Once we've scrolled past the active+pause zone the sticky element starts
       // moving up out of the viewport — hide the arrow to avoid it floating mid-screen.
       const totalScrollHeight = activeScrollHeight + window.innerHeight * (pauseVH / 100);
-      setIsPastEnd(-rect.top >= totalScrollHeight);
+      const nextIsPastEnd = -rect.top >= totalScrollHeight;
+      if (!stateRef.current.isSectionSticky) {
+        stateRef.current = {...stateRef.current, isSectionSticky: true};
+        setIsSectionSticky(true);
+      }
+      if (nextIsPastEnd !== stateRef.current.isPastEnd) {
+        stateRef.current = {...stateRef.current, isPastEnd: nextIsPastEnd};
+        setIsPastEnd(nextIsPastEnd);
+      }
 
       let rawProgress = 0;
       if (activeScrollHeight > 0) {
@@ -333,18 +367,42 @@ function CardStack({
 
       scrollYProgress.set(rawProgress);
 
-      if (cards.length <= 1) { setActiveIndex(0); return; }
+      if (cards.length <= 1) {
+        if (stateRef.current.activeIndex !== 0) {
+          stateRef.current = {...stateRef.current, activeIndex: 0};
+          setActiveIndex(0);
+        }
+        return;
+      }
       const step = 1 / (cards.length - 1);
-      setActiveIndex(Math.max(0, Math.min(Math.round(rawProgress / step), cards.length - 1)));
+      const holdRatio = 0.38;
+      const segment = Math.min(cards.length - 2, Math.max(0, Math.floor(rawProgress / step)));
+      const segmentProgress = (rawProgress - segment * step) / step;
+      const nextActiveIndex = rawProgress >= 1
+        ? cards.length - 1
+        : segment + (segmentProgress > holdRatio + (1 - holdRatio) * 0.5 ? 1 : 0);
+      if (nextActiveIndex !== stateRef.current.activeIndex) {
+        stateRef.current = {...stateRef.current, activeIndex: nextActiveIndex};
+        setActiveIndex(nextActiveIndex);
+      }
+    };
+
+    const scheduleUpdate = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        update();
+      });
     };
 
     update();
-    window.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update, { passive: true });
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', scheduleUpdate, { passive: true });
 
     return () => {
-      window.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', scheduleUpdate);
+      window.removeEventListener('resize', scheduleUpdate);
     };
   }, [cards.length, scrollYProgress, scrollVH, pauseVH]);
 
@@ -651,7 +709,7 @@ export function ProjectsSection({
 
   return (
     <Section className="deck-section" eyebrow={eyebrow} animateContent={false}>
-      <CardStack scrollVH={80}>
+      <CardStack scrollVH={112}>
         {filled.map((item, idx) => (
           <ProjectItem
             item={item}

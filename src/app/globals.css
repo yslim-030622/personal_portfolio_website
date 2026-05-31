@@ -237,7 +237,7 @@ html[lang="ko"] .font-display {
 .card-stack-sticky {
   position: sticky;
   top: 0;
-  height: 100svh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -267,7 +267,8 @@ html[lang="ko"] .font-display {
   margin: auto;
   width: min(88vw, 1040px);
   max-width: 100%;
-  height: clamp(480px, 70svh, 680px);
+  height: min(680px, calc(100dvh - 9.5rem));
+  min-height: min(480px, calc(100dvh - 9.5rem));
   pointer-events: auto;
   user-select: none;
   filter: drop-shadow(0 24px 28px rgb(24 20 13 / 0.18));
@@ -286,13 +287,13 @@ html[lang="ko"] .font-display {
 
 /* Preview image height cap so description text always fits */
 .card-stack-drag .clearsplit-showcase {
-  max-height: min(45svh, 380px);
+  max-height: min(38dvh, 340px);
   flex-shrink: 0;
 }
 
 @media (max-height: 820px) {
   .card-stack-drag .clearsplit-showcase {
-    max-height: min(35svh, 280px);
+    max-height: min(31dvh, 260px);
   }
 }
 
@@ -584,16 +585,30 @@ html[data-theme="dark"] .liquid-card.card-colored:hover {
   }
 
   .card-stack-sticky {
-    padding: 0 1.25rem;
+    height: 100dvh;
+    padding: 0 1rem;
   }
 
   .card-stack-drag {
-    width: min(92vw, 1040px);
-    height: clamp(480px, 72svh, 580px);
+    width: min(91vw, 1040px);
+    height: min(560px, calc(100dvh - 10.75rem));
+    min-height: min(460px, calc(100dvh - 10.75rem));
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    transition: transform 70ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                opacity 70ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    contain: layout paint style;
+  }
+
+  .card-stack-drag > .liquid-card {
+    box-shadow:
+      -2px 2px 8px rgb(15 23 42 / 0.12),
+      -10px 14px 30px rgb(15 23 42 / 0.22);
+  }
+
+  html[data-theme="light"] .liquid-card.card-colored,
+  html[data-theme="light"] .card-stack-drag > .liquid-card.card-colored {
+    box-shadow:
+      -2px 2px 8px rgb(15 23 42 / 0.12),
+      -10px 14px 30px rgb(15 23 42 / 0.22);
   }
 
   .card-stack-status {
@@ -709,7 +724,17 @@ html[data-theme="dark"] .liquid-card.card-colored:hover {
 
   .project-card {
     gap: 0.85rem;
-    padding: 1.2rem;
+    padding: clamp(1rem, 4.8vw, 1.2rem);
+  }
+
+  .card-colored.grid:not(.project-card) {
+    gap: 0.75rem;
+    padding: clamp(1rem, 4.8vw, 1.2rem);
+  }
+
+  .card-colored .card-title-glass {
+    font-size: clamp(1.2rem, 7vw, 1.5rem);
+    line-height: 1.08;
   }
 
   .project-left-actions {
@@ -727,8 +752,31 @@ html[data-theme="dark"] .liquid-card.card-colored:hover {
   }
 
   .project-description {
-    font-size: 0.88rem;
-    line-height: 1.6;
+    font-size: clamp(0.82rem, 3.65vw, 0.9rem);
+    line-height: 1.55;
+  }
+
+  .project-card-body > p {
+    font-size: clamp(0.82rem, 3.65vw, 0.9rem);
+    line-height: 1.58;
+  }
+
+  .card-stack-drag .clearsplit-showcase {
+    width: 100%;
+    max-height: min(27dvh, 220px);
+    border-radius: 22px;
+  }
+
+  .clearsplit-showcase-pdf[data-pdf-landscape="true"] {
+    aspect-ratio: 16 / 9;
+  }
+
+  .clearsplit-showcase-pdf:not([data-pdf-landscape="true"]) {
+    aspect-ratio: 4 / 3;
+  }
+
+  .pdf-preview-frame {
+    transform: translateZ(0);
   }
 }
 

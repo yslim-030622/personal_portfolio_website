@@ -14,6 +14,7 @@ export function PresentationPreview({
   }
 
   const isLandscape = link.pdfLandscape === true;
+  const fragment = isLandscape ? "toolbar=0&navpanes=0&view=Fit&zoom=page-fit" : "toolbar=0&navpanes=0&view=Fit";
 
   return (
     <div
@@ -22,9 +23,10 @@ export function PresentationPreview({
     >
       <div className="clearsplit-showcase-stage bg-white relative">
         <iframe
-          className="absolute inset-0 h-full w-full border-0 bg-white pointer-events-none"
+          className="pdf-preview-frame absolute inset-0 h-full w-full border-0 bg-white pointer-events-none"
           loading="lazy"
-          src={`${link.href}#toolbar=0&navpanes=0&view=FitH`}
+          scrolling="no"
+          src={`${link.href}#${fragment}`}
           title={link.ariaLabel ?? link.label}
         />
         {/* Transparent overlay link that captures clicks/taps over the entire preview area but allows scroll events to bubble up naturally */}
