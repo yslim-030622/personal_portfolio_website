@@ -1429,4 +1429,16 @@ html.theme-transitioning * {
   .card-stack-drag .clearsplit-showcase-pdf {
     max-height: 190px !important;
   }
+  .clearsplit-showcase-pdf .clearsplit-showcase-stage {
+    overflow: hidden;
+  }
+  .clearsplit-showcase-pdf .clearsplit-showcase-stage iframe {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 250% !important;
+    height: 250% !important;
+    transform: scale(0.4) !important;
+    transform-origin: top left !important;
+  }
 }
