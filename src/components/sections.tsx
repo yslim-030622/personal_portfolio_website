@@ -152,6 +152,7 @@ const TECH_ICON_SLUGS: Record<string, string> = {
   "Python": "python",
   "Swift": "swift",
   "FastAPI": "fastapi",
+  "PyTorch": "pytorch",
   "PostgreSQL": "postgresql",
   "Docker": "docker",
   "TypeScript": "typescript",
@@ -164,16 +165,31 @@ const TECH_ICON_SLUGS: Record<string, string> = {
 
 function TechIcon({name}: {name: string}) {
   const slug = TECH_ICON_SLUGS[name] ?? name.toLowerCase().replace(/\s+/g, "");
+  const [hasError, setHasError] = useState(false);
+  const fallback = name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <span title={name} className="tech-icon-wrap inline-flex items-center justify-center">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={`https://cdn.simpleicons.org/${slug}/FFFFFF`}
-        alt={name}
-        width={22}
-        height={22}
-        className="tech-icon-img"
-      />
+      {hasError ? (
+        <span aria-label={name} className="tech-icon-fallback">
+          {fallback}
+        </span>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={`https://cdn.simpleicons.org/${slug}/FFFFFF`}
+          alt={name}
+          width={22}
+          height={22}
+          className="tech-icon-img"
+          onError={() => setHasError(true)}
+        />
+      )}
     </span>
   );
 }
@@ -195,7 +211,7 @@ function StackCard({
   total: number;
   scrollYProgress: MotionValue<number>;
 }) {
-  const PEEK_VH      = 4;
+  const PEEK_VH      = 2.35;
   const ENTRY_Y      = 88;
   const PEEK_OPACITY = 0.90;
   const NAV_OFFSET   = 0;
@@ -228,7 +244,7 @@ function StackCard({
   // Scale: active at 1, peeked cards shrink slightly
   const scaleAt = (pi: number) => {
     if (pi <= index) return 1;
-    return Math.max(0.91, 1 - (pi - index) * 0.03);
+    return Math.max(0.86, 1 - (pi - index) * 0.03);
   };
 
   // RotateX: peeked cards tilt backward for depth (perspective is set on sticky container)
@@ -263,7 +279,7 @@ function StackCard({
     const currP  = pi * step;
     const holdP  = Math.max(0, currP - step * (1 - holdRatio));
     const depth  = pi - index;
-    const peekOp = Math.max(0.65, PEEK_OPACITY - (depth - 1) * 0.07);
+    const peekOp = Math.max(0.56, PEEK_OPACITY - (depth - 1) * 0.08);
     opacityIns.push(holdP);
     opacityOuts.push(pi === index + 1 ? 1 : peekOp);
     opacityIns.push(currP);
@@ -569,7 +585,7 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
       {/* Right column */}
       <div className="project-card-body min-w-0 flex flex-col h-full md:justify-center">
         {item.previewImages?.length ? (
-          <ProjectScreenshotPreview className="order-1 mb-4 mt-0 md:mb-6" images={item.previewImages} title={item.company} />
+          <ProjectScreenshotPreview animateOnMount className="order-1 mb-4 mt-0 md:mb-6" imageFit="contain" images={item.previewImages} title={item.company} />
         ) : null}
         {previewLinks?.map((link) => (
           <div key={link.label} className="order-1 mb-4 mt-0 md:mb-6">
@@ -595,8 +611,7 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
 
 export function WorkSection({
   eyebrow,
-  items,
-  pauseVH = 0
+  items
 }: {
   eyebrow: string;
   items: LocalizedWorkEntry[];
@@ -605,16 +620,24 @@ export function WorkSection({
   const filled = items.filter(isFilledEntry);
 
   return (
-    <Section className="deck-section" eyebrow={eyebrow} animateContent={false}>
-      <CardStack pauseVH={pauseVH} scrollVH={95}>
+    <Section className="work-list-section" eyebrow={eyebrow} animateContent={false}>
+      <div className="work-card-list">
         {filled.map((item, idx) => (
-          <WorkItem
-            item={item}
-            colorValue={WORK_CARD_COLORS[idx % WORK_CARD_COLORS.length]}
+          <motion.div
+            className="work-card-list-item"
+            initial={{opacity: 0, y: 48}}
             key={`${item.company}-${item.dates}`}
-          />
+            transition={{duration: 0.72, ease: EASE}}
+            viewport={VP}
+            whileInView={{opacity: 1, y: 0}}
+          >
+            <WorkItem
+              item={item}
+              colorValue={WORK_CARD_COLORS[idx % WORK_CARD_COLORS.length]}
+            />
+          </motion.div>
         ))}
-      </CardStack>
+      </div>
     </Section>
   );
 }
@@ -624,23 +647,27 @@ type FilledProjectEntry = Extract<LocalizedProjectEntry, {status: "filled"}>;
 function ProjectScreenshotPreview({
   title,
   images,
-  className
+  className,
+  animateOnMount = false,
+  imageFit = "cover"
 }: {
   title: string;
   images: NonNullable<FilledProjectEntry["previewImages"]>;
   className?: string;
+  animateOnMount?: boolean;
+  imageFit?: "cover" | "contain";
 }) {
   const isActive = useContext(CardActiveContext);
   const hasPlayedRef = useRef(false);
-  const [hasPlayed, setHasPlayed] = useState(false);
+  const [hasPlayed, setHasPlayed] = useState(animateOnMount);
 
   useEffect(() => {
-    if (isActive && !hasPlayedRef.current) {
+    if ((animateOnMount || isActive) && !hasPlayedRef.current) {
       hasPlayedRef.current = true;
       const id = setTimeout(() => setHasPlayed(true), 0);
       return () => clearTimeout(id);
     }
-  }, [isActive]);
+  }, [animateOnMount, isActive]);
 
   if (!images.length) {
     return null;
@@ -649,14 +676,15 @@ function ProjectScreenshotPreview({
   return (
     <motion.div
       className={`clearsplit-showcase overflow-hidden rounded-[26px] ${className ?? "mt-6"}`}
+      style={{aspectRatio: `${images[0].width} / ${images[0].height}`}}
       initial={{opacity: 0, y: 20}}
       animate={hasPlayed || isActive ? {opacity: 1, y: 0} : {opacity: 0, y: 20}}
       transition={{duration: 0.72, delay: 0.22, ease: [0.22, 1, 0.36, 1]}}
     >
       <div aria-label={`${title} app screenshots`} className="clearsplit-showcase-stage">
         <Image
-          alt={`${title} app screens preview`}
-          className="object-contain"
+          alt={images[0].alt}
+          className="project-preview-image"
           fill
           priority
           sizes="(max-width: 768px) 84vw, 720px"
@@ -679,11 +707,11 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
 
   return (
     <article
-      className="project-card card-colored liquid-card group grid gap-5 rounded-[28px] p-6 transition duration-300 md:grid-cols-[minmax(0,240px)_1fr] md:gap-9 md:p-9"
+      className="project-card card-colored liquid-card group grid gap-5 rounded-[28px] p-6 transition duration-300 md:grid-cols-[minmax(0,280px)_1fr] md:gap-8 md:p-9"
       style={{"--card-color": colorValue} as React.CSSProperties}
     >
       {/* Left column */}
-      <div className="border-b border-white/20 pb-3 md:flex md:h-full md:flex-col md:border-b-0 md:border-r md:pb-0 md:pr-9">
+      <div className="border-b border-white/20 pb-3 md:flex md:h-full md:flex-col md:border-b-0 md:border-r md:pb-0 md:pr-7">
         <div className="min-w-0">
           <h2 className="card-title-glass font-display text-[1.5rem] font-medium leading-tight text-white transition-colors duration-200 group-hover:text-white/80 md:text-[1.82rem] break-keep">
             {item.title}
