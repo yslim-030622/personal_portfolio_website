@@ -12,6 +12,7 @@ export type OptionalLink = {
   href?: string | Bilingual;
   external?: boolean;
   ariaLabel?: Bilingual;
+  pdfLandscape?: boolean | Partial<Record<Locale, boolean>>;
 };
 
 export type ProjectPreviewImage = {
@@ -125,6 +126,7 @@ export type LocalizedOptionalLink = {
   href?: string;
   external?: boolean;
   ariaLabel?: string;
+  pdfLandscape?: boolean;
 };
 
 export type LocalizedEmptySlot = EmptySlot;

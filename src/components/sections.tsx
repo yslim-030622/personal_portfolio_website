@@ -195,9 +195,9 @@ function StackCard({
   total: number;
   scrollYProgress: MotionValue<number>;
 }) {
-  const PEEK_VH      = 5;
-  const ENTRY_Y      = 100;
-  const PEEK_OPACITY = 0.88;
+  const PEEK_VH      = 4;
+  const ENTRY_Y      = 88;
+  const PEEK_OPACITY = 0.90;
   const NAV_OFFSET   = 0;
   const step         = total > 1 ? 1 / (total - 1) : 1;
 
@@ -230,13 +230,13 @@ function StackCard({
     opacityIns.push(0); opacityOuts.push(1);
   } else {
     const prevP       = (index - 1) * step;
-    const fadeInStart = prevP + 0.2 * step; // Start fading in slightly after it begins moving
+    const fadeInStart = prevP + 0.12 * step; // Start fading in slightly after it begins moving
     
     if (prevP > 0) {
       opacityIns.push(0); opacityOuts.push(0);
     }
     opacityIns.push(prevP);       opacityOuts.push(0);
-    opacityIns.push(fadeInStart); opacityOuts.push(0.1);
+    opacityIns.push(fadeInStart); opacityOuts.push(0.18);
     opacityIns.push(index * step); opacityOuts.push(1);
   }
 

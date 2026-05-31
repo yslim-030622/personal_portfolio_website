@@ -31,6 +31,15 @@ const localizeHref = (href: string | Bilingual | undefined, locale: Locale) => {
   return href[locale];
 };
 
+const localizePdfLandscape = (
+  pdfLandscape: boolean | Partial<Record<Locale, boolean>> | undefined,
+  locale: Locale
+): boolean | undefined => {
+  if (pdfLandscape === undefined) return undefined;
+  if (typeof pdfLandscape === "boolean") return pdfLandscape;
+  return pdfLandscape[locale];
+};
+
 const localizeLinks = (
   links: RawPortfolioContent["hero"]["links"],
   locale: Locale
@@ -39,7 +48,8 @@ const localizeLinks = (
     label: text(link.label, locale),
     href: localizeHref(link.href, locale),
     external: link.external,
-    ariaLabel: link.ariaLabel ? text(link.ariaLabel, locale) : undefined
+    ariaLabel: link.ariaLabel ? text(link.ariaLabel, locale) : undefined,
+    pdfLandscape: localizePdfLandscape(link.pdfLandscape, locale)
   }));
 
 export function getRawPortfolioContent(): RawPortfolioContent {

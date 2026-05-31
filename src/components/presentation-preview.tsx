@@ -13,8 +13,13 @@ export function PresentationPreview({
     return null;
   }
 
+  const isLandscape = link.pdfLandscape === true;
+
   return (
-    <div className={`clearsplit-showcase clearsplit-showcase-pdf overflow-hidden rounded-[26px] mt-6 ${className ?? ""}`}>
+    <div
+      className={`clearsplit-showcase clearsplit-showcase-pdf overflow-hidden rounded-[26px] mt-6 ${className ?? ""}`}
+      data-pdf-landscape={isLandscape ? "true" : undefined}
+    >
       <div className="clearsplit-showcase-stage bg-white relative">
         <iframe
           className="absolute inset-0 h-full w-full border-0 bg-white pointer-events-none"

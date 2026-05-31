@@ -590,6 +590,10 @@ html[data-theme="dark"] .liquid-card.card-colored:hover {
   .card-stack-drag {
     width: min(92vw, 1040px);
     height: clamp(480px, 72svh, 580px);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transition: transform 70ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                opacity 70ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
   .card-stack-status {
@@ -1432,6 +1436,7 @@ html.theme-transitioning * {
   .clearsplit-showcase-pdf .clearsplit-showcase-stage {
     overflow: hidden;
   }
+  /* Portrait PDFs: 250% / scale(0.4) — wide enough for A4 portrait */
   .clearsplit-showcase-pdf .clearsplit-showcase-stage iframe {
     position: absolute !important;
     top: 0 !important;
@@ -1439,6 +1444,14 @@ html.theme-transitioning * {
     width: 250% !important;
     height: 250% !important;
     transform: scale(0.4) !important;
+    transform-origin: top left !important;
+  }
+  /* Landscape PDFs (e.g. 1920px-wide 16:9 KO PDF): need 760%+ so the full
+     width renders at 100% scale even without #view=FitH on iOS Safari */
+  [data-pdf-landscape="true"].clearsplit-showcase-pdf .clearsplit-showcase-stage iframe {
+    width: 760% !important;
+    height: 760% !important;
+    transform: scale(0.132) !important;
     transform-origin: top left !important;
   }
 }

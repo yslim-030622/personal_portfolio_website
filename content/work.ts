@@ -45,7 +45,8 @@ export const work: RawWorkEntry[] = [
         ariaLabel: {
           en: "Preview Fasoo internship presentation PDF",
           ko: "Fasoo 인턴 발표 자료 PDF 미리보기"
-        }
+        },
+        pdfLandscape: {en: false, ko: true}
       }
     ]
   },
