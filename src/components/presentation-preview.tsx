@@ -15,7 +15,6 @@ export function PresentationPreview({
   }
 
   const isLandscape = link.pdfLandscape === true;
-  const fragment = isLandscape ? "toolbar=0&navpanes=0&view=Fit&zoom=page-fit" : "toolbar=0&navpanes=0&view=Fit";
   const previewImage = link.previewImage;
 
   return (
@@ -37,7 +36,7 @@ export function PresentationPreview({
             className="pdf-preview-frame absolute inset-0 h-full w-full border-0 bg-white pointer-events-none"
             loading="lazy"
             scrolling="no"
-            src={`${link.href}#${fragment}`}
+            src={`${link.href}#toolbar=0&navpanes=0&view=Fit`}
             title={link.ariaLabel ?? link.label}
           />
         )}

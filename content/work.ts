@@ -48,14 +48,23 @@ export const work: RawWorkEntry[] = [
         },
         pdfLandscape: {en: false, ko: true},
         previewImage: {
+          en: {
+            src: "/docs/previews/fasoo-internship-en-preview.png",
+            alt: {
+              en: "Fasoo internship English presentation first page preview",
+              ko: "Fasoo 인턴 발표 자료 영어 첫 페이지 미리보기"
+            },
+            width: 1192,
+            height: 1686
+          },
           ko: {
             src: "/docs/previews/fasoo-internship-ko-preview.png",
             alt: {
-              en: "Fasoo internship Korean presentation preview",
-              ko: "Fasoo 인턴 발표 자료 한국어 미리보기"
+              en: "Fasoo internship Korean presentation first page preview",
+              ko: "Fasoo 인턴 발표 자료 한국어 첫 페이지 미리보기"
             },
-            width: 1600,
-            height: 899
+            width: 2880,
+            height: 1620
           }
         }
       }

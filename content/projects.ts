@@ -86,6 +86,16 @@ export const projects: RawProjectEntry[] = [
         ariaLabel: {
           en: "Preview Canvas Assistant final demo presentation PDF",
           ko: "Canvas Assistant 최종 데모 발표 자료 PDF 미리보기"
+        },
+        pdfLandscape: true,
+        previewImage: {
+          src: "/docs/previews/canvas-assistant-architecture-preview.png",
+          alt: {
+            en: "Canvas Assistant architecture stack diagram preview",
+            ko: "Canvas Assistant 아키텍처 스택 다이어그램 미리보기"
+          },
+          width: 1440,
+          height: 810
         }
       }
     ]

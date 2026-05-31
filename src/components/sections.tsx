@@ -319,16 +319,34 @@ function CardStack({
   const [isSectionSticky, setIsSectionSticky] = useState(false);
   const [isPastEnd, setIsPastEnd] = useState(false);
   const stateRef = useRef({activeIndex: 0, isSectionSticky: false, isPastEnd: false});
+  const snapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isSnappingRef = useRef(false);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
     let frame = 0;
 
-    const update = () => {
+    const getStackMetrics = () => {
       // Find the distance from top of container to top of viewport
       const rect = container.getBoundingClientRect();
+      const activeScrollHeight = (cards.length - 1) * window.innerHeight * (scrollVH / 100);
+      const totalScrollHeight = activeScrollHeight + window.innerHeight * (pauseVH / 100);
+      const rawProgress = activeScrollHeight > 0
+        ? Math.max(0, Math.min(1, -rect.top / activeScrollHeight))
+        : 1;
 
+      return {
+        rect,
+        activeScrollHeight,
+        totalScrollHeight,
+        rawProgress,
+        stackTop: window.scrollY + rect.top
+      };
+    };
+
+    const update = () => {
+      const {rect, totalScrollHeight, rawProgress} = getStackMetrics();
       // Don't activate any card until the sticky card has reached the top of the viewport
       // Use a small tolerance for sub-pixel rounding (rect.top is often ~0.2 at the boundary)
       if (rect.top > 2) {
@@ -343,11 +361,9 @@ function CardStack({
       // Calculate how far we've scrolled inside this specific container
       // Rect.top is 0 when the container hits the top of the viewport
       // activeScrollHeight is the scroll amount needed to fully switch all cards
-      const activeScrollHeight = (cards.length - 1) * window.innerHeight * (scrollVH / 100);
 
       // Once we've scrolled past the active+pause zone the sticky element starts
       // moving up out of the viewport — hide the arrow to avoid it floating mid-screen.
-      const totalScrollHeight = activeScrollHeight + window.innerHeight * (pauseVH / 100);
       const nextIsPastEnd = -rect.top >= totalScrollHeight;
       if (!stateRef.current.isSectionSticky) {
         stateRef.current = {...stateRef.current, isSectionSticky: true};
@@ -356,13 +372,6 @@ function CardStack({
       if (nextIsPastEnd !== stateRef.current.isPastEnd) {
         stateRef.current = {...stateRef.current, isPastEnd: nextIsPastEnd};
         setIsPastEnd(nextIsPastEnd);
-      }
-
-      let rawProgress = 0;
-      if (activeScrollHeight > 0) {
-        rawProgress = Math.max(0, Math.min(1, -rect.top / activeScrollHeight));
-      } else {
-        rawProgress = 1;
       }
 
       scrollYProgress.set(rawProgress);
@@ -387,6 +396,27 @@ function CardStack({
       }
     };
 
+    const snapToNearestCard = () => {
+      if (cards.length <= 1 || isSnappingRef.current) return;
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const coarse = window.matchMedia("(pointer: coarse)");
+      if (reduce.matches || !coarse.matches) return;
+
+      const {rect, activeScrollHeight, rawProgress, stackTop} = getStackMetrics();
+      if (rect.top > 2 || -rect.top < 8 || -rect.top > activeScrollHeight - 8) return;
+
+      const step = 1 / (cards.length - 1);
+      const nearestProgress = Math.max(0, Math.min(1, Math.round(rawProgress / step) * step));
+      const target = stackTop + nearestProgress * activeScrollHeight;
+      if (Math.abs(window.scrollY - target) < 3) return;
+
+      isSnappingRef.current = true;
+      window.scrollTo({top: target, behavior: "smooth"});
+      window.setTimeout(() => {
+        isSnappingRef.current = false;
+      }, 520);
+    };
+
     const scheduleUpdate = () => {
       if (frame) return;
       frame = window.requestAnimationFrame(() => {
@@ -395,13 +425,23 @@ function CardStack({
       });
     };
 
+    const scheduleSnap = () => {
+      if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
+      snapTimerRef.current = setTimeout(snapToNearestCard, 150);
+    };
+
     update();
-    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    const onScroll = () => {
+      scheduleUpdate();
+      scheduleSnap();
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', scheduleUpdate, { passive: true });
 
     return () => {
       if (frame) window.cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', scheduleUpdate);
+      if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
+      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', scheduleUpdate);
     };
   }, [cards.length, scrollYProgress, scrollVH, pauseVH]);
