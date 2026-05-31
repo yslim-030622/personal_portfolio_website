@@ -10,8 +10,8 @@ export const footer = {
 
 export const seo = {
   title: {
-    en: "Yeongseok Lim — Software Engineer",
-    ko: "임영석 — 소프트웨어 엔지니어"
+    en: "Yeongseok's Portfolio",
+    ko: "Yeongseok's Portfolio"
   },
   description: {
     en: "CS senior at UW–Madison. Backend systems, applied ML, security tooling. Previously at Fasoo and MoDoc AI.",

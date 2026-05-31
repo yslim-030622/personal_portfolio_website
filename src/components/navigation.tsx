@@ -1,7 +1,6 @@
 "use client";
 
 import {useLocale, useTranslations} from "next-intl";
-import {AnimatePresence, motion} from "motion/react";
 import {useEffect, useState, type ReactNode} from "react";
 
 function SegmentedSwitch<T extends string>({
@@ -41,16 +40,6 @@ function SegmentedSwitch<T extends string>({
   );
 }
 
-function HomeIcon() {
-  return (
-    <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24" width="16">
-      <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
-      <path d="M9 21V12h6v9" />
-    </svg>
-  );
-}
-
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export function Navigation({
   sectionTitles = [],
@@ -116,23 +105,6 @@ export function Navigation({
         </nav>
       </header>
 
-      {/* Home button — bottom left */}
-      <AnimatePresence>
-        {scrolled && (
-          <motion.button
-            initial={{opacity: 0, y: 6}}
-            animate={{opacity: 1, y: 0}}
-            exit={{opacity: 0, y: 6}}
-            transition={{duration: 0.22, ease: EASE}}
-            className="fixed bottom-6 left-6 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-bg/70 text-fg/60 backdrop-blur-xl shadow-sm transition-colors duration-200 hover:bg-bg hover:text-fg"
-            onClick={() => window.scrollTo({top: 0, behavior: "smooth"})}
-            aria-label={locale === "ko" ? "맨 위로 이동" : "Scroll to top"}
-            type="button"
-          >
-            <HomeIcon />
-          </motion.button>
-        )}
-      </AnimatePresence>
     </>
   );
 }
