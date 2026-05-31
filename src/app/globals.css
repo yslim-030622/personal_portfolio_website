@@ -1582,3 +1582,33 @@ html.theme-transitioning * {
     margin-bottom: 0.55rem;
   }
 }
+
+@media (max-width: 767px) {
+  .card-stack-drag,
+  html[data-theme="light"] .card-stack-drag {
+    filter: none !important;
+  }
+
+  .card-stack-drag > .liquid-card,
+  .liquid-card.card-colored,
+  html[data-theme="light"] .liquid-card.card-colored,
+  html[data-theme="light"] .card-stack-drag > .liquid-card,
+  html[data-theme="light"] .card-stack-drag > .liquid-card.card-colored,
+  html[data-theme="dark"] .liquid-card.card-colored,
+  html[data-theme="dark"] .card-stack-drag > .liquid-card.card-colored,
+  .clearsplit-showcase,
+  .card-colored .liquid-preview,
+  .card-github-btn,
+  .card-glass-pane,
+  .liquid-button,
+  .liquid-pill {
+    box-shadow: none !important;
+  }
+
+  .card-stack-drag > .liquid-card::after,
+  .liquid-card::after,
+  .liquid-preview::after,
+  .clearsplit-showcase::before {
+    box-shadow: none !important;
+  }
+}
