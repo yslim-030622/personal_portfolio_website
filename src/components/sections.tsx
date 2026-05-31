@@ -568,17 +568,17 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
 
       {/* Right column */}
       <div className="project-card-body min-w-0 flex flex-col h-full md:justify-center">
-        <p className="order-1 md:order-2 font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] break-keep md:mt-0">
-          {item.paragraph}
-        </p>
         {item.previewImages?.length ? (
-          <ProjectScreenshotPreview className="order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0" images={item.previewImages} title={item.company} />
+          <ProjectScreenshotPreview className="order-1 mb-4 mt-0 md:mb-6" images={item.previewImages} title={item.company} />
         ) : null}
         {previewLinks?.map((link) => (
-          <div key={link.label} className="order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0">
+          <div key={link.label} className="order-1 mb-4 mt-0 md:mb-6">
             <PresentationPreview link={link} />
           </div>
         ))}
+        <p className="order-2 font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] break-keep md:mt-0">
+          {item.paragraph}
+        </p>
         <div className="order-3 mt-4 md:mt-0">
           {otherLinks?.length ? (
             <div className="mt-4 flex flex-wrap gap-4 text-[0.8rem] uppercase text-white md:text-[0.86rem]">
@@ -713,17 +713,17 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
 
       {/* Right column */}
       <div className="project-card-body min-w-0 flex flex-col h-full md:justify-center">
-        <p className="project-description order-1 md:order-2 font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] break-keep md:mt-0">
-          {item.description}
-        </p>
         {item.previewImages?.length ? (
-          <ProjectScreenshotPreview className="order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0" images={item.previewImages} title={item.title} />
+          <ProjectScreenshotPreview className="order-1 mb-4 mt-0 md:mb-6" images={item.previewImages} title={item.title} />
         ) : null}
         {previewLinks?.map((link) => (
-          <div key={link.label} className="order-2 md:order-1 mb-4 mt-3 md:mb-6 md:mt-0">
+          <div key={link.label} className="order-1 mb-4 mt-0 md:mb-6">
             <PresentationPreview link={link} />
           </div>
         ))}
+        <p className="project-description order-2 font-body text-[0.94rem] leading-[1.7] text-white/90 md:text-[1.08rem] md:leading-[1.76] break-keep md:mt-0">
+          {item.description}
+        </p>
         <div className="order-3 mt-4 md:mt-0">
           {otherLinks?.length ? (
             <div className="mt-4 flex flex-wrap gap-4 text-[0.8rem] uppercase text-white md:text-[0.86rem]">
