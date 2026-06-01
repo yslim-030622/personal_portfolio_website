@@ -8,11 +8,20 @@ Personal portfolio site built with Next.js 15 App Router. English is served at `
 
 ## Preview
 
-| Desktop | Mobile |
-| ------- | ------ |
-| ![Desktop hero preview](public/readme/portfolio-01-desktop-hero.jpg) | ![Mobile hero preview](public/readme/portfolio-04-mobile-hero.jpg) |
-| ![Desktop work section preview](public/readme/portfolio-02-desktop-work.jpg) | ![Mobile work section preview](public/readme/portfolio-05-mobile-work.jpg) |
-| ![Desktop projects section preview](public/readme/portfolio-03-desktop-projects.jpg) | ![Mobile projects section preview](public/readme/portfolio-06-mobile-projects.jpg) |
+### Desktop
+
+![Desktop hero preview](public/readme/portfolio-01-desktop-hero.png)
+![Desktop Fasoo work preview](public/readme/portfolio-02-desktop-fasoo.png)
+![Desktop MoDoc work preview](public/readme/portfolio-03-desktop-modoc.png)
+![Desktop ClearSplit project preview](public/readme/portfolio-04-desktop-clearsplit.png)
+![Desktop Pyrefly project preview](public/readme/portfolio-05-desktop-pyrefly.png)
+
+### Mobile
+
+<p>
+  <img src="public/readme/portfolio-06-mobile-systems.png" alt="Mobile systems project preview" width="360">
+  <img src="public/readme/portfolio-07-mobile-work.png" alt="Mobile work preview" width="360">
+</p>
 
 ## Tech Stack
 
