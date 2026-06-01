@@ -1,6 +1,7 @@
 "use client";
 
 import type {LocalizedOptionalLink} from "@/content";
+import type {CSSProperties} from "react";
 import Image from "next/image";
 
 export function PresentationPreview({
@@ -16,17 +17,24 @@ export function PresentationPreview({
 
   const isLandscape = link.pdfLandscape === true;
   const previewImage = link.previewImage;
+  const ratio = previewImage
+    ? previewImage.width / previewImage.height
+    : isLandscape
+      ? 16 / 9
+      : 4 / 3;
 
   return (
     <div
-      className={`clearsplit-showcase clearsplit-showcase-pdf overflow-hidden rounded-[26px] mt-6 ${className ?? ""}`}
+      className={`clearsplit-showcase clearsplit-showcase-pdf overflow-hidden rounded-[16px] mt-6 ${className ?? ""}`}
       data-pdf-landscape={isLandscape ? "true" : undefined}
+      data-has-preview={previewImage ? "true" : undefined}
+      style={{"--preview-ratio": ratio} as CSSProperties}
     >
       <div className="clearsplit-showcase-stage relative">
         {previewImage ? (
           <Image
             alt={previewImage.alt}
-            className="project-preview-image"
+            className="project-preview-image project-preview-image-contain project-preview-image-left"
             fill
             sizes="(max-width: 768px) 84vw, 720px"
             src={previewImage.src}
@@ -47,10 +55,6 @@ export function PresentationPreview({
           rel="noreferrer"
           className="absolute inset-0 z-20 cursor-pointer pointer-events-auto block"
           aria-label={link.ariaLabel ?? `Open ${link.label} PDF in a new tab`}
-        />
-        <div
-          className="absolute inset-x-0 bottom-0 h-20 pointer-events-none"
-          style={{zIndex: 10, background: 'linear-gradient(to top, rgba(15,23,42,0.16) 0%, rgba(15,23,42,0) 100%)'}}
         />
       </div>
     </div>

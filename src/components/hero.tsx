@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import type {CSSProperties} from "react";
-import {useEffect, useState} from "react";
 
 import type {LocalizedPortfolioContent} from "@/content";
 import {HeroLinks} from "@/components/hero-links";
@@ -100,16 +99,6 @@ function HeadlineWords({
 
 export function Hero({content, locale}: HeroProps) {
   const isKorean = locale === "ko";
-  const [arrowOpacity, setArrowOpacity] = useState(1);
-
-  useEffect(() => {
-    const handler = () => {
-      const progress = Math.min(window.scrollY / (window.innerHeight * 0.4), 1);
-      setArrowOpacity(1 - progress);
-    };
-    window.addEventListener("scroll", handler, {passive: true});
-    return () => window.removeEventListener("scroll", handler);
-  }, []);
 
   return (
     <section
@@ -193,17 +182,6 @@ export function Hero({content, locale}: HeroProps) {
         </div>
       </figure>
 
-      <div
-        className="pointer-events-none fixed bottom-7 left-0 right-0 flex items-center justify-center z-20"
-        aria-hidden="true"
-        style={{opacity: arrowOpacity, transition: "opacity 0.15s ease"}}
-      >
-        <div className="hero-scroll-arrow">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 5v14M5 12l7 7 7-7" />
-          </svg>
-        </div>
-      </div>
     </section>
   );
 }

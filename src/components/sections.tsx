@@ -326,8 +326,6 @@ function CardStack({
   const scrollYProgress = useMotionValue(0);
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isSectionSticky, setIsSectionSticky] = useState(false);
-  const [isPastEnd, setIsPastEnd] = useState(false);
   const [isTouchScroll, setIsTouchScroll] = useState(false);
   const stateRef = useRef({activeIndex: 0, isSectionSticky: false, isPastEnd: false});
   const snapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -375,8 +373,6 @@ function CardStack({
       if (rect.top > 2) {
         if (stateRef.current.isSectionSticky) {
           stateRef.current = {...stateRef.current, isSectionSticky: false, isPastEnd: false};
-          setIsSectionSticky(false);
-          setIsPastEnd(false);
         }
         return;
       }
@@ -390,11 +386,9 @@ function CardStack({
       const nextIsPastEnd = -rect.top >= totalScrollHeight;
       if (!stateRef.current.isSectionSticky) {
         stateRef.current = {...stateRef.current, isSectionSticky: true};
-        setIsSectionSticky(true);
       }
       if (nextIsPastEnd !== stateRef.current.isPastEnd) {
         stateRef.current = {...stateRef.current, isPastEnd: nextIsPastEnd};
-        setIsPastEnd(nextIsPastEnd);
       }
 
       scrollYProgress.set(rawProgress);
@@ -492,9 +486,6 @@ function CardStack({
     return <div className={className ?? ""}>{cards}</div>;
   }
 
-  const isLastCard = activeIndex === cards.length - 1;
-  const showScrollArrow = isSectionSticky && !isPastEnd && !isLastCard;
-
   return (
     <div
       className={`card-stack-scroll relative w-full ${className ?? ""} z-10`}
@@ -515,18 +506,6 @@ function CardStack({
             </StackCard>
           ))}
         </div>
-        <motion.div
-          className="pointer-events-none absolute bottom-7 left-0 right-0 flex items-center justify-center z-30"
-          aria-hidden="true"
-          animate={{ opacity: showScrollArrow ? 1 : 0 }}
-          transition={{ duration: 0.4 }}
-        >
-          <div className="card-stack-scroll-arrow">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 5v14M5 12l7 7 7-7" />
-            </svg>
-          </div>
-        </motion.div>
       </div>
     </div>
   );
@@ -611,7 +590,7 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
       {/* Right column */}
       <div className="project-card-body min-w-0 flex flex-col h-full md:justify-center">
         {item.previewImages?.length ? (
-          <ProjectScreenshotPreview animateOnMount className="order-1 mb-4 mt-0 md:mb-6" imageFit="contain" images={item.previewImages} title={item.company} />
+          <ProjectScreenshotPreview animateOnMount className="work-image-preview order-1 mb-4 mt-0 md:mb-6" imageFit="contain" images={item.previewImages} title={item.company} />
         ) : null}
         {previewLinks?.map((link) => (
           <div key={link.label} className="order-1 mb-4 mt-0 md:mb-6">
@@ -725,7 +704,7 @@ function ProjectScreenshotPreview({
   images,
   className,
   animateOnMount = false,
-  imageFit = "cover"
+  imageFit = "contain"
 }: {
   title: string;
   images: NonNullable<FilledProjectEntry["previewImages"]>;
@@ -752,7 +731,10 @@ function ProjectScreenshotPreview({
   return (
     <motion.div
       className={`clearsplit-showcase overflow-hidden rounded-[26px] ${className ?? "mt-6"}`}
-      style={{aspectRatio: `${images[0].width} / ${images[0].height}`}}
+      style={{
+        "--preview-ratio": images[0].width / images[0].height,
+        aspectRatio: `${images[0].width} / ${images[0].height}`
+      } as React.CSSProperties}
       initial={{opacity: 0, y: 20}}
       animate={hasPlayed || isActive ? {opacity: 1, y: 0} : {opacity: 0, y: 20}}
       transition={{duration: 0.72, delay: 0.22, ease: [0.22, 1, 0.36, 1]}}
@@ -780,10 +762,13 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
   );
 
   const hasLeftActions = !!(githubLink?.href || prLink?.href || previewLinks?.length);
+  const isDenseProject =
+    item.title === "SharedComputing" ||
+    item.title === "Pyrefly (Meta) contribution";
 
   return (
     <article
-      className="project-card card-colored liquid-card group grid gap-5 rounded-[28px] p-6 transition duration-300 md:grid-cols-[minmax(0,280px)_1fr] md:gap-8 md:p-9"
+      className={`project-card card-colored liquid-card group grid gap-5 rounded-[28px] p-6 transition duration-300 md:grid-cols-[minmax(0,280px)_1fr] md:gap-8 md:p-9 ${isDenseProject ? "project-card-dense" : ""}`}
       style={{"--card-color": colorValue} as React.CSSProperties}
     >
       {/* Left column */}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Github, Linkedin, ExternalLink } from "lucide-react";
+import { Mail, Github, Linkedin, FileText } from "lucide-react";
 import type { LocalizedPortfolioContent } from "@/content";
 
 type HeroLinksProps = {
@@ -29,13 +29,16 @@ export function HeroLinks({ links }: HeroLinksProps) {
     if (lowercase.includes("linkedin") || lowercase.includes("링크드인")) {
       return <Linkedin size={14} className="shrink-0 transition-transform duration-300 group-hover:scale-110" />;
     }
-    return <ExternalLink size={13} className="shrink-0 opacity-80 transition-transform duration-300 group-hover:scale-110" />;
+    if (lowercase.includes("resume") || lowercase.includes("pdf") || lowercase.includes("이력서")) {
+      return <FileText size={14} className="shrink-0 transition-transform duration-300 group-hover:scale-110" />;
+    }
+    return null;
   };
 
   const btnClass = "hero-glass-btn group";
 
   return (
-    <div className="flex flex-wrap items-center justify-start gap-[clamp(0.3rem,1.2vw,0.6rem)] gap-y-3 font-display text-[clamp(0.68rem,1.5vw,0.92rem)] tracking-wide text-fg w-full min-w-0">
+    <div className="flex flex-wrap items-center justify-center gap-[clamp(0.3rem,1.2vw,0.6rem)] gap-y-3 font-display text-[clamp(0.68rem,1.5vw,0.92rem)] tracking-wide text-fg w-full min-w-0 md:justify-start">
       {links.map((link) => {
         const isEmail = link.href?.startsWith("mailto:");
         const email = isEmail ? link.href!.replace("mailto:", "") : null;
