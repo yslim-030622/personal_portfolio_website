@@ -45,24 +45,24 @@ export const hero = {
   },
   links: [
     {
-      label: {en: "email", ko: "email"},
+      label: {en: "Email", ko: "Email"},
       href: "mailto:ylim76@wisc.edu",
       ariaLabel: {en: "Email Yeongseok Lim", ko: "임영석에게 이메일 보내기"}
     },
     {
-      label: {en: "github", ko: "github"},
+      label: {en: "GitHub", ko: "GitHub"},
       href: "https://github.com/yslim-030622",
       external: true,
       ariaLabel: {en: "GitHub profile", ko: "GitHub 프로필"}
     },
     {
-      label: {en: "linkedin", ko: "linkedin"},
+      label: {en: "LinkedIn", ko: "LinkedIn"},
       href: "https://www.linkedin.com/in/yeongseok-lim",
       external: true,
       ariaLabel: {en: "LinkedIn profile", ko: "LinkedIn 프로필"}
     },
     {
-      label: {en: "resume.pdf", ko: "resume.pdf"},
+      label: {en: "Resume PDF", ko: "Resume PDF"},
       href: "/Yeongseok_Lim_resume.pdf",
       external: true,
       ariaLabel: {en: "Resume PDF", ko: "이력서 PDF"}

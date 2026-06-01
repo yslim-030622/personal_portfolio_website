@@ -84,7 +84,7 @@ const isPdfLink = (link: LocalizedOptionalLink) =>
   link.href?.toLowerCase().endsWith(".pdf") ?? false;
 
 const isGitHubRepoLink = (link: LocalizedOptionalLink) =>
-  link.label.toLowerCase() === "github";
+  /github\.com\/[^/]+\/[^/]+/i.test(link.href ?? "") && !isGitHubPullRequestLink(link);
 
 const isGitHubPullRequestLink = (link: LocalizedOptionalLink) =>
   /github\.com\/[^/]+\/[^/]+\/pull\/\d+/i.test(link.href ?? "");
@@ -111,7 +111,7 @@ function GitHubButton({
   return (
     <a
       aria-label={link.ariaLabel ?? fallbackAriaLabel}
-      className="card-github-btn inline-flex items-center gap-2 rounded-md px-3.5 py-2 text-[0.82rem] text-white transition-all duration-200 lowercase"
+      className="card-github-btn inline-flex items-center gap-2 rounded-md px-3.5 py-2 text-[0.82rem] text-white transition-all duration-200"
       href={link.href}
       rel="noreferrer"
       target="_blank"
@@ -136,7 +136,7 @@ function PdfButton({
   return (
     <a
       aria-label={link.ariaLabel ?? fallbackAriaLabel}
-      className="card-github-btn inline-flex items-center gap-2 rounded-md px-3.5 py-2 text-[0.82rem] text-white transition-all duration-200 lowercase"
+      className="card-github-btn inline-flex items-center gap-2 rounded-md px-3.5 py-2 text-[0.82rem] text-white transition-all duration-200"
       href={link.href}
       rel="noreferrer"
       target="_blank"
@@ -778,7 +778,7 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
             {item.title}
           </h2>
         </div>
-        <div className="pt-4 md:pt-5 flex flex-wrap items-center gap-2.5 md:gap-3">
+        <div className="project-card-actions pt-4 md:pt-5 flex flex-wrap items-center gap-2.5 md:items-start md:gap-3">
           <div className="project-tech-stack card-glass-pane rounded-md px-3.5 py-2 !mt-0">
             {item.tech.map((tech) => (
               <TechIcon key={tech} name={tech} />

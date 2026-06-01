@@ -1,12 +1,12 @@
 import type {RawProjectEntry} from "./types";
 
 const projectLinks = [
-  {label: {en: "github", ko: "github"}}
+  {label: {en: "Link to GitHub", ko: "GitHub 바로가기"}}
 ];
 
 const clearSplitLinks = [
   {
-    label: {en: "github", ko: "github"},
+    label: {en: "Link to GitHub", ko: "GitHub 바로가기"},
     href: "https://github.com/yslim-030622/ClearSplit",
     external: true,
     ariaLabel: {
@@ -38,7 +38,7 @@ const sharedComputingProject = {
   tech: ["Python", "PyTorch", "Swift", "FastAPI"],
   links: [
     {
-      label: {en: "github", ko: "github"},
+      label: {en: "Link to GitHub", ko: "GitHub 바로가기"},
       href: "https://github.com/twoSquaredHoon/SharedComputing",
       external: true,
       ariaLabel: {
@@ -114,7 +114,7 @@ export const projects: RawProjectEntry[] = [
     links: [
       ...projectLinks,
       {
-        label: {en: "portfolio", ko: "포트폴리오"},
+        label: {en: "Link to Portfolio", ko: "포트폴리오 바로가기"},
         href: "/docs/canvas-assistant-final-demo.pdf",
         external: true,
         ariaLabel: {
@@ -170,7 +170,7 @@ export const projects: RawProjectEntry[] = [
     tech: ["C"],
     links: [
       {
-        label: {en: "github", ko: "github"},
+        label: {en: "Link to GitHub", ko: "GitHub 바로가기"},
         href: "https://github.com/yslim-030622/systems-programming-portfolio",
         external: true,
         ariaLabel: {

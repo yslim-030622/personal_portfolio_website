@@ -39,7 +39,7 @@ export const work: RawWorkEntry[] = [
     ],
     links: [
       {
-        label: {en: "portfolio", ko: "포트폴리오"},
+        label: {en: "Link to Portfolio", ko: "포트폴리오 바로가기"},
         href: {en: "/docs/fasoo-internship-en.pdf", ko: "/docs/fasoo-internship-ko.pdf"},
         external: true,
         ariaLabel: {
@@ -108,7 +108,7 @@ export const work: RawWorkEntry[] = [
     ],
     links: [
       {
-        label: {en: "github", ko: "github"},
+        label: {en: "Link to GitHub", ko: "GitHub 바로가기"},
         href: "https://github.com/yslim-030622/Modoc-Ai-Pipeline",
         external: true,
         ariaLabel: {
