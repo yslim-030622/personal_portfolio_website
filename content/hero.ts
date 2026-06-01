@@ -51,7 +51,7 @@ export const hero = {
     },
     {
       label: {en: "github", ko: "github"},
-      href: "https://github.com/ylim76",
+      href: "https://github.com/yslim-030622",
       external: true,
       ariaLabel: {en: "GitHub profile", ko: "GitHub 프로필"}
     },

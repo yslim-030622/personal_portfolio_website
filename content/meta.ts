@@ -24,7 +24,7 @@ export const seo = {
     },
     email: "ylim76@wisc.edu",
     location: "Madison, WI",
-    githubUrl: "https://github.com/ylim76",
+    githubUrl: "https://github.com/yslim-030622",
     linkedInUrl: "https://www.linkedin.com/in/yeongseok-lim",
     resumeUrl: "/resume.pdf"
   }
