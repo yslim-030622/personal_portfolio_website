@@ -13,6 +13,7 @@ import {PresentationPreview} from "./presentation-preview";
 import {motion, useMotionValue, useTransform} from "motion/react";
 import Image from "next/image";
 import {Children, type ReactNode, useRef, useState, useEffect, createContext, useContext, useMemo} from "react";
+import {usePrefersReducedMotion} from "./use-prefers-reduced-motion";
 
 const CardActiveContext = createContext(false);
 
@@ -33,6 +34,7 @@ function isFilledEntry<T extends {status: string}>(
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const VP = {once: true, margin: "0px 0px -80px 0px", amount: 0.06} as const;
+const TOUCH_SCROLL_MULTIPLIER = 1.55;
 
 function Section({eyebrow, children, className, animateContent = true}: SectionProps) {
   
@@ -326,10 +328,22 @@ function CardStack({
   const [activeIndex, setActiveIndex] = useState(0);
   const [isSectionSticky, setIsSectionSticky] = useState(false);
   const [isPastEnd, setIsPastEnd] = useState(false);
+  const [isTouchScroll, setIsTouchScroll] = useState(false);
   const stateRef = useRef({activeIndex: 0, isSectionSticky: false, isPastEnd: false});
   const snapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isSnappingRef = useRef(false);
   const scrollSessionStartCard = useRef(0);
+  const effectiveScrollVH = scrollVH * (isTouchScroll ? TOUCH_SCROLL_MULTIPLIER : 1);
+
+  useEffect(() => {
+    const coarse = window.matchMedia("(pointer: coarse)");
+    const updatePointerMode = () => setIsTouchScroll(coarse.matches);
+
+    updatePointerMode();
+    coarse.addEventListener("change", updatePointerMode);
+
+    return () => coarse.removeEventListener("change", updatePointerMode);
+  }, []);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -339,7 +353,7 @@ function CardStack({
     const getStackMetrics = () => {
       // Find the distance from top of container to top of viewport
       const rect = container.getBoundingClientRect();
-      const activeScrollHeight = (cards.length - 1) * window.innerHeight * (scrollVH / 100);
+      const activeScrollHeight = (cards.length - 1) * window.innerHeight * (effectiveScrollVH / 100);
       const totalScrollHeight = activeScrollHeight + window.innerHeight * (pauseVH / 100);
       const rawProgress = activeScrollHeight > 0
         ? Math.max(0, Math.min(1, -rect.top / activeScrollHeight))
@@ -420,10 +434,11 @@ function CardStack({
       // Track where the session started and only allow ±1 from that position.
       const startCard = scrollSessionStartCard.current;
       const startProgress = startCard * step;
+      const intentThreshold = step * 0.28;
       let targetCardIndex: number;
-      if (rawProgress > startProgress + step * 0.1) {
+      if (rawProgress > startProgress + intentThreshold) {
         targetCardIndex = Math.min(cards.length - 1, startCard + 1);
-      } else if (rawProgress < startProgress - step * 0.1) {
+      } else if (rawProgress < startProgress - intentThreshold) {
         targetCardIndex = Math.max(0, startCard - 1);
       } else {
         targetCardIndex = startCard;
@@ -441,7 +456,7 @@ function CardStack({
       window.setTimeout(() => {
         isSnappingRef.current = false;
         scrollSessionStartCard.current = targetCardIndex;
-      }, 700);
+      }, 950);
     };
 
     const scheduleUpdate = () => {
@@ -454,7 +469,7 @@ function CardStack({
 
     const scheduleSnap = () => {
       if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
-      snapTimerRef.current = setTimeout(snapToNearestCard, 350);
+      snapTimerRef.current = setTimeout(snapToNearestCard, 520);
     };
 
     update();
@@ -471,7 +486,7 @@ function CardStack({
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', scheduleUpdate);
     };
-  }, [cards.length, scrollYProgress, scrollVH, pauseVH]);
+  }, [cards.length, scrollYProgress, effectiveScrollVH, pauseVH]);
 
   if (cards.length <= 1) {
     return <div className={className ?? ""}>{cards}</div>;
@@ -484,7 +499,7 @@ function CardStack({
     <div
       className={`card-stack-scroll relative w-full ${className ?? ""} z-10`}
       ref={containerRef}
-      style={{ height: `calc(${(cards.length - 1) * scrollVH}vh + 100vh + ${pauseVH}vh)` }}
+      style={{ height: `calc(${(cards.length - 1) * effectiveScrollVH}vh + 100vh + ${pauseVH}vh)` }}
     >
       <div className="card-stack-sticky sticky top-0 h-[100svh] flex items-center justify-center perspective-[1200px]">
         <div className="card-stack-stage relative mx-auto h-full max-w-[1100px] w-full">
@@ -620,6 +635,58 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
   );
 }
 
+function WorkRevealItem({
+  children,
+  index,
+  reduce
+}: {
+  children: ReactNode;
+  index: number;
+  reduce: boolean;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const shouldShow = reduce || isVisible;
+
+  useEffect(() => {
+    if (reduce) {
+      return;
+    }
+
+    const node = ref.current;
+    if (!node) return;
+
+    if (!("IntersectionObserver" in window)) {
+      const id = setTimeout(() => setIsVisible(true), 0);
+      return () => clearTimeout(id);
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      {rootMargin: "0px 0px -4% 0px", threshold: 0.08}
+    );
+
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, [reduce]);
+
+  return (
+    <div
+      className={`work-card-list-item ${shouldShow ? "is-visible" : ""}`}
+      ref={ref}
+      style={{transitionDelay: reduce ? "0ms" : `${index * 100}ms`}}
+    >
+      {children}
+    </div>
+  );
+}
+
 export function WorkSection({
   eyebrow,
   items
@@ -629,24 +696,22 @@ export function WorkSection({
   pauseVH?: number;
 }) {
   const filled = items.filter(isFilledEntry);
+  const reduce = usePrefersReducedMotion();
 
   return (
     <Section className="work-list-section" eyebrow={eyebrow} animateContent={false}>
       <div className="work-card-list">
         {filled.map((item, idx) => (
-          <motion.div
-            className="work-card-list-item"
-            initial={{opacity: 0, y: 48}}
+          <WorkRevealItem
+            index={idx}
             key={`${item.company}-${item.dates}`}
-            transition={{duration: 0.72, ease: EASE}}
-            viewport={VP}
-            whileInView={{opacity: 1, y: 0}}
+            reduce={reduce}
           >
             <WorkItem
               item={item}
               colorValue={WORK_CARD_COLORS[idx % WORK_CARD_COLORS.length]}
             />
-          </motion.div>
+          </WorkRevealItem>
         ))}
       </div>
     </Section>
@@ -695,7 +760,7 @@ function ProjectScreenshotPreview({
       <div aria-label={`${title} app screenshots`} className="clearsplit-showcase-stage">
         <Image
           alt={images[0].alt}
-          className="project-preview-image"
+          className={`project-preview-image ${imageFit === "contain" ? "project-preview-image-contain" : ""}`}
           fill
           priority
           sizes="(max-width: 768px) 84vw, 720px"
