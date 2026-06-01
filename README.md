@@ -6,6 +6,14 @@
 
 Personal portfolio site built with Next.js 15 App Router. English is served at `/` and Korean at `/ko`. All portfolio copy lives in `content/*.ts` — no CMS, no database.
 
+## Preview
+
+| Desktop | Mobile |
+| ------- | ------ |
+| ![Desktop hero preview](public/readme/portfolio-01-desktop-hero.jpg) | ![Mobile hero preview](public/readme/portfolio-04-mobile-hero.jpg) |
+| ![Desktop work section preview](public/readme/portfolio-02-desktop-work.jpg) | ![Mobile work section preview](public/readme/portfolio-05-mobile-work.jpg) |
+| ![Desktop projects section preview](public/readme/portfolio-03-desktop-projects.jpg) | ![Mobile projects section preview](public/readme/portfolio-06-mobile-projects.jpg) |
+
 ## Tech Stack
 
 | Layer | Technology | Why |
