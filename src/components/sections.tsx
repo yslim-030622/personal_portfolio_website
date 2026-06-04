@@ -7,15 +7,12 @@ import type {
   LocalizedProjectEntry,
   LocalizedWorkEntry
 } from "@/content";
-import type {MotionValue} from "motion/react";
 import {NotesAccordion} from "./notes-accordion";
 import {PresentationPreview} from "./presentation-preview";
-import {motion, useMotionValue, useTransform} from "motion/react";
+import {motion} from "motion/react";
 import Image from "next/image";
-import {Children, type ReactNode, useRef, useState, useEffect, createContext, useContext, useMemo} from "react";
+import {type ReactNode, useRef, useState, useEffect} from "react";
 import {usePrefersReducedMotion} from "./use-prefers-reduced-motion";
-
-const CardActiveContext = createContext(false);
 
 type SectionProps = {
   eyebrow: string;
@@ -34,7 +31,6 @@ function isFilledEntry<T extends {status: string}>(
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const VP = {once: true, margin: "0px 0px -80px 0px", amount: 0.06} as const;
-const TOUCH_SCROLL_MULTIPLIER = 1.55;
 
 function Section({eyebrow, children, className, animateContent = true}: SectionProps) {
   
@@ -196,320 +192,12 @@ function TechIcon({name}: {name: string}) {
   );
 }
 
-const STACK_CARD_COLORS = ['#5B6EAE', '#64748B'];
-const WORK_CARD_COLORS = STACK_CARD_COLORS;
-const PROJECT_CARD_COLORS = ['#4A7FA5', '#B05C6B', '#5A8F72', '#7C6B9A'];
-
-function StackCard({
-  children,
-  index,
-  activeIndex,
-  total,
-  scrollYProgress,
-}: {
-  children: ReactNode;
-  index: number;
-  activeIndex: number;
-  total: number;
-  scrollYProgress: MotionValue<number>;
-}) {
-  const PEEK_VH      = 2.35;
-  const ENTRY_Y      = 88;
-  const PEEK_OPACITY = 0.90;
-  const NAV_OFFSET   = 0;
-  const step         = total > 1 ? 1 / (total - 1) : 1;
-  const holdRatio    = 0.38;
-
-  const points = useMemo(() => {
-    if (total <= 1) return [0];
-
-    const ranges = [0];
-    for (let i = 0; i < total - 1; i++) {
-      const start = i * step;
-      const hold = Math.min(start + step * holdRatio, (i + 1) * step - 0.0001);
-      const end = (i + 1) * step;
-      if (hold > ranges[ranges.length - 1]) ranges.push(hold);
-      ranges.push(end);
-    }
-    return ranges;
-  }, [holdRatio, step, total]);
-
-  const pointIndex = (progress: number) => Math.min(total - 1, Math.floor(progress / step + 0.0001));
-
-  const yAt = (pi: number) => {
-    if (pi < index) return `${ENTRY_Y}vh`;
-    const depth       = pi - index;
-    const activeShift = pi * (PEEK_VH / 2);
-    return `${activeShift - depth * PEEK_VH + NAV_OFFSET}vh`;
-  };
-
-  // Scale: active at 1, peeked cards shrink slightly
-  const scaleAt = (pi: number) => {
-    if (pi <= index) return 1;
-    return Math.max(0.86, 1 - (pi - index) * 0.03);
-  };
-
-  const yValues = points.map((point) => yAt(pointIndex(point)));
-  const scaleValues = points.map((point) => scaleAt(pointIndex(point)));
-
-  // Opacity: smooth transition without dipping to 0 when moving to the background
-  const opacityIns: number[] = [];
-  const opacityOuts: number[] = [];
-
-  if (index === 0) {
-    opacityIns.push(0); opacityOuts.push(1);
-  } else {
-    const prevP       = (index - 1) * step;
-    const fadeInStart = prevP + 0.12 * step; // Start fading in slightly after it begins moving
-    
-    if (prevP > 0) {
-      opacityIns.push(0); opacityOuts.push(0);
-    }
-    opacityIns.push(prevP);       opacityOuts.push(0);
-    opacityIns.push(fadeInStart); opacityOuts.push(0.18);
-    opacityIns.push(index * step); opacityOuts.push(1);
-  }
-
-  for (let pi = index + 1; pi < total; pi++) {
-    const currP  = pi * step;
-    const holdP  = Math.max(0, currP - step * (1 - holdRatio));
-    const depth  = pi - index;
-    const peekOp = Math.max(0.56, PEEK_OPACITY - (depth - 1) * 0.08);
-    opacityIns.push(holdP);
-    opacityOuts.push(pi === index + 1 ? 1 : peekOp);
-    opacityIns.push(currP);
-    opacityOuts.push(peekOp);
-  }
-
-  const y       = useTransform(scrollYProgress, points,     yValues);
-  const scale   = useTransform(scrollYProgress, points,     scaleValues);
-  const opacity = useTransform(scrollYProgress, opacityIns, opacityOuts);
-
-  const zIndex   = index + 1;
-  const isActive = index === activeIndex;
-
-  
-
-  return (
-    <CardActiveContext.Provider value={isActive}>
-      <div
-        aria-label={`Card ${index + 1} of ${total}`}
-        aria-hidden={!isActive}
-        className="card-stack-item"
-        data-active={isActive}
-        style={{ zIndex, pointerEvents: isActive ? "auto" : "none" }}
-      >
-        <motion.div
-          className="card-stack-drag will-change-transform"
-          style={{ y, scale, opacity, transformOrigin: "center center" }}
-        >
-          {children}
-        </motion.div>
-      </div>
-    </CardActiveContext.Provider>
-  );
-}
-
-function CardStack({
-  children,
-  className,
-  pauseVH = 0,
-  scrollVH = 100,
-}: {
-  children: ReactNode;
-  className?: string;
-  pauseVH?: number;
-  scrollVH?: number;
-}) {
-  const cards = Children.toArray(children);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const scrollYProgress = useMotionValue(0);
-
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isTouchScroll, setIsTouchScroll] = useState(false);
-  const stateRef = useRef({activeIndex: 0, isSectionSticky: false, isPastEnd: false});
-  const snapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isSnappingRef = useRef(false);
-  const scrollSessionStartCard = useRef(0);
-  const effectiveScrollVH = scrollVH * (isTouchScroll ? TOUCH_SCROLL_MULTIPLIER : 1);
-
-  useEffect(() => {
-    const coarse = window.matchMedia("(pointer: coarse)");
-    const updatePointerMode = () => setIsTouchScroll(coarse.matches);
-
-    updatePointerMode();
-    coarse.addEventListener("change", updatePointerMode);
-
-    return () => coarse.removeEventListener("change", updatePointerMode);
-  }, []);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    let frame = 0;
-
-    const getStackMetrics = () => {
-      // Find the distance from top of container to top of viewport
-      const rect = container.getBoundingClientRect();
-      const activeScrollHeight = (cards.length - 1) * window.innerHeight * (effectiveScrollVH / 100);
-      const totalScrollHeight = activeScrollHeight + window.innerHeight * (pauseVH / 100);
-      const rawProgress = activeScrollHeight > 0
-        ? Math.max(0, Math.min(1, -rect.top / activeScrollHeight))
-        : 1;
-
-      return {
-        rect,
-        activeScrollHeight,
-        totalScrollHeight,
-        rawProgress,
-        stackTop: window.scrollY + rect.top
-      };
-    };
-
-    const update = () => {
-      const {rect, totalScrollHeight, rawProgress} = getStackMetrics();
-      // Don't activate any card until the sticky card has reached the top of the viewport
-      // Use a small tolerance for sub-pixel rounding (rect.top is often ~0.2 at the boundary)
-      if (rect.top > 2) {
-        if (stateRef.current.isSectionSticky) {
-          stateRef.current = {...stateRef.current, isSectionSticky: false, isPastEnd: false};
-        }
-        return;
-      }
-
-      // Calculate how far we've scrolled inside this specific container
-      // Rect.top is 0 when the container hits the top of the viewport
-      // activeScrollHeight is the scroll amount needed to fully switch all cards
-
-      // Once we've scrolled past the active+pause zone the sticky element starts
-      // moving up out of the viewport — hide the arrow to avoid it floating mid-screen.
-      const nextIsPastEnd = -rect.top >= totalScrollHeight;
-      if (!stateRef.current.isSectionSticky) {
-        stateRef.current = {...stateRef.current, isSectionSticky: true};
-      }
-      if (nextIsPastEnd !== stateRef.current.isPastEnd) {
-        stateRef.current = {...stateRef.current, isPastEnd: nextIsPastEnd};
-      }
-
-      scrollYProgress.set(rawProgress);
-
-      if (cards.length <= 1) {
-        if (stateRef.current.activeIndex !== 0) {
-          stateRef.current = {...stateRef.current, activeIndex: 0};
-          setActiveIndex(0);
-        }
-        return;
-      }
-      const step = 1 / (cards.length - 1);
-      const holdRatio = 0.38;
-      const segment = Math.min(cards.length - 2, Math.max(0, Math.floor(rawProgress / step)));
-      const segmentProgress = (rawProgress - segment * step) / step;
-      const nextActiveIndex = rawProgress >= 1
-        ? cards.length - 1
-        : segment + (segmentProgress > holdRatio + (1 - holdRatio) * 0.5 ? 1 : 0);
-      if (nextActiveIndex !== stateRef.current.activeIndex) {
-        stateRef.current = {...stateRef.current, activeIndex: nextActiveIndex};
-        setActiveIndex(nextActiveIndex);
-      }
-    };
-
-    const snapToNearestCard = () => {
-      if (cards.length <= 1 || isSnappingRef.current) return;
-      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-      const coarse = window.matchMedia("(pointer: coarse)");
-      if (reduce.matches || !coarse.matches) return;
-
-      const {rect, activeScrollHeight, rawProgress, stackTop} = getStackMetrics();
-      if (rect.top > 2 || -rect.top < 8 || -rect.top > activeScrollHeight - 8) return;
-
-      const step = 1 / (cards.length - 1);
-
-      // On mobile: limit to one card per scroll gesture to prevent flying past multiple cards.
-      // Track where the session started and only allow ±1 from that position.
-      const startCard = scrollSessionStartCard.current;
-      const startProgress = startCard * step;
-      const intentThreshold = step * 0.28;
-      let targetCardIndex: number;
-      if (rawProgress > startProgress + intentThreshold) {
-        targetCardIndex = Math.min(cards.length - 1, startCard + 1);
-      } else if (rawProgress < startProgress - intentThreshold) {
-        targetCardIndex = Math.max(0, startCard - 1);
-      } else {
-        targetCardIndex = startCard;
-      }
-
-      const nearestProgress = targetCardIndex * step;
-      const target = stackTop + nearestProgress * activeScrollHeight;
-      if (Math.abs(window.scrollY - target) < 3) {
-        scrollSessionStartCard.current = targetCardIndex;
-        return;
-      }
-
-      isSnappingRef.current = true;
-      window.scrollTo({top: target, behavior: "smooth"});
-      window.setTimeout(() => {
-        isSnappingRef.current = false;
-        scrollSessionStartCard.current = targetCardIndex;
-      }, 950);
-    };
-
-    const scheduleUpdate = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
-        update();
-      });
-    };
-
-    const scheduleSnap = () => {
-      if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
-      snapTimerRef.current = setTimeout(snapToNearestCard, 520);
-    };
-
-    update();
-    const onScroll = () => {
-      scheduleUpdate();
-      scheduleSnap();
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', scheduleUpdate, { passive: true });
-
-    return () => {
-      if (frame) window.cancelAnimationFrame(frame);
-      if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', scheduleUpdate);
-    };
-  }, [cards.length, scrollYProgress, effectiveScrollVH, pauseVH]);
-
-  if (cards.length <= 1) {
-    return <div className={className ?? ""}>{cards}</div>;
-  }
-
-  return (
-    <div
-      className={`card-stack-scroll relative w-full ${className ?? ""} z-10`}
-      ref={containerRef}
-      style={{ height: `calc(${(cards.length - 1) * effectiveScrollVH}vh + 100vh + ${pauseVH}vh)` }}
-    >
-      <div className="card-stack-sticky sticky top-0 h-[100svh] flex items-center justify-center perspective-[1200px]">
-        <div className="card-stack-stage relative mx-auto h-full max-w-[1100px] w-full">
-          {cards.map((child, i) => (
-            <StackCard
-              key={i}
-              index={i}
-              activeIndex={activeIndex}
-              total={cards.length}
-              scrollYProgress={scrollYProgress}
-            >
-              {child}
-            </StackCard>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+const WORK_CARD_COLORS = ['#1e3352', '#1e3d30'];
+const WORK_CARD_GRADIENTS = [
+  'linear-gradient(135deg, #1e3352 0%, #2d5278 100%)',
+  'linear-gradient(135deg, #1e3d30 0%, #2a5a44 100%)',
+];
+const PROJECT_CARD_COLORS = ['#3F86A6', '#A95364', '#5F8C6B', '#7B6AA0', '#8A724E'];
 
 function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string}) {
   const previewLinks = item.links?.filter(isPdfLink);
@@ -523,7 +211,7 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
   return (
     <article
       className="card-colored liquid-card group grid gap-3 rounded-[28px] p-5 transition duration-300 md:grid-cols-[260px_1fr] md:gap-9 md:p-9"
-      style={{"--card-color": colorValue} as React.CSSProperties}
+      style={{"--card-color": colorValue, "--card-gradient": colorValue === WORK_CARD_COLORS[0] ? WORK_CARD_GRADIENTS[0] : WORK_CARD_GRADIENTS[1]} as React.CSSProperties}
     >
       {/* Left column */}
       <div className="border-b border-white/20 pb-3 md:flex md:h-full md:flex-col md:border-b-0 md:border-r md:pb-0 md:pr-9">
@@ -712,17 +400,16 @@ function ProjectScreenshotPreview({
   animateOnMount?: boolean;
   imageFit?: "cover" | "contain";
 }) {
-  const isActive = useContext(CardActiveContext);
   const hasPlayedRef = useRef(false);
   const [hasPlayed, setHasPlayed] = useState(animateOnMount);
 
   useEffect(() => {
-    if ((animateOnMount || isActive) && !hasPlayedRef.current) {
+    if (animateOnMount && !hasPlayedRef.current) {
       hasPlayedRef.current = true;
       const id = setTimeout(() => setHasPlayed(true), 0);
       return () => clearTimeout(id);
     }
-  }, [animateOnMount, isActive]);
+  }, [animateOnMount]);
 
   if (!images.length) {
     return null;
@@ -736,7 +423,7 @@ function ProjectScreenshotPreview({
         aspectRatio: `${images[0].width} / ${images[0].height}`
       } as React.CSSProperties}
       initial={{opacity: 0, y: 20}}
-      animate={hasPlayed || isActive ? {opacity: 1, y: 0} : {opacity: 0, y: 20}}
+      animate={hasPlayed ? {opacity: 1, y: 0} : {opacity: 0, y: 20}}
       transition={{duration: 0.72, delay: 0.22, ease: [0.22, 1, 0.36, 1]}}
     >
       <div aria-label={`${title} app screenshots`} className="clearsplit-showcase-stage">
@@ -803,7 +490,7 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
       {/* Right column */}
       <div className="project-card-body min-w-0 flex flex-col h-full md:justify-center">
         {item.previewImages?.length ? (
-          <ProjectScreenshotPreview className="order-1 mb-4 mt-0 md:mb-6" images={item.previewImages} title={item.title} />
+          <ProjectScreenshotPreview animateOnMount className="order-1 mb-4 mt-0 md:mb-6" images={item.previewImages} title={item.title} />
         ) : null}
         {previewLinks?.map((link) => (
           <div key={link.label} className="order-1 mb-4 mt-0 md:mb-6">
@@ -827,6 +514,58 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
   );
 }
 
+function ProjectRevealItem({
+  children,
+  index,
+  reduce
+}: {
+  children: ReactNode;
+  index: number;
+  reduce: boolean;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const shouldShow = reduce || isVisible;
+
+  useEffect(() => {
+    if (reduce) {
+      return;
+    }
+
+    const node = ref.current;
+    if (!node) return;
+
+    if (!("IntersectionObserver" in window)) {
+      const id = setTimeout(() => setIsVisible(true), 0);
+      return () => clearTimeout(id);
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      {rootMargin: "0px 0px -6% 0px", threshold: 0.1}
+    );
+
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, [reduce]);
+
+  return (
+    <div
+      className={`project-card-list-item ${shouldShow ? "is-visible" : ""}`}
+      ref={ref}
+      style={{transitionDelay: reduce ? "0ms" : `${index * 80}ms`}}
+    >
+      {children}
+    </div>
+  );
+}
+
 export function ProjectsSection({
   eyebrow,
   items
@@ -835,18 +574,24 @@ export function ProjectsSection({
   items: LocalizedProjectEntry[];
 }) {
   const filled = items.filter(isFilledEntry) as FilledProjectEntry[];
+  const reduce = usePrefersReducedMotion();
 
   return (
-    <Section className="deck-section" eyebrow={eyebrow} animateContent={false}>
-      <CardStack scrollVH={112}>
+    <Section className="projects-list-section" eyebrow={eyebrow} animateContent={false}>
+      <div className="project-card-list">
         {filled.map((item, idx) => (
-          <ProjectItem
-            item={item}
-            colorValue={PROJECT_CARD_COLORS[idx % PROJECT_CARD_COLORS.length]}
+          <ProjectRevealItem
+            index={idx}
             key={item.title}
-          />
+            reduce={reduce}
+          >
+            <ProjectItem
+              item={item}
+              colorValue={PROJECT_CARD_COLORS[idx % PROJECT_CARD_COLORS.length]}
+            />
+          </ProjectRevealItem>
         ))}
-      </CardStack>
+      </div>
     </Section>
   );
 }

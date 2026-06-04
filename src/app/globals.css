@@ -370,7 +370,7 @@ html[lang="ko"] .font-display {
 .liquid-card.card-colored,
 html[data-theme="light"] .card-stack-drag > .liquid-card.card-colored,
 html[data-theme="dark"] .card-stack-drag > .liquid-card.card-colored {
-  background: var(--card-color, #4f46e5) !important;
+  background: var(--card-gradient, var(--card-color, #4f46e5)) !important;
   border: 1px solid color-mix(in srgb, var(--card-color) 50%, rgb(255 255 255 / 0.20)) !important;
   box-shadow:
     -4px 4px 12px rgb(0 0 0 / 0.24),
@@ -617,6 +617,46 @@ html[data-theme="dark"] .liquid-card.card-colored:hover {
 .project-card .tech-icon-img {
   width: 18px;
   height: 18px;
+}
+
+.projects-list-section {
+  padding-top: clamp(4rem, 8svh, 6.5rem) !important;
+  padding-bottom: clamp(4rem, 8svh, 6.5rem) !important;
+}
+
+.project-card-list {
+  display: grid;
+  gap: clamp(4.5rem, 11vw, 8rem);
+  width: 100%;
+  margin-inline: auto;
+}
+
+.project-card-list-item {
+  opacity: 0;
+  transform:
+    translate3d(0, 64px, 0)
+    scale(0.982);
+  transform-origin: center 58%;
+  transition:
+    opacity 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+  width: min(100%, 1040px);
+  margin-inline: auto;
+  will-change: opacity, transform;
+}
+
+.project-card-list-item.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.project-card-list-item > .project-card {
+  min-height: clamp(28rem, 62svh, 42rem);
+}
+
+.project-card-list .clearsplit-showcase {
+  width: min(100%, 44rem);
+  flex-shrink: 0;
 }
 
 .work-list-section {

@@ -78,7 +78,7 @@ export const work: RawWorkEntry[] = [
     location: {en: "Boston remote", ko: "보스턴 원격"},
     role: {en: "AI Automation Developer", ko: "AI Automation Developer"},
     paragraph: {
-      en: "Collaboration project between LikeLion Madison Chapter and MoDoc AI, a health-tech startup. I'm building an automated pipeline that converts child medical text content into short videos and uploads them to YouTube.",
+      en: "Collaboration project between LikeLion Madison Chapter and MoDoc AI, a health-tech startup. I built a LangGraph-based AI pipeline that turns child medical text content into short videos.",
       ko: "학교 산하 멋쟁이사자처럼 동아리와 헬스케어 스타트업 MoDoc AI 간의 산학협력 프로젝트입니다. 아이들 대상의 의료 콘텐츠를 숏폼 영상으로 변환을 자동화하고, 포스팅하는 파이프라인을 만들었습니다."
     },
     highlights: [
