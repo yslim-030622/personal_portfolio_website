@@ -316,44 +316,12 @@ function WorkRevealItem({
   index: number;
   reduce: boolean;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const shouldShow = reduce || isVisible;
-
-  useEffect(() => {
-    if (reduce) {
-      return;
-    }
-
-    const node = ref.current;
-    if (!node) return;
-
-    if (!("IntersectionObserver" in window)) {
-      const id = setTimeout(() => setIsVisible(true), 0);
-      return () => clearTimeout(id);
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      {rootMargin: "0px 0px -4% 0px", threshold: 0.08}
-    );
-
-    observer.observe(node);
-
-    return () => observer.disconnect();
-  }, [reduce]);
+  if (reduce) {
+    return <div className="work-card-list-item work-card-list-item--static">{children}</div>;
+  }
 
   return (
-    <div
-      className={`work-card-list-item ${shouldShow ? "is-visible" : ""}`}
-      ref={ref}
-      style={{transitionDelay: reduce ? "0ms" : `${index * 100}ms`}}
-    >
+    <div className="work-card-list-item" style={{zIndex: index + 1}}>
       {children}
     </div>
   );
