@@ -274,7 +274,7 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
       <div className="project-card-body min-w-0 flex flex-col h-full md:justify-center">
         {logo ? (
           <div className="mb-4 md:mb-5">
-            <Image alt={item.company + " logo"} src={logo} width={120} height={40} className="h-8 w-auto object-contain object-left opacity-90" />
+            <Image alt={item.company + " logo"} src={logo} width={900} height={500} className="h-14 w-auto rounded-lg object-contain object-left md:h-16" />
           </div>
         ) : null}
         {item.previewImages?.length ? (
