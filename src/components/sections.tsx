@@ -307,7 +307,108 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
   );
 }
 
-function WorkRevealItem({
+/** How many cards deep a card may sink before it stops shrinking further. */
+const STACK_MAX_DEPTH = 3;
+
+/**
+ * Drives the sticky card stack: each card reports how far it has been covered by
+ * the card after it, and the accumulated depth is written to `--stack-depth` so
+ * CSS can shrink and shade the layers underneath.
+ */
+function useCardStack(reduce: boolean) {
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const list = listRef.current;
+    if (reduce || !list) {
+      return;
+    }
+
+    let items: HTMLElement[] = [];
+    let metrics: {stickyTop: number; height: number}[] = [];
+    let frame = 0;
+
+    const measure = () => {
+      items = Array.from(list.querySelectorAll<HTMLElement>(".scroll-stack-item"));
+      metrics = items.map((item) => ({
+        stickyTop: Number.parseFloat(window.getComputedStyle(item).top) || 0,
+        height: (item.querySelector<HTMLElement>(".scroll-stack-inner") ?? item).offsetHeight
+      }));
+
+      // A sticky card unpins once `stickyTop + boxHeight` no longer fits above the
+      // list's bottom edge. Cards differ in height, so without this padding the
+      // tallest one would tear off the stack first.
+      const release = metrics.map(({stickyTop, height}) => stickyTop + height);
+      const latest = Math.max(...release, 0);
+      items.forEach((item, index) => {
+        item.style.setProperty("--stack-tail", `${Math.round(latest - release[index])}px`);
+      });
+    };
+
+    const apply = () => {
+      frame = 0;
+
+      const covered = new Array<number>(items.length).fill(0);
+      for (let index = 0; index < items.length - 1; index += 1) {
+        const {stickyTop, height} = metrics[index];
+        // The next card starts covering this one once its top passes this card's
+        // bottom, and finishes once it settles on its own sticky offset.
+        const span = height - (metrics[index + 1].stickyTop - stickyTop);
+        if (span <= 0) {
+          continue;
+        }
+
+        const nextTop = items[index + 1].getBoundingClientRect().top;
+        const ratio = (stickyTop + height - nextTop) / span;
+        covered[index] = Math.min(Math.max(ratio, 0), 1);
+      }
+
+      let depth = 0;
+      for (let index = items.length - 1; index >= 0; index -= 1) {
+        depth += covered[index];
+        items[index].style.setProperty(
+          "--stack-depth",
+          Math.min(depth, STACK_MAX_DEPTH).toFixed(3)
+        );
+      }
+    };
+
+    const schedule = () => {
+      if (!frame) {
+        frame = window.requestAnimationFrame(apply);
+      }
+    };
+
+    const remeasure = () => {
+      measure();
+      schedule();
+    };
+
+    measure();
+    apply();
+
+    window.addEventListener("scroll", schedule, {passive: true});
+    window.addEventListener("resize", remeasure);
+
+    const observer = new ResizeObserver(remeasure);
+    observer.observe(list);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", remeasure);
+      observer.disconnect();
+      items.forEach((item) => {
+        item.style.removeProperty("--stack-depth");
+        item.style.removeProperty("--stack-tail");
+      });
+    };
+  }, [reduce]);
+
+  return listRef;
+}
+
+function StackCardItem({
   children,
   index,
   reduce
@@ -316,13 +417,52 @@ function WorkRevealItem({
   index: number;
   reduce: boolean;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (reduce) {
+      return;
+    }
+
+    const node = ref.current;
+    if (!node) {
+      return;
+    }
+
+    if (!("IntersectionObserver" in window)) {
+      const id = setTimeout(() => setIsVisible(true), 0);
+      return () => clearTimeout(id);
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      {rootMargin: "0px 0px -6% 0px", threshold: 0.08}
+    );
+
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, [reduce]);
+
   if (reduce) {
-    return <div className="work-card-list-item work-card-list-item--static">{children}</div>;
+    return <div className="scroll-stack-item scroll-stack-item--static">{children}</div>;
   }
 
   return (
-    <div className="work-card-list-item" style={{zIndex: index + 1}}>
-      {children}
+    <div
+      className="scroll-stack-item"
+      ref={ref}
+      style={{zIndex: index + 1, "--stack-index": index} as React.CSSProperties}
+    >
+      <div className={`scroll-stack-enter ${isVisible ? "is-visible" : ""}`}>
+        <div className="scroll-stack-inner">{children}</div>
+      </div>
     </div>
   );
 }
@@ -337,12 +477,13 @@ export function WorkSection({
 }) {
   const filled = items.filter(isFilledEntry);
   const reduce = usePrefersReducedMotion();
+  const listRef = useCardStack(reduce);
 
   return (
     <Section className="work-list-section" eyebrow={eyebrow} animateContent={false}>
-      <div className="work-card-list">
+      <div className="work-card-list scroll-stack-list" ref={listRef}>
         {filled.map((item, idx) => (
-          <WorkRevealItem
+          <StackCardItem
             index={idx}
             key={`${item.company}-${item.dates}`}
             reduce={reduce}
@@ -351,8 +492,9 @@ export function WorkSection({
               item={item}
               colorValue={WORK_CARD_COLORS[idx % WORK_CARD_COLORS.length]}
             />
-          </WorkRevealItem>
+          </StackCardItem>
         ))}
+        {reduce ? null : <div aria-hidden="true" className="scroll-stack-spacer" />}
       </div>
     </Section>
   );
@@ -487,58 +629,6 @@ function ProjectItem({item, colorValue}: {item: FilledProjectEntry; colorValue: 
   );
 }
 
-function ProjectRevealItem({
-  children,
-  index,
-  reduce
-}: {
-  children: ReactNode;
-  index: number;
-  reduce: boolean;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const shouldShow = reduce || isVisible;
-
-  useEffect(() => {
-    if (reduce) {
-      return;
-    }
-
-    const node = ref.current;
-    if (!node) return;
-
-    if (!("IntersectionObserver" in window)) {
-      const id = setTimeout(() => setIsVisible(true), 0);
-      return () => clearTimeout(id);
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      {rootMargin: "0px 0px -6% 0px", threshold: 0.1}
-    );
-
-    observer.observe(node);
-
-    return () => observer.disconnect();
-  }, [reduce]);
-
-  return (
-    <div
-      className={`project-card-list-item ${shouldShow ? "is-visible" : ""}`}
-      ref={ref}
-      style={{transitionDelay: reduce ? "0ms" : `${index * 80}ms`}}
-    >
-      {children}
-    </div>
-  );
-}
-
 export function ProjectsSection({
   eyebrow,
   items
@@ -548,12 +638,13 @@ export function ProjectsSection({
 }) {
   const filled = items.filter(isFilledEntry) as FilledProjectEntry[];
   const reduce = usePrefersReducedMotion();
+  const listRef = useCardStack(reduce);
 
   return (
     <Section className="projects-list-section" eyebrow={eyebrow} animateContent={false}>
-      <div className="project-card-list">
+      <div className="project-card-list scroll-stack-list" ref={listRef}>
         {filled.map((item, idx) => (
-          <ProjectRevealItem
+          <StackCardItem
             index={idx}
             key={item.title}
             reduce={reduce}
@@ -562,8 +653,9 @@ export function ProjectsSection({
               item={item}
               colorValue={PROJECT_CARD_COLORS[idx % PROJECT_CARD_COLORS.length]}
             />
-          </ProjectRevealItem>
+          </StackCardItem>
         ))}
+        {reduce ? null : <div aria-hidden="true" className="scroll-stack-spacer" />}
       </div>
     </Section>
   );

@@ -624,33 +624,99 @@ html[data-theme="dark"] .liquid-card.card-colored:hover {
   padding-bottom: clamp(4rem, 8svh, 6.5rem) !important;
 }
 
-.project-card-list {
-  display: grid;
-  gap: clamp(4.5rem, 11vw, 8rem);
+/* ============ Scroll stack (work + projects) ============ */
+.scroll-stack-list {
+  --stack-top: clamp(4rem, 8vh, 6rem);
+  --stack-step: 20px;
+  --stack-scale-step: 0.042;
+  --stack-dim-step: 0.11;
+  --stack-radius: 28px;
+  --stack-gap: clamp(1.5rem, 4vw, 3rem);
+  display: flex;
+  flex-direction: column;
   width: 100%;
   margin-inline: auto;
 }
 
-.project-card-list-item {
-  opacity: 0;
-  transform:
-    translate3d(0, 64px, 0)
-    scale(0.982);
-  transform-origin: center 58%;
-  transition:
-    opacity 760ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+.scroll-stack-item {
+  position: sticky;
+  top: calc(var(--stack-top) + var(--stack-index, 0) * var(--stack-step));
   width: min(100%, 1040px);
   margin-inline: auto;
-  will-change: opacity, transform;
+  /* `--stack-tail` is measured in JS so every card's box bottom lands on the
+     container bottom at the same time, letting the finished stack lift off as
+     one deck instead of the front card peeling away first. */
+  padding-bottom: calc(var(--stack-gap) + var(--stack-tail, 0px));
 }
 
-.project-card-list-item.is-visible {
+/* Gives the last card room to stay pinned, so the completed stack holds for a
+   beat before it scrolls away. */
+.scroll-stack-spacer {
+  flex: 0 0 auto;
+  height: clamp(4rem, 14vh, 10rem);
+  pointer-events: none;
+}
+
+.scroll-stack-item--static {
+  position: relative;
+  top: auto;
+  z-index: auto !important;
+}
+
+.scroll-stack-enter {
+  opacity: 0;
+  transform: translate3d(0, 56px, 0);
+  transition:
+    opacity 720ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 720ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.scroll-stack-enter.is-visible {
   opacity: 1;
-  transform: translate3d(0, 0, 0) scale(1);
+  transform: translate3d(0, 0, 0);
 }
 
-.project-card-list-item > .project-card {
+.scroll-stack-inner {
+  position: relative;
+  transform-origin: top center;
+  transform: scale(clamp(0.82, calc(1 - var(--stack-depth, 0) * var(--stack-scale-step)), 1));
+  will-change: transform;
+}
+
+/* Shade cards as they sink into the stack so the layers read as separate sheets. */
+.scroll-stack-inner::after {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  content: "";
+  border-radius: var(--stack-radius);
+  background: #050a14;
+  opacity: clamp(0, calc(var(--stack-depth, 0) * var(--stack-dim-step)), 0.44);
+}
+
+/* The card above casts onto the sliver of the card below, so the stack needs an
+   upward shadow on top of the usual drop shadow. */
+.scroll-stack-inner > .card-colored,
+html[data-theme="dark"] .scroll-stack-inner > .card-colored {
+  box-shadow:
+    0 -14px 28px -14px rgb(0 0 0 / 0.55),
+    0 26px 50px -16px rgb(0 0 0 / 0.45),
+    0 10px 22px -8px rgb(0 0 0 / 0.32);
+}
+
+html[data-theme="light"] .scroll-stack-inner > .card-colored {
+  box-shadow:
+    0 -12px 24px -14px rgb(15 23 42 / 0.38),
+    0 26px 50px -16px rgb(15 23 42 / 0.32),
+    0 10px 22px -8px rgb(15 23 42 / 0.22);
+}
+
+.project-card-list {
+  gap: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+.project-card-list .scroll-stack-inner > .project-card {
   min-height: clamp(28rem, 62svh, 42rem);
 }
 
@@ -665,31 +731,11 @@ html[data-theme="dark"] .liquid-card.card-colored:hover {
 }
 
 .work-card-list {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin-inline: auto;
+  gap: clamp(1rem, 3vw, 2rem);
 }
 
-.work-card-list-item {
-  position: sticky;
-  top: clamp(4rem, 8vh, 6rem);
-  width: min(100%, 1040px);
-  margin-inline: auto;
-  padding-bottom: clamp(1.5rem, 4vw, 3rem);
-}
-
-.work-card-list-item > .card-colored {
+.work-card-list .scroll-stack-inner > .card-colored {
   min-height: clamp(28rem, 62svh, 42rem);
-  box-shadow:
-    0 24px 48px -12px rgb(0 0 0 / 0.35),
-    0 8px 20px -6px rgb(0 0 0 / 0.28);
-}
-
-.work-card-list-item--static {
-  position: relative;
-  top: auto;
-  z-index: auto !important;
 }
 
 .work-card-list .clearsplit-showcase {
@@ -916,14 +962,28 @@ html[data-theme="dark"] .liquid-card.card-colored:hover {
     padding: clamp(0.85rem, 4vw, 1rem);
   }
 
-  .work-card-list-item {
-    width: min(100%, calc(100vw - 4.5rem));
-    top: clamp(3.5rem, 7vh, 5rem);
-    padding-bottom: 1.5rem;
+  .scroll-stack-list {
+    --stack-top: clamp(3.5rem, 7vh, 5rem);
+    --stack-step: 14px;
+    --stack-scale-step: 0.038;
+    --stack-dim-step: 0.10;
+    --stack-gap: 1.5rem;
   }
 
-  .work-card-list-item > .card-colored {
+  .scroll-stack-spacer {
+    height: clamp(2.5rem, 10vh, 6rem);
+  }
+
+  .work-card-list .scroll-stack-item {
+    width: min(100%, calc(100vw - 4.5rem));
+  }
+
+  .work-card-list .scroll-stack-inner > .card-colored {
     min-height: 0;
+  }
+
+  .project-card-list {
+    gap: clamp(1.75rem, 6vw, 3rem);
   }
 
   .card-colored .card-title-glass {
@@ -1484,6 +1544,25 @@ html[data-theme="light"][lang="ko"] .hero-name-glow:hover {
   .hero-name-glow::before,
   .hero-name-glow::after {
     transition: none;
+  }
+
+  .scroll-stack-item {
+    position: relative;
+    top: auto;
+  }
+
+  .scroll-stack-enter {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .scroll-stack-inner {
+    transform: none;
+  }
+
+  .scroll-stack-inner::after {
+    display: none;
   }
 
   .link-underline::after {
