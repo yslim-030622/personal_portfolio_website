@@ -31,8 +31,8 @@ export const hero = {
     }
   },
   subline: {
-    en: "Hi! My full name is Yeongseok Lim but you can call me Eddie :) I was born in South Korea, continued my education in the U.S. starting in high school. I recently graduated from the University of Wisconsin-Madison with a degree in Computer Science. I'm interested in backend systems and AI, and this site is where I document what I build. I'm currently working as an AX Engineer at LG CNS in Seoul. Let's stay connected!",
-    ko: "저는 한국에서 태어나 미국에서 고등학교부터 재학했고, 최근 위스콘신 대학교에서 컴퓨터 과학 전공으로 졸업했습니다. 제가 관심을 가지고 있는 분야는 백엔드 시스템과 인공지능이고, 이 웹사이트는 제가 만든 것과 그에 관한 느낀 점들을 정리하는 공간입니다. 현재는 LG CNS에서 AX Engineer로 근무하고 있습니다."
+    en: "Hi! My full name is Yeongseok Lim but you can call me Eddie :) I was born in South Korea, continued my education in the U.S. starting in high school, and studied Computer Science at the University of Wisconsin-Madison. I'm interested in backend systems and AI, and this site is where I document what I build. I also enjoy connecting with people from different fields and talking about the latest tech. I'm currently working as an AX Engineer at LG CNS in Seoul. Let's stay connected!",
+    ko: "저는 한국에서 태어나 미국에서 고등학교부터 재학했고, 위스콘신 대학교에서 컴퓨터 과학을 전공했습니다. 제가 관심을 가지고 있는 분야는 백엔드 시스템과 인공지능이고, 이 웹사이트는 제가 만든 것과 그에 관한 느낀 점들을 정리하는 공간입니다. 다양한 분야의 사람들과 소통하는 것도 좋아하고, 최신 기술에 대해 이야기하는 것도 좋아합니다. 현재는 LG CNS에서 AX Engineer로 근무하고 있습니다."
   },
   image: {
     src: "/photo1.jpg",
