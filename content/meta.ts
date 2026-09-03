@@ -5,7 +5,7 @@ export const footer = {
     en: "Thanks for visiting!",
     ko: "방문해주셔서 감사합니다!"
   },
-  line2: "ylim76@wisc.edu · linkedin · github"
+  line2: "yeongseoklim@lgcns.com · linkedin · github"
 } satisfies RawPortfolioContent["footer"];
 
 export const seo = {
@@ -22,7 +22,7 @@ export const seo = {
       en: "Yeongseok Lim",
       ko: "임영석"
     },
-    email: "ylim76@wisc.edu",
+    email: "yeongseoklim@lgcns.com",
     location: "Seoul, South Korea",
     githubUrl: "https://github.com/yslim-030622",
     linkedInUrl: "https://www.linkedin.com/in/yeongseok-lim",

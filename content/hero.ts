@@ -46,7 +46,7 @@ export const hero = {
   links: [
     {
       label: {en: "Email", ko: "Email"},
-      href: "mailto:ylim76@wisc.edu",
+      href: "mailto:yeongseoklim@lgcns.com",
       ariaLabel: {en: "Email Yeongseok Lim", ko: "임영석에게 이메일 보내기"}
     },
     {
