@@ -9,21 +9,21 @@ export const work: RawWorkEntry[] = [
     location: {en: "Seoul", ko: "서울"},
     role: {en: "Full-time AX Engineer", ko: "AX Engineer"},
     paragraph: {
-      en: "LG CNS is a Korean IT services company specializing in digital and AI transformation (DX/AX). As an AX Engineer, I work on a next-generation banking system project for Mizuho Bank's Singapore corporation, analyzing client requirements and existing systems to help design and build the new platform.",
-      ko: "LG CNS는 디지털/AI 전환(DX/AX)에 특화된 국내 IT 서비스 기업입니다. AX Engineer로서 미즈호 은행 싱가포르 법인의 차세대 시스템 구축 프로젝트에 참여해, 고객 요구사항과 기존 시스템을 분석하고 이를 바탕으로 신규 시스템을 설계 및 구축하고 있습니다."
+      en: "LG CNS is a Korean IT services company specializing in digital and AI transformation (DX/AX). As an AX Engineer, I'm developing a next-generation banking system for Mizuho Bank's Singapore corporation, analyzing client requirements and existing systems to design and build the new platform.",
+      ko: "LG CNS는 디지털/AI 전환(DX/AX)에 특화된 국내 IT 서비스 기업입니다. AX Engineer로서 미즈호 은행 싱가포르 법인의 차세대 시스템을 개발하고 있으며, 고객 요구사항과 기존 시스템을 분석하고 이를 바탕으로 신규 시스템을 설계 및 개발하고 있습니다."
     },
     highlights: [
       {
-        en: "Analyzed business requirements and existing system architecture for Mizuho Bank's Singapore corporation.",
-        ko: "미즈호 은행 싱가포르 법인의 비즈니스 요구사항과 기존 시스템 아키텍처를 분석했습니다."
+        en: "Analyzed business requirements and existing system architecture to inform development of Mizuho Bank Singapore's next-generation platform.",
+        ko: "미즈호 은행 싱가포르 법인의 비즈니스 요구사항과 기존 시스템 아키텍처를 분석해 차세대 시스템 개발에 반영했습니다."
       },
       {
-        en: "Translated client requirements into design specifications for the next-generation system.",
-        ko: "고객 요구사항을 차세대 시스템 설계 명세로 구체화했습니다."
+        en: "Translated client requirements into design specifications and development tasks for the next-generation system.",
+        ko: "고객 요구사항을 차세대 시스템의 설계 명세와 개발 과업으로 구체화했습니다."
       },
       {
-        en: "Collaborating with cross-functional teams to build and deliver the next-generation banking system.",
-        ko: "차세대 뱅킹 시스템 구축을 위해 여러 팀과 협업하고 있습니다."
+        en: "Developing the next-generation banking system in collaboration with cross-functional engineering teams.",
+        ko: "여러 개발팀과 협업하며 차세대 뱅킹 시스템을 개발하고 있습니다."
       }
     ],
     logo: {
