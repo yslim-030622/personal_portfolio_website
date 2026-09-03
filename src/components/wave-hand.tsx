@@ -23,8 +23,7 @@ export function WaveHand({slideDelay, waveDelay}: {slideDelay: number; waveDelay
       className="wave-hand-wrap"
       style={{
         display: "inline-block",
-        marginLeft: "0.08em",
-        marginRight: "-0.08em",
+        marginLeft: "0.1em",
         overflow: "visible",
         whiteSpace: "nowrap",
       }}

@@ -115,11 +115,10 @@ html[lang="ko"] :where(h1, h2, h3, p, a, button, span, li) {
 }
 
 html[lang="ko"] .hero-headline {
-  max-width: 10.5em;
+  max-width: 100%;
   font-family: var(--font-pretendard), sans-serif;
-  font-size: 5.4rem;
   font-weight: 700;
-  line-height: 1.06;
+  line-height: 1.08;
   letter-spacing: -0.04em;
 }
 
@@ -143,8 +142,7 @@ html[lang="ko"] .font-display {
 
 @media (max-width: 1023px) {
   html[lang="ko"] .hero-headline {
-    max-width: none;
-    font-size: 3.3rem;
+    max-width: 100%;
     line-height: 1.1;
   }
 
@@ -163,7 +161,6 @@ html[lang="ko"] .font-display {
 
 @media (min-width: 768px) and (max-width: 1023px) {
   html[lang="ko"] .hero-headline {
-    font-size: 3.25rem;
     line-height: 1.08;
   }
 
@@ -1191,8 +1188,45 @@ html[data-theme="dark"] .liquid-card .bg-accent\/80 {
   will-change: opacity, transform;
 }
 
+.hero-copy {
+  container-type: inline-size;
+  container-name: hero-copy;
+}
+
+.hero-headline-line {
+  display: block;
+  max-width: 100%;
+  overflow: visible;
+  font-size: clamp(2.35rem, 8.8cqi + 0.55rem, 5.15rem);
+  line-height: 1.08;
+  text-align: left;
+  white-space: nowrap;
+}
+
+html[lang="ko"] .hero-headline-line {
+  font-size: clamp(2.05rem, 8.2cqi + 0.55rem, 4.05rem);
+}
+
+.hero-headline-line-2 {
+  margin-inline-start: 0.36em;
+  padding-inline-end: 0.32em;
+}
+
+@media (min-width: 1280px) {
+  .hero-headline-line-2 {
+    margin-inline-start: 0.52em;
+  }
+}
+
+@media (min-width: 1536px) {
+  .hero-headline-line-2 {
+    margin-inline-start: 0.64em;
+  }
+}
+
 .wave-hand-wrap {
   vertical-align: 0.02em;
+  padding-inline-end: 0.12em;
 }
 
 .wave-hand {
@@ -1258,7 +1292,13 @@ html[lang="ko"] .hero-name-accent {
 
 @media (min-width: 768px) {
   html[lang="ko"] .hero-name-accent {
-    font-size: 1.28em;
+    font-size: 1.12em;
+  }
+}
+
+@media (min-width: 1280px) {
+  html[lang="ko"] .hero-name-accent {
+    font-size: 1.18em;
   }
 }
 
@@ -1533,6 +1573,10 @@ html[data-theme="light"][lang="ko"] .hero-name-glow:hover {
 
   .word-slide {
     opacity: 1;
+    animation: none;
+  }
+
+  .wave-hand {
     animation: none;
   }
 

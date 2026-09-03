@@ -102,20 +102,20 @@ export function Hero({content, locale}: HeroProps) {
 
   return (
     <section
-      className="relative mx-auto grid w-full max-w-[1480px] min-h-[100svh] content-center items-center overflow-hidden overflow-x-hidden px-6 py-12 md:h-[100svh] md:grid-cols-[minmax(0,50vw)_minmax(0,50vw)] md:px-10 md:py-0 xl:px-20 2xl:px-28"
+      className="relative mx-auto grid w-full max-w-[1480px] min-h-[100svh] content-center items-center overflow-x-clip px-5 py-12 sm:px-6 md:h-[100svh] md:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)] md:gap-x-8 md:px-10 md:py-0 lg:gap-x-12 xl:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)] xl:gap-x-16 xl:px-20 2xl:gap-x-20 2xl:px-28"
     >
-      <div className="relative z-10 mx-auto w-full min-w-0 max-w-[540px] md:mx-0 md:max-w-none md:pr-10 xl:pr-14">
+      <div className="hero-copy relative z-10 mx-auto w-full min-w-0 max-w-[540px] md:mx-0 md:max-w-none">
         <h1
-          className="hero-headline mt-3 w-full max-w-[17ch] font-display font-normal leading-[1.02] tracking-normal text-fg md:mt-4 md:max-w-[18ch] md:leading-[0.98] lg:max-w-[18.5ch]"
+          className="hero-headline mt-3 w-full font-display font-normal leading-[1.08] tracking-normal text-fg md:mt-4 md:leading-[1.04]"
         >
-          <span className={`block text-left whitespace-nowrap ${isKorean ? "text-[clamp(2.8rem,5vw,4.8rem)]" : "text-[clamp(3.1rem,6vw,5.65rem)]"}`}>
+          <span className="hero-headline-line">
             <HeadlineWords
               before={content.headline.before.replace(/\n/g, "")}
               italic=""
               after=""
             />
           </span>
-          <span className={`block text-left whitespace-nowrap ml-[1em] ${isKorean ? "text-[clamp(2.8rem,5vw,4.8rem)] mt-3 md:mt-4" : "text-[clamp(3.1rem,6vw,5.65rem)]"}`}>
+          <span className={`hero-headline-line hero-headline-line-2 ${isKorean ? "mt-3 md:mt-4" : ""}`}>
             <HeadlineWords
               before=""
               italic={content.headline.italic}
@@ -126,7 +126,7 @@ export function Hero({content, locale}: HeroProps) {
         </h1>
 
         <p
-          className="hero-reveal hero-subline mt-6 hidden max-w-[42ch] font-display text-[1.34rem] font-normal leading-[1.58] text-fg/88 [hyphens:none] [overflow-wrap:break-word] md:mt-8 md:block xl:max-w-[44ch] xl:text-[1.42rem]"
+          className="hero-reveal hero-subline mt-6 hidden max-w-[36ch] font-display text-[1.34rem] font-normal leading-[1.58] text-fg/88 [hyphens:none] [overflow-wrap:break-word] md:mt-8 md:block lg:max-w-[42ch] xl:max-w-[44ch] xl:text-[1.42rem]"
           style={{animationDelay: "450ms"}}
         >
           {content.subline}
@@ -166,7 +166,7 @@ export function Hero({content, locale}: HeroProps) {
       </div>
 
       <figure
-        className="hero-photo-reveal hero-photo hero-photo-desktop pointer-events-none relative hidden h-[min(62svh,600px)] min-h-[360px] w-full md:mt-0 md:block"
+        className="hero-photo-reveal hero-photo hero-photo-desktop pointer-events-none relative isolate z-0 hidden min-w-0 w-full md:mt-0 md:block md:h-[min(48svh,420px)] md:min-h-[280px] lg:h-[min(56svh,520px)] lg:min-h-[320px] xl:h-[min(62svh,600px)] xl:min-h-[360px]"
         style={{animationDelay: "380ms"}}
       >
         <div className="hero-photo-frame relative h-full w-full overflow-hidden">
