@@ -273,8 +273,13 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
       {/* Right column */}
       <div className="project-card-body min-w-0 flex flex-col h-full md:justify-center">
         {logo ? (
-          <div className="mb-4 md:mb-5">
-            <Image alt={item.company + " logo"} src={logo} width={900} height={500} className="h-14 w-auto rounded-lg object-contain object-left md:h-16" />
+          <div
+            className="clearsplit-showcase overflow-hidden rounded-[16px] order-1 mb-4 mt-0 md:mb-6"
+            style={{"--preview-ratio": logo.width / logo.height, aspectRatio: `${logo.width} / ${logo.height}`} as React.CSSProperties}
+          >
+            <div className="clearsplit-showcase-stage relative bg-white">
+              <Image alt={item.company + " logo"} className="object-contain" fill sizes="(max-width: 768px) 84vw, 720px" src={logo.src} />
+            </div>
           </div>
         ) : null}
         {item.previewImages?.length ? (

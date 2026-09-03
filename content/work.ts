@@ -7,7 +7,7 @@ export const work: RawWorkEntry[] = [
     companyUrl: "https://www.lgcns.com/en",
     dates: {en: "Aug 2026–Present", ko: "2026년 8월–현재"},
     location: {en: "Seoul", ko: "서울"},
-    role: {en: "AX Engineer", ko: "AX Engineer"},
+    role: {en: "Full-time AX Engineer", ko: "AX Engineer"},
     paragraph: {
       en: "LG CNS is a Korean IT services company specializing in digital and AI transformation (DX/AX). As an AX Engineer, I work on a next-generation banking system project for Mizuho Bank's Singapore corporation, analyzing client requirements and existing systems to help design and build the new platform.",
       ko: "LG CNS는 디지털/AI 전환(DX/AX)에 특화된 국내 IT 서비스 기업입니다. AX Engineer로서 미즈호 은행 싱가포르 법인의 차세대 시스템 구축 프로젝트에 참여해, 고객 요구사항과 기존 시스템을 분석하고 이를 바탕으로 신규 시스템을 설계 및 구축하고 있습니다."
@@ -26,7 +26,11 @@ export const work: RawWorkEntry[] = [
         ko: "차세대 뱅킹 시스템 구축을 위해 여러 팀과 협업하고 있습니다."
       }
     ],
-    logo: "/lg-cns-logo.png"
+    logo: {
+      src: "/lg-cns-logo.png",
+      width: 900,
+      height: 500
+    }
   },
   {
     status: "filled",

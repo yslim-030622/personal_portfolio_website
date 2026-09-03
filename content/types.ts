@@ -38,7 +38,11 @@ export type RawWorkEntry =
       role: Bilingual;
       paragraph: BilingualParagraph;
       highlights?: BilingualParagraph[];
-      logo?: string;
+      logo?: {
+        src: string;
+        width: number;
+        height: number;
+      };
       photos?: {
         src: string;
         alt: Bilingual;
@@ -148,7 +152,11 @@ export type LocalizedWorkEntry =
       role: string;
       paragraph: string;
       highlights?: string[];
-      logo?: string;
+      logo?: {
+        src: string;
+        width: number;
+        height: number;
+      };
       photos?: {
         src: string;
         alt: string;
