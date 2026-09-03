@@ -123,6 +123,17 @@ export const work: RawWorkEntry[] = [
       en: "Collaboration project between LikeLion Madison Chapter and MoDoc AI, a health-tech startup. I built a LangGraph-based AI pipeline that turns child medical text content into short videos.",
       ko: "학교 산하 멋쟁이사자처럼 동아리와 헬스케어 스타트업 MoDoc AI 간의 산학협력 프로젝트입니다. 아이들 대상의 의료 콘텐츠를 숏폼 영상으로 변환을 자동화하고, 포스팅하는 파이프라인을 만들었습니다."
     },
+    photos: [
+      {
+        src: "/modoc_ai_pic.jpg",
+        alt: {
+          en: "LikeLion x MoDoc AI final presentation team photo",
+          ko: "멋쟁이사자처럼 x MoDoc AI 최종 발표 팀 사진"
+        },
+        width: 712,
+        height: 679
+      }
+    ],
     highlights: [
       {
         en: "Structured a database of medical blog posts as the content foundation for the pipeline.",
