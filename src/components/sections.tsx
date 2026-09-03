@@ -231,11 +231,6 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
                 {item.company}
               </h2>
             )}
-            {logo ? (
-              <div className="mt-2.5">
-                <Image alt={item.company + " logo"} src={logo} width={90} height={28} className="h-7 w-auto object-contain object-left opacity-90" />
-              </div>
-            ) : null}
             <p className="mt-2 font-body text-[0.88rem] leading-snug text-white/90 md:mt-3 md:text-[0.94rem] break-keep">
               {item.role}
             </p>
@@ -277,6 +272,11 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
 
       {/* Right column */}
       <div className="project-card-body min-w-0 flex flex-col h-full md:justify-center">
+        {logo ? (
+          <div className="mb-4 md:mb-5">
+            <Image alt={item.company + " logo"} src={logo} width={120} height={40} className="h-8 w-auto object-contain object-left opacity-90" />
+          </div>
+        ) : null}
         {item.previewImages?.length ? (
           <ProjectScreenshotPreview animateOnMount className="work-image-preview order-1 mb-4 mt-0 md:mb-6" imageFit="contain" images={item.previewImages} title={item.company} />
         ) : null}
