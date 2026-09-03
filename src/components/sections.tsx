@@ -250,7 +250,10 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
           {photos?.length ? (
             <div className="shrink-0 md:hidden">
               <figure className="overflow-hidden rounded-lg" key={photos[0].src}>
-                <div className="relative h-32 w-24">
+                <div
+                  className="relative w-24"
+                  style={{aspectRatio: `${photos[0].width} / ${photos[0].height}`}}
+                >
                   <Image alt={photos[0].alt} className="object-cover object-top" fill sizes="96px" src={photos[0].src} />
                 </div>
               </figure>
@@ -261,7 +264,10 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
           <div className="mt-6 hidden md:block">
             {photos.map((photo) => (
               <figure className="overflow-hidden rounded-lg shadow-md" key={photo.src}>
-                <div className="relative aspect-[3/4] w-full max-w-[180px]">
+                <div
+                  className="relative w-full max-w-[180px]"
+                  style={{aspectRatio: `${photo.width} / ${photo.height}`}}
+                >
                   <Image alt={photo.alt} className="object-cover object-top" fill sizes="180px" src={photo.src} />
                 </div>
               </figure>

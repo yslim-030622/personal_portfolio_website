@@ -26,6 +26,17 @@ export const work: RawWorkEntry[] = [
         ko: "여러 개발팀과 협업하며 차세대 뱅킹 시스템을 개발하고 있습니다."
       }
     ],
+    photos: [
+      {
+        src: "/namecard.jpg",
+        alt: {
+          en: "Yeongseok Lim's LG CNS business card",
+          ko: "임영석의 LG CNS 명함"
+        },
+        width: 1937,
+        height: 1066
+      }
+    ],
     logo: {
       src: "/lg-cns-logo.png",
       width: 900,
