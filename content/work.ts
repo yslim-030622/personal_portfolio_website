@@ -3,6 +3,33 @@ import type {RawWorkEntry} from "./types";
 export const work: RawWorkEntry[] = [
   {
     status: "filled",
+    company: "LG CNS",
+    companyUrl: "https://www.lgcns.com/en",
+    dates: {en: "Aug 2026–Present", ko: "2026년 8월–현재"},
+    location: {en: "Seoul", ko: "서울"},
+    role: {en: "AX Engineer", ko: "AX Engineer"},
+    paragraph: {
+      en: "LG CNS is a Korean IT services company specializing in digital and AI transformation (DX/AX). As an AX Engineer, I work on a next-generation banking system project for Mizuho Bank's Singapore corporation, analyzing client requirements and existing systems to help design and build the new platform.",
+      ko: "LG CNS는 디지털/AI 전환(DX/AX)에 특화된 국내 IT 서비스 기업입니다. AX Engineer로서 미즈호 은행 싱가포르 법인의 차세대 시스템 구축 프로젝트에 참여해, 고객 요구사항과 기존 시스템을 분석하고 이를 바탕으로 신규 시스템을 설계 및 구축하고 있습니다."
+    },
+    highlights: [
+      {
+        en: "Analyzed business requirements and existing system architecture for Mizuho Bank's Singapore corporation.",
+        ko: "미즈호 은행 싱가포르 법인의 비즈니스 요구사항과 기존 시스템 아키텍처를 분석했습니다."
+      },
+      {
+        en: "Translated client requirements into design specifications for the next-generation system.",
+        ko: "고객 요구사항을 차세대 시스템 설계 명세로 구체화했습니다."
+      },
+      {
+        en: "Collaborating with cross-functional teams to build and deliver the next-generation banking system.",
+        ko: "차세대 뱅킹 시스템 구축을 위해 여러 팀과 협업하고 있습니다."
+      }
+    ],
+    logo: "/lg-cns-logo.png"
+  },
+  {
+    status: "filled",
     company: "Fasoo, Inc.",
     companyUrl: "https://en.fasoo.ai/",
     dates: {en: "May–Aug 2025", ko: "2025년 5–8월"},
@@ -74,7 +101,7 @@ export const work: RawWorkEntry[] = [
     status: "filled",
     company: "MoDoc AI",
     companyUrl: "https://www.modoc-ai.com/",
-    dates: {en: "May 2026–Present", ko: "2026년 5월–현재"},
+    dates: {en: "May–Jul 2026", ko: "2026년 5–7월"},
     location: {en: "Boston remote", ko: "보스턴 원격"},
     role: {en: "AI Automation Developer", ko: "AI Automation Developer"},
     paragraph: {
