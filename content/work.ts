@@ -28,13 +28,13 @@ export const work: RawWorkEntry[] = [
     ],
     photos: [
       {
-        src: "/namecard.jpg",
+        src: "/lgcns-group-photo.jpg",
         alt: {
-          en: "Yeongseok Lim's LG CNS business card",
-          ko: "임영석의 LG CNS 명함"
+          en: "LG CNS team group photo",
+          ko: "LG CNS 팀 단체사진"
         },
-        width: 1937,
-        height: 1066
+        width: 8160,
+        height: 4592
       }
     ],
     logo: {
