@@ -39,7 +39,7 @@ function Section({eyebrow, children, className, animateContent = true}: SectionP
     <section
       className={`mx-auto max-w-[1100px] pl-3 pr-5 py-10 md:pl-5 md:pr-8 md:py-14 ${className ?? ""}`}
     >
-      <span className="sr-only">{eyebrow}</span>
+      <span className="section-eyebrow">{eyebrow}</span>
 
       {animateContent ? (
         <motion.div
@@ -231,7 +231,7 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
                 {item.company}
               </h2>
             )}
-            <p className="mt-2 font-body text-[0.88rem] leading-snug text-white/90 md:mt-3 md:text-[0.94rem] break-keep">
+            <p className="card-role-badge mt-2 font-body leading-snug break-keep md:mt-3">
               {item.role}
             </p>
             <p className="mt-1.5 font-body text-[0.8rem] text-white/65 md:text-[0.86rem] break-keep">
@@ -249,12 +249,12 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
           </div>
           {photos?.length ? (
             <div className="shrink-0 md:hidden">
-              <figure className="w-fit overflow-hidden rounded-lg" key={photos[0].src}>
+              <figure className="w-[clamp(6.5rem,32vw,9.5rem)] overflow-hidden rounded-lg" key={photos[0].src}>
                 <div
-                  className="relative w-24 bg-white"
+                  className="relative w-full bg-white"
                   style={{aspectRatio: `${photos[0].width} / ${photos[0].height}`}}
                 >
-                  <Image alt={photos[0].alt} className="object-cover object-top" fill sizes="96px" src={photos[0].src} />
+                  <Image alt={photos[0].alt} className="object-contain" fill sizes="(max-width: 767px) 32vw, 152px" src={photos[0].src} />
                 </div>
               </figure>
             </div>
@@ -263,12 +263,12 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
         {photos?.length ? (
           <div className="mt-6 hidden md:block">
             {photos.map((photo) => (
-              <figure className="w-fit overflow-hidden rounded-lg shadow-[0_2px_10px_rgba(0,0,0,0.28)]" key={photo.src}>
+              <figure className="w-full overflow-hidden rounded-lg shadow-[0_2px_10px_rgba(0,0,0,0.28)]" key={photo.src}>
                 <div
-                  className="relative w-[180px] bg-white"
+                  className="relative w-full bg-white"
                   style={{aspectRatio: `${photo.width} / ${photo.height}`}}
                 >
-                  <Image alt={photo.alt} className="object-cover object-top" fill sizes="180px" src={photo.src} />
+                  <Image alt={photo.alt} className="object-contain" fill sizes="260px" src={photo.src} />
                 </div>
               </figure>
             ))}
