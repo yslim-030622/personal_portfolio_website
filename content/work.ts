@@ -117,7 +117,7 @@ export const work: RawWorkEntry[] = [
     company: "MoDoc AI",
     companyUrl: "https://www.modoc-ai.com/",
     dates: {en: "May–Jul 2026", ko: "2026년 5–7월"},
-    location: {en: "Boston remote", ko: "보스턴 원격"},
+    location: {en: "Boston", ko: "보스턴"},
     role: {en: "Internship", ko: "Internship"},
     paragraph: {
       en: "Collaboration project between LikeLion Madison Chapter and MoDoc AI, a health-tech startup. I built a LangGraph-based AI pipeline that turns child medical text content into short videos.",

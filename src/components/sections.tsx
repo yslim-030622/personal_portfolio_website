@@ -231,7 +231,7 @@ function WorkItem({item, colorValue}: {item: FilledWorkEntry; colorValue: string
                 {item.company}
               </h2>
             )}
-            <p className="card-role-badge mt-2 font-body leading-snug break-keep md:mt-3">
+            <p className="mt-2 font-body text-[0.88rem] leading-snug text-white/90 md:mt-3 md:text-[0.94rem] break-keep">
               {item.role}
             </p>
             <p className="mt-1.5 font-body text-[0.8rem] text-white/65 md:text-[0.86rem] break-keep">

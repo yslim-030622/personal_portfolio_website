@@ -558,22 +558,6 @@ article.card-colored:hover .card-title-glass::after {
   width: 4.75rem;
 }
 
-/* Role / position badge (work cards) — promotes the role from plain text to
-   a small pill so it reads as a tag rather than body copy. */
-.card-role-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.3rem 0.75rem;
-  border: 1px solid rgb(255 255 255 / 0.22);
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.14);
-  color: rgb(255 255 255 / 0.94);
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  white-space: normal;
-}
-
 .project-card {
 }
 
