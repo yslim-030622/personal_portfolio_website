@@ -49,7 +49,7 @@ export const work: RawWorkEntry[] = [
     companyUrl: "https://en.fasoo.ai/",
     dates: {en: "May–Aug 2025", ko: "2025년 5–8월"},
     location: {en: "Seoul", ko: "서울"},
-    role: {en: "Software Engineer Intern", ko: "Software Engineer Intern"},
+    role: {en: "Internship", ko: "Internship"},
     paragraph: {
       en: "Fasoo is a Korean software company specializing in document and data security. For about 10 weeks, I built an anomaly detection pipeline for a static analyzer on the development team.",
       ko: "파수는 문서, 데이터 보안에 특화되어 있는 소프트웨어 기업입니다. 저는 개발 1팀에서 약 10주 동안 정적 분석기의 이상 탐지 기준 수립 및 파이프라인 구축을 담당하였습니다."
@@ -118,7 +118,7 @@ export const work: RawWorkEntry[] = [
     companyUrl: "https://www.modoc-ai.com/",
     dates: {en: "May–Jul 2026", ko: "2026년 5–7월"},
     location: {en: "Boston remote", ko: "보스턴 원격"},
-    role: {en: "AI Automation Developer", ko: "AI Automation Developer"},
+    role: {en: "Internship", ko: "Internship"},
     paragraph: {
       en: "Collaboration project between LikeLion Madison Chapter and MoDoc AI, a health-tech startup. I built a LangGraph-based AI pipeline that turns child medical text content into short videos.",
       ko: "학교 산하 멋쟁이사자처럼 동아리와 헬스케어 스타트업 MoDoc AI 간의 산학협력 프로젝트입니다. 아이들 대상의 의료 콘텐츠를 숏폼 영상으로 변환을 자동화하고, 포스팅하는 파이프라인을 만들었습니다."
