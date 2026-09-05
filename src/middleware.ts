@@ -7,6 +7,15 @@ const intlMiddleware = createMiddleware(routing);
 export default function middleware(request: NextRequest) {
   const {pathname} = request.nextUrl;
 
+  // Korean locale stays in routing/content, but is hidden from visitors
+  // until the language switch is re-enabled. Flip SHOW_LOCALE_SWITCH in
+  // navigation.tsx back to true and remove this redirect together.
+  if (pathname === "/ko" || pathname.startsWith("/ko/")) {
+    const url = request.nextUrl.clone();
+    url.pathname = pathname.replace(/^\/ko/, "") || "/";
+    return NextResponse.redirect(url);
+  }
+
   if (pathname === "/") {
     const url = request.nextUrl.clone();
     url.pathname = "/en";

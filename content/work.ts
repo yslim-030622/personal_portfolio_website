@@ -82,7 +82,9 @@ export const work: RawWorkEntry[] = [
     links: [
       {
         label: {en: "Link to Portfolio", ko: "포트폴리오 바로가기"},
-        href: {en: "/docs/fasoo-internship-en.pdf", ko: "/docs/fasoo-internship-ko.pdf"},
+        // English PDF (`fasoo-internship-en.pdf` + en-preview) is kept on disk;
+        // the visible site temporarily uses the Korean deck for both locales.
+        href: {en: "/docs/fasoo-internship-ko.pdf", ko: "/docs/fasoo-internship-ko.pdf"},
         external: true,
         ariaLabel: {
           en: "Preview Fasoo internship presentation PDF",
@@ -91,13 +93,13 @@ export const work: RawWorkEntry[] = [
         pdfLandscape: {en: true, ko: true},
         previewImage: {
           en: {
-            src: "/docs/previews/fasoo-internship-en-preview.png",
+            src: "/docs/previews/fasoo-internship-ko-preview.png",
             alt: {
-              en: "Fasoo internship English presentation first page preview",
-              ko: "Fasoo 인턴 발표 자료 영어 첫 페이지 미리보기"
+              en: "Fasoo internship Korean presentation first page preview",
+              ko: "Fasoo 인턴 발표 자료 한국어 첫 페이지 미리보기"
             },
-            width: 1632,
-            height: 925
+            width: 2880,
+            height: 1620
           },
           ko: {
             src: "/docs/previews/fasoo-internship-ko-preview.png",

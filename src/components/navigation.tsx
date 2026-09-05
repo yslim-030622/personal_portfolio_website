@@ -3,6 +3,11 @@
 import {useLocale, useTranslations} from "next-intl";
 import {useEffect, useState, type ReactNode} from "react";
 
+// Korean is fully wired up (routing, content, messages) but temporarily
+// hidden from the UI while the site stays English-only. Flip this back to
+// `true` to re-expose the language switch — no other code needs to change.
+const SHOW_LOCALE_SWITCH = false;
+
 function SegmentedSwitch<T extends string>({
   options,
   value,
@@ -90,18 +95,20 @@ export function Navigation({
           >
             {currentTitle ?? " "}
           </p>
-          <div className="flex items-center gap-3">
-            <SegmentedSwitch
-              options={[
-                {label: "ENG", value: "en", ariaLabel: t("switchToEnglish")},
-                {label: "KOR", value: "ko", ariaLabel: t("switchToKorean")},
-              ]}
-              value={locale as "en" | "ko"}
-              onChange={(val) => {
-                window.location.href = val === "en" ? "/en" : "/ko";
-              }}
-            />
-          </div>
+          {SHOW_LOCALE_SWITCH ? (
+            <div className="flex items-center gap-3">
+              <SegmentedSwitch
+                options={[
+                  {label: "ENG", value: "en", ariaLabel: t("switchToEnglish")},
+                  {label: "KOR", value: "ko", ariaLabel: t("switchToKorean")},
+                ]}
+                value={locale as "en" | "ko"}
+                onChange={(val) => {
+                  window.location.href = val === "en" ? "/en" : "/ko";
+                }}
+              />
+            </div>
+          ) : null}
         </nav>
       </header>
 
