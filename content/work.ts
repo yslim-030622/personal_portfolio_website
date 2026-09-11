@@ -9,8 +9,8 @@ export const work: RawWorkEntry[] = [
     location: {en: "Seoul", ko: "서울"},
     role: {en: "Full-time AX Engineer", ko: "AX Engineer"},
     paragraph: {
-      en: "LG CNS is a Korean IT services company specializing in digital and AI transformation (DX/AX). As an AX Engineer, I'm developing a next-generation banking system for Mizuho Bank's Singapore corporation, analyzing client requirements and existing systems to design and build the new platform.",
-      ko: "LG CNS는 디지털/AI 전환(DX/AX)에 특화된 국내 IT 서비스 기업입니다. AX Engineer로서 미즈호 은행 싱가포르 법인의 차세대 시스템을 개발하고 있으며, 고객 요구사항과 기존 시스템을 분석하고 이를 바탕으로 신규 시스템을 설계 및 개발하고 있습니다."
+      en: "As an AX Engineer at LG CNS, I am working on the modernization of a Singapore-based bank's international payments system. I focus on Fit-Gap analysis, payment flow design, SWIFT, and functional requirements for development.",
+      ko: "LG CNS의 AX Engineer로서 싱가포르 소재 은행의 국제 결제 시스템 현대화 프로젝트를 수행하고 있습니다. Fit-Gap 분석, 결제 흐름 설계, SWIFT 및 개발을 위한 기능 요구사항 정의에 집중하고 있습니다."
     },
     highlights: [
       {

@@ -62,10 +62,10 @@ export const hero = {
       ariaLabel: {en: "LinkedIn profile", ko: "LinkedIn 프로필"}
     },
     {
-      label: {en: "Resume PDF", ko: "Resume PDF"},
-      href: "/Yeongseok_Lim_resume.pdf",
+      label: {en: "Resume.pdf", ko: "포트폴리오.pdf"},
+      href: {en: "/Resume.pdf", ko: "/Yeongseok_Lim_portfolio_ko.pdf"},
       external: true,
-      ariaLabel: {en: "Resume PDF", ko: "이력서 PDF"}
+      ariaLabel: {en: "Resume.pdf", ko: "포트폴리오 PDF"}
     }
   ]
 } satisfies RawPortfolioContent["hero"];
