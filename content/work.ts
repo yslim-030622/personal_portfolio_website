@@ -7,7 +7,7 @@ export const work: RawWorkEntry[] = [
     companyUrl: "https://www.lgcns.com/en",
     dates: {en: "Aug 2026–Present", ko: "2026년 8월–현재"},
     location: {en: "Seoul", ko: "서울"},
-    role: {en: "Full-time AX Engineer", ko: "AX Engineer"},
+    role: {en: "Financial Software Engineer", ko: "Financial Software Engineer"},
     paragraph: {
       en: "As an AX Engineer at LG CNS, I am working on the modernization of a Singapore-based bank's international payments system. I focus on Fit-Gap analysis, payment flow design, SWIFT, and functional requirements for development.",
       ko: "LG CNS의 AX Engineer로서 싱가포르 소재 은행의 국제 결제 시스템 현대화 프로젝트를 수행하고 있습니다. Fit-Gap 분석, 결제 흐름 설계, SWIFT 및 개발을 위한 기능 요구사항 정의에 집중하고 있습니다."
@@ -38,9 +38,9 @@ export const work: RawWorkEntry[] = [
       }
     ],
     logo: {
-      src: "/lg-cns-logo.png",
-      width: 900,
-      height: 500
+      src: "/namecard.jpg",
+      width: 2503,
+      height: 1345
     }
   },
   {
