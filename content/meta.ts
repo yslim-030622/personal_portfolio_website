@@ -26,6 +26,6 @@ export const seo = {
     location: "Seoul, South Korea",
     githubUrl: "https://github.com/yslim-030622",
     linkedInUrl: "https://www.linkedin.com/in/yeongseok-lim",
-    resumeUrl: "/Resume.pdf"
+    resumeUrl: "/Yeongseok_Lim_root_resume.pdf"
   }
 } satisfies RawPortfolioContent["seo"];

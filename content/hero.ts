@@ -63,7 +63,7 @@ export const hero = {
     },
     {
       label: {en: "Resume.pdf", ko: "포트폴리오.pdf"},
-      href: {en: "/Resume.pdf", ko: "/Yeongseok_Lim_portfolio_ko.pdf"},
+      href: {en: "/Yeongseok_Lim_root_resume.pdf", ko: "/Yeongseok_Lim_portfolio_ko.pdf"},
       external: true,
       ariaLabel: {en: "Resume.pdf", ko: "포트폴리오 PDF"}
     }

@@ -9,7 +9,7 @@ export const work: RawWorkEntry[] = [
     location: {en: "Seoul", ko: "서울"},
     role: {en: "Financial Software Engineer", ko: "Financial Software Engineer"},
     paragraph: {
-      en: "As a software engineer, I am working on the modernization of a Singapore-based bank's international payments system. I focus on Fit-Gap analysis, payment flow design, SWIFT, and functional requirements for development.",
+      en: "As a financial software engineer at LG CNS, I'm working on a core banking modernization project for a Singapore-based bank. I focus on fit-gap analysis, cross-border and internal payment flows, SWIFT integration, and functional requirements for the new payments platform.",
       ko: "LG CNS의 AX Engineer로서 싱가포르 소재 은행의 국제 결제 시스템 현대화 프로젝트를 수행하고 있습니다. Fit-Gap 분석, 결제 흐름 설계, SWIFT 및 개발을 위한 기능 요구사항 정의에 집중하고 있습니다."
     },
     highlights: [
